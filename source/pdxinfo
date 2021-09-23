@@ -1,0 +1,6 @@
+name=Playnote
+author=James Daniel
+description=Flipnote Studio animation player for the Playdate
+bundleID=com.jaames.playnote
+version=1.0
+buildNumber=1
