@@ -5,6 +5,8 @@ import 'CoreLibs/graphics'
 -- Format reference:
 -- https://github.com/Flipnote-Collective/flipnote-studio-docs/wiki/PPM-format
 
+PpmParser = {}
+
 class("PpmParser").extends()
 
 local gfx <const> = playdate.graphics
@@ -38,11 +40,11 @@ function PpmParser:parseHeader()
   self.file:seek(0)
   local header = self.file:read(16)
   self.magic,
-  self.anim_size,
-  self.sound_size,
-  self.frame_count,
+  self.animSize,
+  self.soundSize,
+  self.frameCount,
   self.version = string.unpack('<c4 I4 I4 H H', header)
-  self.frame_count = self.frame_count + 1
+  self.frameCount = self.frameCount + 1
   assert(self.magic == 'PARA', 'Flipnote Studio PPM file magic not found')
 end
 
@@ -50,26 +52,26 @@ function PpmParser:parseMeta()
   self.file:seek(0x10)
   local meta = self.file:read(144)
   local lock, 
-    thumb_index, 
-    root_author_name, 
-    parent_author_name, 
-    current_author_name,
-    parent_author_id,
-    current_author_id,
-    parent_filename,
-    current_filename,
-    root_author_id,
-    root_fragment,
+    thumbIndex, 
+    rootAuthorName, 
+    parentAuthorName, 
+    currentAuthorName,
+    parentAuthorId,
+    currentAuthorId,
+    parentFilename,
+    currentFilename,
+    rootAuthorId,
+    rootFragment,
     timestamp,
     unused = string.unpack('<H H c22 c22 c22 c8 c8 c18 c18 c8 c8 I4 H', meta)
   self.lock = lock == 1
-  self.thumb_index = thumb_index
-  self.root_author_id = unpack_fsid(root_author_id)
-  self.root_author_name = unpack_username(root_author_name)
-  self.parent_author_id = unpack_fsid(parent_author_id)
-  self.parent_author_name = unpack_username(parent_author_name)
-  self.current_author_id = unpack_fsid(current_author_id)
-  self.current_author_name = unpack_username(current_author_name)
+  self.thumb_index = thumbIndex
+  self.root_author_id = unpack_fsid(rootAuthorId)
+  self.root_author_name = unpack_username(rootAuthorName)
+  self.parent_author_id = unpack_fsid(parentAuthorId)
+  self.parent_author_name = unpack_username(parentAuthorName)
+  self.current_author_id = unpack_fsid(currentAuthorId)
+  self.current_author_name = unpack_username(currentAuthorName)
   self.timestamp = playdate.timeFromEpoch(timestamp, 0) -- playdate conveniently uses the same timestamp epoch as nintendo!
 end
 
@@ -77,24 +79,24 @@ function PpmParser:parseFrameTable()
   self.file:seek(0x06A0)
   -- unpack frame table header
   local header = self.file:read(6)
-  local table_size, unknown, anim_flags = string.unpack('<H H H', header)
-  local frame_offset_base <const> = 0x06A8 + self.frame_count * 4
-  local num_frames <const> = self.frame_count
-  assert(table_size / 4 == num_frames, 'Frame table size does not match frame count')
+  local tableSize, unknown, anim_flags = string.unpack('<H H H', header)
+  local frameOffsetBase <const> = 0x06A8 + self.frameCount * 4
+  local numFrames <const> = self.frameCount
+  assert(tableSize / 4 == numFrames, 'Frame table size does not match frame count')
   -- unpack frame offset table
   self.file:seek(0x06A8)
-  local frame_offsets = table.create(num_frames, 0)
+  local frameOffsets = table.create(numFrames, 0)
   local buf
-  for i = 1, num_frames, 1 do
+  for i = 1, numFrames, 1 do
     buf = self.file:read(4)
-    frame_offsets[i] = frame_offset_base + string.unpack('<I', buf)
+    frameOffsets[i] = frameOffsetBase + string.unpack('<I', buf)
   end
-  self.frame_offsets = frame_offsets
+  self.frameOffsets = frameOffsets
 end
 
 function PpmParser:parseFrame(frame_index)
-  assert(frame_index > 0 and frame_index <= self.frame_count)
-  local offset = self.frame_offsets[frame_index]
+  assert(frame_index > 0 and frame_index <= self.frameCount)
+  local offset = self.frameOffsets[frame_index]
   local f <const> = self.file
   f:seek(offset)
   local b = f:read(1)

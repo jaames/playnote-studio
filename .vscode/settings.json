@@ -1,0 +1,6 @@
+{
+  "Lua.diagnostics.globals": ["playdate", "import"],
+  "Lua.workspace.library": [
+    "/Users/james1/Developer/PlaydateSDK"
+  ]
+}
