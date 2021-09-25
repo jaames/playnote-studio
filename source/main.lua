@@ -2,25 +2,25 @@
 -- import 'CoreLibs/graphics'
 import 'CoreLibs/frameTimer'
 
-import './PpmParser'
-
 local gfx <const> = playdate.graphics
 
 gfx.setBackgroundColor(gfx.kColorWhite)
 gfx.clear()
 
-local ppm = PpmParser("ppm/samplememo_02.ppm")
+local str = playdate.testFunction("world")
 
-local i = 1
+print(str)
+
+playdate.stop()
 
 function playdate.update()
 
-  if i <= ppm.frameCount then
-    ppm:drawFrame(i, 32, 24)
-    i = i + 1
-  else
-    i = 1
-  end
+  -- if i <= ppm.frameCount then
+  --   ppm:drawFrame(i, 32, 24)
+  --   i = i + 1
+  -- else
+  --   i = 1
+  -- end
 
-  if playdate.buttonIsPressed(playdate.kButtonA) then i = 1 end
+  -- if playdate.buttonIsPressed(playdate.kButtonA) then i = 1 end
 end
