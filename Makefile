@@ -1,8 +1,9 @@
 HEAP_SIZE      = 8388208
 STACK_SIZE     = 61800
 
-PRODUCT = Playnote.pdx
+PRODUCT = HelloWorld.pdx
 
+# Locate the SDK
 SDK = $(shell egrep '^\s*SDKRoot' ~/.Playdate/config | head -n 1 | cut -c9-)
 
 ######
@@ -20,10 +21,11 @@ SRC = \
 	src/ppm_video.c \
 	src/ppm_audio.c \
 
-ASRC = setup.s
-
 # List all user directories here
-UINCDIR =
+UINCDIR = src
+
+# List user asm files
+UASRC = 
 
 # List all user C define here, like -D_DEBUG=1
 UDEFS = 
@@ -35,6 +37,7 @@ UADEFS =
 ULIBDIR =
 
 # List all user libraries here
-ULIBS = 
+ULIBS =
 
 include $(SDK)/C_API/buildsupport/common.mk
+
