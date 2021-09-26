@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include "pd_api.h"
 
-void registerExt(PlaydateAPI* playdate);
+#include "ppm.h"
+#include "ppm_video.h"
+
+void registerExt(PlaydateAPI *playdate);
 
 #endif /* _d_glue_h */

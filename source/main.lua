@@ -7,9 +7,18 @@ local gfx <const> = playdate.graphics
 gfx.setBackgroundColor(gfx.kColorWhite)
 gfx.clear()
 
-local str = playdate.testFunction("world")
+local ppm = PpmParser.new("./ppm/samplememo_01.ppm")
 
-print(str)
+local magic = ppm:getMagic();
+
+local numFrames = ppm:getNumFrames();
+
+print(ppm, numFrames, magic);
+
+ppm:decodeFrame(1);
+
+print(ppm);
+
 
 playdate.stop()
 

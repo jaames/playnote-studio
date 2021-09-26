@@ -15,7 +15,10 @@ VPATH += src
 # List C source files here
 SRC = \
 	src/main.c \
-	src/luaglue.c
+	src/luaglue.c \
+	src/ppm.c \
+	src/ppm_video.c \
+	src/ppm_audio.c \
 
 ASRC = setup.s
 
