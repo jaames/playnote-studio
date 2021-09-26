@@ -1,35 +1,38 @@
 -- import 'CoreLibs/sprites'
--- import 'CoreLibs/graphics'
+import 'CoreLibs/graphics'
 import 'CoreLibs/frameTimer'
 
 local gfx <const> = playdate.graphics
 
+local ppm = PpmParser.new("./ppm/fdd.ppm")
+
+local numFrames = ppm:getNumFrames()
+
+print(ppm, numFrames)
+
+local layer = gfx.image.new(256, 192)
+
 gfx.setBackgroundColor(gfx.kColorWhite)
 gfx.clear()
 
-local ppm = PpmParser.new("./ppm/samplememo_01.ppm")
+-- ppm:decodeFrameToBitmap(1, layer)
 
-local magic = ppm:getMagic();
+-- layer:draw(10, 10)
 
-local numFrames = ppm:getNumFrames();
+-- playdate.stop()
 
-print(ppm, numFrames, magic);
-
-ppm:decodeFrame(1);
-
-print(ppm);
-
-
-playdate.stop()
+local i = 1;
 
 function playdate.update()
 
-  -- if i <= ppm.frameCount then
-  --   ppm:drawFrame(i, 32, 24)
-  --   i = i + 1
-  -- else
-  --   i = 1
-  -- end
+  if i <= numFrames then
+    ppm:decodeFrameToBitmap(i, layer)
+    gfx.clear()
+    layer:draw(72, 24)
+    i = i + 1
+  else
+    i = 1
+  end
 
   -- if playdate.buttonIsPressed(playdate.kButtonA) then i = 1 end
 end

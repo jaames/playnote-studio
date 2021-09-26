@@ -85,12 +85,69 @@ static int ppm_decodeFrame(lua_State *L)
   return 0;
 }
 
+static int ppm_decodeFrameToBitmap(lua_State *L)
+{
+	ppm_ctx_t *ctx = getPpmCtx(1);
+	int frame = pd->lua->getArgInt(2);
+	
+	LCDBitmap* bitmap = pd->lua->getBitmap(3);
+
+	int width = 0;
+	int height = 0;
+	int rowBytes = 0;
+	int hasMask = 0;
+	u8* data;
+	
+	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &hasMask, &data);
+
+	// TODO: better error message
+	if (width != SCREEN_WIDTH || height != SCREEN_HEIGHT || hasMask != 1)
+	{
+		pd->system->logToConsole("Error with layer bitmap");
+		return 0;
+	}
+
+	// bitmap data is comprised of two maps for each channel, one after the other
+	int mapSize = (height * rowBytes);
+	u8* color = data; // 0 = black, 1 = white
+	u8* alpha = data + mapSize; // 0 = transparent, 1 = opaque
+
+	// clear color map
+	memset(color, 0x00, mapSize);
+	// fill alpha map - so all pixels are opaque
+	memset(alpha, 0xFF, mapSize);
+
+	ppmVideoDecodeFrame(ctx, (u16)frame - 1);
+
+	u8* layerA = ctx->layers[0];
+	u8* layerB = ctx->layers[1];
+
+	int srcOffset = 0;
+	int dstOffset = 0;
+	u8 chunk = 0;
+
+	while(dstOffset < mapSize)
+	{
+		chunk = 0xFF;
+		for (int shift = 0; shift < 8; shift++)
+		{
+			if (layerA[srcOffset] == 1 || layerB[srcOffset] == 1)
+				chunk ^= (0x80 >> shift);
+			srcOffset++;
+		}
+		color[dstOffset++] = chunk;
+	}
+
+	return 0;
+}
+
 static const lua_reg libPpm[] =
 {
-	{ "__gc",         ppm_gc },
-	{ "new",          ppm_new },
-	{ "getMagic",     ppm_getMagic },
-	{ "getNumFrames", ppm_getNumFrames },
-	{ "decodeFrame",  ppm_decodeFrame },
+	{ "__gc",                ppm_gc },
+	{ "new",                 ppm_new },
+	{ "getMagic",            ppm_getMagic },
+	{ "getNumFrames",        ppm_getNumFrames },
+	{ "decodeFrame",         ppm_decodeFrame },
+	{ "decodeFrameToBitmap", ppm_decodeFrameToBitmap },
 	{ NULL,       NULL }
 };
