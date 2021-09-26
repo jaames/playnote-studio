@@ -1,6 +1,6 @@
-#include "luaglue.h"
-
 #include "pd_api.h"
+
+#include "luaglue.h"
 
 #include "ppm.h"
 #include "ppm_video.h"
@@ -19,6 +19,7 @@ void registerExt(PlaydateAPI *playdate)
 	// expose PpmParser class to lua runtime
 	if (!pd->lua->registerClass("PpmParser", libPpm, NULL, 0, &err))
 		pd->system->logToConsole("%s:%i: registerClass failed, %s", __FILE__, __LINE__, err);
+
 }
 
 static ppm_ctx_t *getPpmCtx(int n) { return pd->lua->getArgObject(n, "PpmParser", NULL); }
@@ -42,7 +43,9 @@ static int ppm_new(lua_State *L)
 
 	int err = ppmInit(ctx, buf, fsize);
 
-	pd->system->logToConsole("%d", err);
+	pd->system->logToConsole("err: %d", err);
+
+	pd->system->logToConsole("size: %d", ctx->sndHdr.bgmLength);
 
 	free(buf);
 	pd->file->close(f);
@@ -67,6 +70,15 @@ static int ppm_getMagic(lua_State *L)
   return 1;
 }
 
+// get the flipnote framerate (in frames per second) as a float
+static int ppm_getFps(lua_State *L)
+{
+	ppm_ctx_t *ctx = getPpmCtx(1);
+	float rate = ctx->frameRate;
+	pd->lua->pushFloat(rate);
+  return 1;
+}
+
 // get the number of flipnote frames
 static int ppm_getNumFrames(lua_State *L)
 {
@@ -80,15 +92,17 @@ static int ppm_getNumFrames(lua_State *L)
 static int ppm_decodeFrame(lua_State *L)
 {
 	ppm_ctx_t *ctx = getPpmCtx(1);
-	int frame = pd->lua->getArgInt(2);
-	ppmVideoDecodeFrame(ctx, (u16)frame - 1);
+	int frame = pd->lua->getArgInt(2) - 1;
+	ppmVideoDecodeFrame(ctx, (u16)frame);
   return 0;
 }
 
+// decode a frame at a given index
+// frame index begins at 1 - lua-style
 static int ppm_decodeFrameToBitmap(lua_State *L)
 {
 	ppm_ctx_t *ctx = getPpmCtx(1);
-	int frame = pd->lua->getArgInt(2);
+	int frame = pd->lua->getArgInt(2) - 1;
 	
 	LCDBitmap* bitmap = pd->lua->getBitmap(3);
 
@@ -109,28 +123,29 @@ static int ppm_decodeFrameToBitmap(lua_State *L)
 
 	// bitmap data is comprised of two maps for each channel, one after the other
 	int mapSize = (height * rowBytes);
-	u8* color = data; // 0 = black, 1 = white
-	u8* alpha = data + mapSize; // 0 = transparent, 1 = opaque
+	u8* color = data; // each bit is 0 for black, 1 for white
+	u8* alpha = data + mapSize; // each bit is 0 for transparent, 1 for opaque
 
 	// clear color map
 	memset(color, 0x00, mapSize);
 	// fill alpha map - so all pixels are opaque
 	memset(alpha, 0xFF, mapSize);
 
-	ppmVideoDecodeFrame(ctx, (u16)frame - 1);
+	ppmVideoDecodeFrame(ctx, (u16)frame);
 
 	u8* layerA = ctx->layers[0];
 	u8* layerB = ctx->layers[1];
-
+	
+	// pack layers into 1-bit pixel map
 	int srcOffset = 0;
-	int dstOffset = 0;
 	u8 chunk = 0;
-
-	while(dstOffset < mapSize)
+	int dstOffset = 0;
+	while (dstOffset < mapSize)
 	{
-		chunk = 0xFF;
+		chunk = 0xFF; // all bits start out white
 		for (int shift = 0; shift < 8; shift++)
 		{
+			// set a bit to black if it corresponds to a black pixel
 			if (layerA[srcOffset] == 1 || layerB[srcOffset] == 1)
 				chunk ^= (0x80 >> shift);
 			srcOffset++;
@@ -147,7 +162,8 @@ static const lua_reg libPpm[] =
 	{ "new",                 ppm_new },
 	{ "getMagic",            ppm_getMagic },
 	{ "getNumFrames",        ppm_getNumFrames },
+	{ "getFps",              ppm_getFps },
 	{ "decodeFrame",         ppm_decodeFrame },
 	{ "decodeFrameToBitmap", ppm_decodeFrameToBitmap },
-	{ NULL,       NULL }
+	{ NULL,                  NULL }
 };

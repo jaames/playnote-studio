@@ -54,9 +54,12 @@ int ppmInit(ppm_ctx_t *ctx, u8 *ppm, int len)
 	ctx->audioFrames = malloc(ctx->hdr.numFrames);
 	memcpy(ctx->audioFrames, ppm, ctx->hdr.numFrames);
 
-	// TODO: FIXME
-	// ppm = (u8 *)ROUND_UP_4((int)ppm);
-	
+	// TODO: fixme
+	// ppm = ROUND_UP_4((int)ppm);
+	// tmp hack:
+	if ((int)ppm % 4 != 0)
+		ppm = (int)ppm + (4 - ((int)ppm % 4));
+
 	if (ppm - start + sizeof(ppm_sound_header_t) >= len)
 	{
 		free(ctx->videoOffsets);
