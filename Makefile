@@ -1,7 +1,7 @@
 HEAP_SIZE      = 8388208
 STACK_SIZE     = 61800
 
-PRODUCT = HelloWorld.pdx
+PRODUCT = Playnote.pdx
 
 # Locate the SDK
 SDK = $(shell egrep '^\s*SDKRoot' ~/.Playdate/config | head -n 1 | cut -c9-)
@@ -16,10 +16,11 @@ VPATH += src
 # List C source files here
 SRC = \
 	src/main.c \
+	src/pd.c \
 	src/luaglue.c \
-	src/ppm.c \
 	src/ppm_video.c \
-	src/ppm_audio.c \
+	src/ppm.c
+# src/ppm_audio.c
 
 # List all user directories here
 UINCDIR = src

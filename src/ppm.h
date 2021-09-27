@@ -106,6 +106,6 @@ typedef struct ppm_ctx_t
 
 #pragma pack(pop)
 
-int  ppmInit(ppm_ctx_t *ctx, u8 *ppm, int len);
+int ppmInit(ppm_ctx_t *ctx, u8 *ppm, int len);
 void ppmGetThumbnail(ppm_ctx_t *ctx, u32 *out);
 void ppmDone(ppm_ctx_t *ctx);

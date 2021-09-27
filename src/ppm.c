@@ -1,5 +1,7 @@
 #include "ppm.h"
 
+#include "pd.h"
+
 int ppmInit(ppm_ctx_t *ctx, u8 *ppm, int len)
 {
 	u8 *start = ppm;
@@ -30,28 +32,28 @@ int ppmInit(ppm_ctx_t *ctx, u8 *ppm, int len)
 	if (ppm - start + (sizeof(u32) * ctx->hdr.numFrames) >= len)
 		return 4;
 
-	ctx->videoOffsets = malloc(sizeof(u32) * ctx->hdr.numFrames);
+	ctx->videoOffsets = pd_malloc(sizeof(u32) * ctx->hdr.numFrames);
 	memcpy(ctx->videoOffsets, ppm, sizeof(u32) * ctx->hdr.numFrames);
 	ppm += sizeof(u32) * ctx->hdr.numFrames;
 	
 	if (ppm - start + ctx->hdr.animationLength - sizeof(ppm_animation_header_t) - (sizeof(u32) * ctx->hdr.numFrames) >= len)
 	{
-		free(ctx->videoOffsets);	
+		pd_free(ctx->videoOffsets);	
 		return 5;
 	}
 	
-	ctx->videoData = malloc(ctx->hdr.animationLength - sizeof(ppm_animation_header_t) - (sizeof(u32) * ctx->hdr.numFrames));
+	ctx->videoData = pd_malloc(ctx->hdr.animationLength - sizeof(ppm_animation_header_t) - (sizeof(u32) * ctx->hdr.numFrames));
 	memcpy(ctx->videoData, ppm, ctx->hdr.animationLength - sizeof(ppm_animation_header_t) - (sizeof(u32) * ctx->hdr.numFrames));
 	ppm += ctx->hdr.animationLength - sizeof(ppm_animation_header_t) - (sizeof(u32) * ctx->hdr.numFrames);
 
 	if (ppm - start + ctx->hdr.numFrames >= len)
 	{
-		free(ctx->videoOffsets);
-		free(ctx->videoData);	
+		pd_free(ctx->videoOffsets);
+		pd_free(ctx->videoData);	
 		return 6;
 	}
 	
-	ctx->audioFrames = malloc(ctx->hdr.numFrames);
+	ctx->audioFrames = pd_malloc(ctx->hdr.numFrames);
 	memcpy(ctx->audioFrames, ppm, ctx->hdr.numFrames);
 
 	// TODO: fixme
@@ -62,9 +64,9 @@ int ppmInit(ppm_ctx_t *ctx, u8 *ppm, int len)
 
 	if (ppm - start + sizeof(ppm_sound_header_t) >= len)
 	{
-		free(ctx->videoOffsets);
-		free(ctx->videoData);
-		free(ctx->audioFrames);
+		pd_free(ctx->videoOffsets);
+		pd_free(ctx->videoData);
+		pd_free(ctx->audioFrames);
 		return 7;
 	}
 
@@ -73,34 +75,34 @@ int ppmInit(ppm_ctx_t *ctx, u8 *ppm, int len)
 
 	if (ppm - start + ctx->sndHdr.bgmLength >= len)
 	{
-		free(ctx->videoOffsets);
-		free(ctx->videoData);
-		free(ctx->audioFrames);
+		pd_free(ctx->videoOffsets);
+		pd_free(ctx->videoData);
+		pd_free(ctx->audioFrames);
 		return 8;
 	}
 	
-	ctx->bgmData = malloc(ctx->sndHdr.bgmLength);
+	ctx->bgmData = pd_malloc(ctx->sndHdr.bgmLength);
 	memcpy(ctx->bgmData, ppm, ctx->sndHdr.bgmLength);
 
 	if (ppm - start + ctx->sndHdr.seLength[0] + ctx->sndHdr.seLength[1] + ctx->sndHdr.seLength[2] >= len)
 	{
-		free(ctx->videoOffsets);
-		free(ctx->videoData);
-		free(ctx->audioFrames);
-		free(ctx->bgmData);
+		pd_free(ctx->videoOffsets);
+		pd_free(ctx->videoData);
+		pd_free(ctx->audioFrames);
+		pd_free(ctx->bgmData);
 		return 9;
 	}
 
 	for (u8 i = 0; i < SE_CHANNELS; i++)
 	{
-		ctx->seData[i] = malloc(ctx->sndHdr.seLength[i]);
+		ctx->seData[i] = pd_malloc(ctx->sndHdr.seLength[i]);
 		memcpy(ctx->seData[i], ppm, ctx->sndHdr.seLength[i]);
 	}
 
 	for (u8 i = 0; i < LAYERS; i++)
 	{
-		ctx->layers[i]     = calloc(SCREEN_SIZE, 1);
-		ctx->prevLayers[i] = calloc(SCREEN_SIZE, 1);
+		ctx->layers[i]     = pd_calloc(SCREEN_SIZE, 1);
+		ctx->prevLayers[i] = pd_calloc(SCREEN_SIZE, 1);
 	}
 
 	ctx->prevFrame = 0;
@@ -127,20 +129,20 @@ void ppmGetThumbnail(ppm_ctx_t *ctx, u32 *out)
 
 void ppmDone(ppm_ctx_t *ctx)
 {
-	free(ctx->audioFrames);
+	pd_free(ctx->audioFrames);
 
-	free(ctx->videoOffsets);
+	pd_free(ctx->videoOffsets);
 
-	free(ctx->bgmData);
+	pd_free(ctx->bgmData);
 
 	for (u8 i = 0; i < SE_CHANNELS; i++)
-		free(ctx->seData[i]);
+		pd_free(ctx->seData[i]);
 
-	free(ctx->videoData);
+	pd_free(ctx->videoData);
 
 	for (u8 i = 0; i < LAYERS; i++)
 	{
-		free(ctx->layers[i]);
-		free(ctx->prevLayers[i]);
+		pd_free(ctx->layers[i]);
+		pd_free(ctx->prevLayers[i]);
 	}
 }

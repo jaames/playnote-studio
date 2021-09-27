@@ -20,9 +20,10 @@ fi
 if [ $CMD == "device" ]; then
   echo "creating simulator build..."
   cd build
-  cmake -DCMAKE_TOOLCHAIN_FILE=/Users/james1/Developer/C_API/buildsupport/arm.cmake ..
+  cmake -DCMAKE_TOOLCHAIN_FILE=/Users/james1/Developer/PlaydateSDK/C_API/buildsupport/arm.cmake ..
   make
   cd -
+  make pdc
 fi
 
 if [ $CMD == "clean" ]; then
