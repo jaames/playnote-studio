@@ -1,4 +1,5 @@
 #include "ppm_audio.h"
+#include "pd.h"
 
 /* Decodes an IMA-ADPCM sample to a PCM-16 one. */
 static s16 ppmAudioDecodeSample(u8 sample)
@@ -78,10 +79,10 @@ void ppmAudioRender(ppm_ctx_t *ctx, s16 *out)
 	trackLengths[3] = ctx->sndHdr.seLength[2] * 4;
 
 	/* Allocate memory for decoded PCM. */
-	bgm   = malloc(trackLengths[0]);
-	se[0] = malloc(trackLengths[1]);
-	se[1] = malloc(trackLengths[2]);
-	se[2] = malloc(trackLengths[3]);
+	bgm   = pd_malloc(trackLengths[0]);
+	se[0] = pd_malloc(trackLengths[1]);
+	se[1] = pd_malloc(trackLengths[2]);
+	se[2] = pd_malloc(trackLengths[3]);
 
 	/* Decode all ADPCM buffers into PCM. */
 	ppmAudioDecodeBuffer(ctx->bgmData,   bgm,   ctx->sndHdr.bgmLength);
@@ -100,7 +101,7 @@ void ppmAudioRender(ppm_ctx_t *ctx, s16 *out)
 	}
 
 	/* We don't need this anymore. */
-	free(bgm);
+	pd_free(bgm);
 
 	/* Render all sound effects. */
 	for (u16 frame = 0; frame < ctx->hdr.numFrames; frame++)
@@ -119,7 +120,7 @@ void ppmAudioRender(ppm_ctx_t *ctx, s16 *out)
 	}
 
 	/* We don't need these anymore either. */
-	free(se[0]);
-	free(se[1]);
-	free(se[2]);
+	pd_free(se[0]);
+	pd_free(se[1]);
+	pd_free(se[2]);
 }

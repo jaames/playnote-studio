@@ -3,6 +3,7 @@
 # this is just here for my convenience, because I am an idiot
 
 CMD=$1
+SDK=$(egrep '^\s*SDKRoot' ~/.Playdate/config | head -n 1 | cut -c9-)
 
 if [ -z $CMD ]; then
   echo "No command provided"
@@ -18,9 +19,9 @@ if [ $CMD == "sim" ]; then
 fi
 
 if [ $CMD == "device" ]; then
-  echo "creating simulator build..."
+  echo "creating device build..."
   cd build
-  cmake -DCMAKE_TOOLCHAIN_FILE=/Users/james1/Developer/PlaydateSDK/C_API/buildsupport/arm.cmake ..
+  cmake -DCMAKE_TOOLCHAIN_FILE=${SDK}/C_API/buildsupport/arm.cmake ..
   make
   cd -
   make pdc
@@ -30,6 +31,10 @@ if [ $CMD == "clean" ]; then
   cd build
   make clean
   cd -
+fi
+
+if [ $CMD == "reset" ]; then
+  rm -rf ./build/*
 fi
 
 exit 0

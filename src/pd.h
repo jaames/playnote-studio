@@ -11,6 +11,6 @@ extern void* (*pd_realloc)(void* ptr, size_t size);
 
 void pd_setRealloc(void* (*realloc)(void* ptr, size_t size));
 
-void *pd_calloc(size_t nelem, size_t elsize);
+void *pd_calloc(size_t numElem, size_t elSize);
 
 #endif /* pd_h */

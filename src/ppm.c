@@ -57,10 +57,10 @@ int ppmInit(ppm_ctx_t *ctx, u8 *ppm, int len)
 	memcpy(ctx->audioFrames, ppm, ctx->hdr.numFrames);
 
 	// TODO: fixme
-	// ppm = ROUND_UP_4((int)ppm);
+	ppm = (u8 *)ROUND_UP_4((long int)ppm);
 	// tmp hack:
-	if ((int)ppm % 4 != 0)
-		ppm = (int)ppm + (4 - ((int)ppm % 4));
+	// if ((int)ppm % 4 != 0)
+	// 	ppm = (long int)ppm + (4 - ((int)ppm % 4));
 
 	if (ppm - start + sizeof(ppm_sound_header_t) >= len)
 	{

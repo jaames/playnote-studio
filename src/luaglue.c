@@ -28,8 +28,6 @@ static int ppm_new(lua_State *L)
 {
 	const char *filePath = pd->lua->getArgString(1);
 
-	pd->system->logToConsole("path: %s", filePath);
-
 	SDFile *f = pd->file->open(filePath, kFileRead | kFileReadData);
 
 	pd->file->seek(f, 0, SEEK_END);
@@ -41,42 +39,19 @@ static int ppm_new(lua_State *L)
 	pd->file->close(f);
 
 	ppm_ctx_t *ctx = pd_malloc(sizeof(ppm_ctx_t));
-
 	int err = ppmInit(ctx, ppm, fsize);
-
-	if (err == -1)
-	{
-		pd->system->logToConsole("file size: %d", fsize);
-		pd->system->logToConsole("ppm init worked!? fuck you koizumi");
-	}
-	// pd->system->logToConsole("anim size: %d", ctx->hdr.animationLength);
-
 	pd_free(ppm);
-	// SDFile *f = pd->file->open(filePath, kFileRead | kFileReadData);
 
-	// pd->file->seek(f, 0, SEEK_END);
-	// int fsize = pd->file->tell(f);
-	// pd->file->seek(f, 0, SEEK_SET);
+	#if TARGET_PLAYDATE
+		pd->system->logToConsole("target playdate");
+	#endif
 
-	// u8 *buf = pd_malloc(fsize);
-	// pd->file->read(f, buf, fsize);
-
-	// ppm_ctx_t *ctx = pd_malloc(sizeof(ppm_ctx_t));
-
-	// int err = ppmInit(ctx, buf, fsize);
-
-	// pd->system->logToConsole("err: %d", err);
-
-	// pd->system->logToConsole("size: %d", ctx->sndHdr.bgmLength);
-
-	// pd_free(buf);
-	// pd->file->close(f);
-
-	ppmVideoDecodeFrame(ctx, 1);
-
-	pd->system->logToConsole("IT JUST FUCKING DECODED A FRAME");
-
-	pd->system->logToConsole("I AM A GOD AMONG MEN");
+	if (err != -1)
+	{
+		pd->system->logToConsole("ppmInit error: %d", err);
+		pd->lua->pushNil();
+		return 1;
+	}
 
 	pd->lua->pushObject(ctx, "PpmParser", 0);
 	return 1;
@@ -99,32 +74,32 @@ static int ppm_getMagic(lua_State *L)
   return 1;
 }
 
-// // get the flipnote framerate (in frames per second) as a float
-// static int ppm_getFps(lua_State *L)
-// {
-// 	ppm_ctx_t *ctx = getPpmCtx(1);
-// 	float rate = ctx->frameRate;
-// 	pd->lua->pushFloat(rate);
-//   return 1;
-// }
+// get the flipnote framerate (in frames per second) as a float
+static int ppm_getFps(lua_State *L)
+{
+	ppm_ctx_t *ctx = getPpmCtx(1);
+	float rate = ctx->frameRate;
+	pd->lua->pushFloat(rate);
+  return 1;
+}
 
-// // get the number of flipnote frames
-// static int ppm_getNumFrames(lua_State *L)
-// {
-// 	ppm_ctx_t *ctx = getPpmCtx(1);
-// 	pd->lua->pushInt(ctx->hdr.numFrames);
-//   return 1;
-// }
+// get the number of flipnote frames
+static int ppm_getNumFrames(lua_State *L)
+{
+	ppm_ctx_t *ctx = getPpmCtx(1);
+	pd->lua->pushInt(ctx->hdr.numFrames);
+  return 1;
+}
 
-// // decode a frame at a given index
-// // frame index begins at 1 - lua-style
-// static int ppm_decodeFrame(lua_State *L)
-// {
-// 	ppm_ctx_t *ctx = getPpmCtx(1);
-// 	int frame = pd->lua->getArgInt(2) - 1;
-// 	ppmVideoDecodeFrame(ctx, (u16)frame);
-//   return 0;
-// }
+// decode a frame at a given index
+// frame index begins at 1 - lua-style
+static int ppm_decodeFrame(lua_State *L)
+{
+	ppm_ctx_t *ctx = getPpmCtx(1);
+	int frame = pd->lua->getArgInt(2) - 1;
+	ppmVideoDecodeFrame(ctx, (u16)frame);
+  return 0;
+}
 
 // decode a frame at a given index
 // frame index begins at 1 - lua-style
@@ -132,8 +107,6 @@ static int ppm_decodeFrameToBitmap(lua_State *L)
 {
 	ppm_ctx_t *ctx = getPpmCtx(1);
 	int frame = pd->lua->getArgInt(2) - 1;
-
-	pd->system->logToConsole("Frame index: %d", frame);
 
 	LCDBitmap* bitmap = pd->lua->getBitmap(3);
 
@@ -151,8 +124,6 @@ static int ppm_decodeFrameToBitmap(lua_State *L)
 		pd->system->logToConsole("Error with layer bitmap");
 		return 0;
 	}
-
-	pd->system->logToConsole("Bitmap w: %d, h:%d", width, height);
 
 	// bitmap data is comprised of two maps for each channel, one after the other
 	int mapSize = (height * rowBytes);
@@ -194,9 +165,9 @@ static const lua_reg libPpm[] =
 	{ "__gc",                ppm_gc },
 	{ "new",                 ppm_new },
 	{ "getMagic",            ppm_getMagic },
-	// { "getNumFrames",        ppm_getNumFrames },
-	// { "getFps",              ppm_getFps },
-	// { "decodeFrame",         ppm_decodeFrame },
+	{ "getNumFrames",        ppm_getNumFrames },
+	{ "getFps",              ppm_getFps },
+	{ "decodeFrame",         ppm_decodeFrame },
 	{ "decodeFrameToBitmap", ppm_decodeFrameToBitmap },
 	{ NULL,                  NULL }
 };

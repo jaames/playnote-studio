@@ -7,12 +7,12 @@ void pd_setRealloc(void *(*realloc)(void *ptr, size_t size))
 	pd_realloc = realloc;
 }
 
-void *pd_calloc(size_t nelem, size_t elsize)
+void *pd_calloc(size_t numElem, size_t elSize)
 {
 	void *p;
-	p = pd_malloc(nelem * elsize);
+	p = pd_malloc(numElem * elSize);
 	if (p == 0)
 		return (p);
-	memset(p, 0, nelem * elsize);
+	memset(p, 0, numElem * elSize);
 	return (p);
 }
