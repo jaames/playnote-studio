@@ -25,7 +25,7 @@ Play animations from the DSiWare version of Flipnote Studio on your Playdate!
 ## Special Thanks
 
 - [Simon](https://github.com/simontime) for kindly letting me use his C PPM library and answering my dumb C questions while I was trying to port it to the Playdate.
-- [Matt](https://github.com/gingerbeardman) for
+- [Matt](https://github.com/gingerbeardman) for helping me get access to the Playdate Developer Preview!
 
 ## Building
 
@@ -41,4 +41,3 @@ For convenience (and because I'm a big dumb-dumb idiot that keeps forgetting thi
 ### Notes
 
 - Memory management functions like `malloc`, `calloc`, `realloc`, `free`, etc are not available - instead you will need to include `pd.h` which contains `pd_malloc`, `pd_calloc`, `pd_realloc` and `pd_free`, which all wrap `playdate->system->realloc` and should behave the same as their respective functions.
-- 
