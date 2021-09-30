@@ -12,7 +12,7 @@ end
 
 function ScreenBase:getTransitionProps(id)
   local props <const> = {
-    duration = 400,
+    duration = 250,
     easing = playdate.easingFunctions.linear
   }
   return props

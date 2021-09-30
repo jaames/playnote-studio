@@ -1,5 +1,4 @@
-#ifndef pd_h
-#define pd_h
+#pragma once
 
 #include <stddef.h>
 #include <string.h>
@@ -12,5 +11,3 @@ extern void* (*pd_realloc)(void* ptr, size_t size);
 void pd_setRealloc(void* (*realloc)(void* ptr, size_t size));
 
 void *pd_calloc(size_t numElem, size_t elSize);
-
-#endif /* pd_h */

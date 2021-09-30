@@ -1,6 +1,7 @@
 import 'CoreLibs/timer'
 
 import './screenManager'
+import './dialogManager'
 import './gfxUtils'
 
 import './screens/Home'
@@ -15,5 +16,6 @@ screenManager:setScreen('home')
 
 function playdate.update()
   screenManager:update()
+  dialogManager:update()
   playdate.timer:updateTimers()
 end

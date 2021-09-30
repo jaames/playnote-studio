@@ -4,6 +4,7 @@ import 'CoreLibs/animation'
 
 import './ScreenBase'
 import '../screenManager.lua'
+import '../dialogManager.lua'
 import '../gfxUtils.lua'
 import '../utils.lua'
 
@@ -26,11 +27,19 @@ function HomeScreen:init()
   self.scrollY = 0
   self.clockBlink = blink
   self.inputHandlers = {
+    BButtonUp = function()
+      if dialogManager.isVisible then
+        dialogManager:hide()
+      else
+        dialogManager:show('*Generic Error*\n\nAh geeze something went really wrong here honestly')
+      end
+      
+    end,
     AButtonUp = function()
       screenManager:setScreen('player')
     end,
     cranked = function(change, acceleratedChange)
-      self.scrollY = utils:clampScroll(self.scrollY + change, 0, 260)
+      self.scrollY = utils:clampScroll(self.scrollY + change, 0, 240)
     end,
   }
 end

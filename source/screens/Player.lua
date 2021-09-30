@@ -12,37 +12,58 @@ local gfx <const> = playdate.graphics
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 
-local ppm = PpmParser.new("./ppm/samplememo_04.ppm")
+local ppm = PpmParser.new("./ppm/fdd.ppm")
 local numFrames = ppm.numFrames
 
 local layer = gfx.image.new(256, 192)
-local i = 1
-
-function decodeFrame(i)
-  ppm:decodeFrameToBitmap(i, layer)
-end
 
 class('PlayerScreen').extends(ScreenBase)
 
 function PlayerScreen:init()
   PlayerScreen.super.init(self)
-  decodeFrame(1)
+
   self.isPlaying = false
+
+  self.prevFrame = -1
+  self.currentFrame = 1
+
+  self.prevFrameCrankAngle = 0
+  self.currentCrankAngle = 0
+  
   self.inputHandlers = {
     leftButtonDown = function()
-      -- frame left
+      if self.currentFrame == 1 then
+        self.currentFrame = numFrames
+      else
+        self.currentFrame = self.currentFrame - 1
+      end
     end,
     rightButtonDown = function()
-      -- frame rright
+      if self.currentFrame == numFrames then
+        self.currentFrame = 1
+      else
+        self.currentFrame = self.currentFrame + 1
+      end
     end,
     downButtonDown = function()
-      -- play
+      if self.isPlaying then
+        self.isPlaying = false
+      else
+        self.isPlaying = true
+      end
     end,
     BButtonUp = function()
       screenManager:setScreen('home')
     end,
     cranked = function(change, acceleratedChange)
-      -- seek frame
+      local newAngle = self.currentCrankAngle + change
+      local diff = self.currentCrankAngle - self.prevFrameCrankAngle
+      local frameDiff = math.floor(diff / 30)
+      if (not self.isPlaying) and (not (frameDiff == 0)) then
+        self:setCurrentFrame(self.currentFrame + frameDiff)
+      end
+      self.prevFrameCrankAngle += frameDiff * 30
+      self.currentCrankAngle = newAngle
     end,
   }
 end
@@ -75,23 +96,31 @@ function PlayerScreen:afterEnter()
   self:update()
 end
 
+function PlayerScreen:setCurrentFrame(i)
+  if i > 0 and i <= numFrames then
+    self.currentFrame = i
+  end
+end
+
 function PlayerScreen:update()
   gfx.setDrawOffset(0, 0)
+  if not (self.currentFrame == self.prevFrame) then
+    ppm:decodeFrameToBitmap(self.currentFrame, layer)
+    self.prevFrame = self.currentFrame
+  end
+  -- draw frame 
   layer:draw(72, 16)
   -- local counterText = string.format("%03d/%03d", math.floor(i), 75);
   gfx.setColor(gfx.kColorWhite)
   gfx.fillRoundRect(PLAYDATE_W - 84, PLAYDATE_H - 26, 80, 22, 4)
 
   gfx.fillRoundRect((PLAYDATE_W / 2) - 80, PLAYDATE_H - 26, 160, 16, 4)
-  gfx.setColor(gfx.kColorBlack)
-  gfx.setLineWidth(2)
-  -- gfx.fillRoundRect(barleft, PLAYDATE_H - 20, 144, 3, 1)
 
-  -- local step = 144 / numFrames
-  -- local x = step * i
-
-  -- gfx.setColor(gfx.kColorWhite)
-  -- gfx.fillRoundRect(barleft + x, PLAYDATE_H - 22, 3, 7, 4)
-  -- gfx.setColor(gfx.kColorBlack)
-  -- gfx.drawRoundRect(barleft + x, PLAYDATE_H - 22, 3, 7, 4)
+  -- TODO: proper frame tming
+  if self.isPlaying then
+    self:setCurrentFrame(self.currentFrame + 1)
+    if self.currentFrame == numFrames then
+      self.currentFrame = 1
+    end
+  end
 end
