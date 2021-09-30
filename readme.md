@@ -1,7 +1,6 @@
 ## TODO
 
-- Main menu screen
-- Parse playlist file to get list of Flipnotes
+- Get list of Flipnotes
 - Flipnote list on main menu
 - Player timeline bar
 - Player counter
@@ -9,14 +8,11 @@
 - Player crank playback
 - Player frame-by-frame
 - Create layer bitmap in C and keep the alphamap around, implement draw() function in C
-- Player correct FPS
 - Player support for Flipnotes that use a black bg
 - Player support for dithering red/blue colors to contrast them against the pen color
 - Player audio
-- Credits screen
 - Grid of thumbnails instead of Flipnote list
 - Bundle sample Flipnotes and add credits for the creators
-- Webapp for creating playlist .txt
 
 ## Playnote Studio
 

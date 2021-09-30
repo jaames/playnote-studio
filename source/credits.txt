@@ -1,0 +1,117 @@
+*-Playnote Studio-*
+
+
+
+Built and Designed by
+
+James Daniel
+_twitter.com/rakujira_
+_github.com/jaames_
+
+
+PPM Parser by
+
+Simon Aarons
+_twitter.com/ItsSimonTime_
+_github.com/simontime_
+
+
+Sample Flipnotes by
+
+Keke
+_twitter.com/kekeflipnote_
+_patreon.com/k__eke_
+
+MdM
+_mdmbunny.com_
+_flipnot.es/930EDBE0CC6FF483_
+
+mrjohn
+_flipnot.es/9F990EE00074AC4D_
+
+ペキラ
+_colorslive.com/artist/pekira_
+
+
+Special Thanks
+
+Matt Sephton
+_twitter.com/gingerbeardman_
+
+Kaeru Team
+_kaeru.world_
+
+Sudomemo
+_sudomemo.net_
+
+
+*-Flipnote Research-*
+
+
+Ugomemo Research Crew
+
+Shinichiro Oba
+_github.com/bricklife_
+
+mirai-iro
+_mirai-iro.hatenablog.jp_
+
+harimau__tigris
+_profile.hatena.ne.jp/harimau__tigris_
+
+
+Audio
+
+Midmad
+
+WDLMaster
+
+Simon Aarons
+_github.com/simontime_
+
+
+Documentation
+
+steven
+
+yellows8
+_github.com/yellows8_
+
+Peder Sundt
+_github.com/pbsds_
+
+James Daniel
+_github.com/jaames_
+
+
+Packet Captures
+
+Lauren Kelly
+_github.com/thejsa_
+
+
+Miscellaneous
+
+Shutterbug
+_github.com/shutterbug2000_
+
+Austin Burk
+_github.com/sudofox_
+
+
+_Flipnote Studio is (c) Nintendo Co., Ltd._
+_This project is not affiliated with or endorsed by them in any way_
+
+
+
+
+
+
+
+_Keep on Flipnoting!_
+
+
+
+
+
+

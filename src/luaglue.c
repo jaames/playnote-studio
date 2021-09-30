@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "pd_api.h"
 
 #include "luaglue.h"
@@ -48,7 +50,7 @@ static int ppm_new(lua_State *L)
 
 	if (err != -1)
 	{
-		pd->system->logToConsole("ppmInit error: %d", err);
+		pd->system->error("ppmInit error: %d", err);
 		pd->lua->pushNil();
 		return 1;
 	}
@@ -60,10 +62,33 @@ static int ppm_new(lua_State *L)
 // called when lua garbage-collects a class instance
 static int ppm_gc(lua_State *L)
 {
-	// TODO: this will crash on boot?
 	ppm_ctx_t *ctx = getPpmCtx(1);
 	ppmDone(ctx);
   return 0;
+}
+
+static int ppm_index(lua_State *L)
+{
+	if (pd->lua->indexMetatable() == 1)
+		return 1;
+	
+	ppm_ctx_t *ctx = getPpmCtx(1);
+	const char* key = pd->lua->getArgString(2);
+
+	if (strcmp(key, "frameRate") == 0)
+		pd->lua->pushFloat(ctx->frameRate);
+	else if (strcmp(key, "numFrames") == 0)
+		pd->lua->pushInt(ctx->hdr.numFrames);
+	// else if (strcmp(key, "isLocked") == 0)
+	// 	pd->lua->pushInt(ctx->hdr.isLocked);
+	// else if (strcmp(key, "currentEditor") == 0)
+	// 	pd->lua->pushBytes((char *)ctx->hdr.currentEditor, sizeof(ctx->hdr.currentEditor));
+	// else if (strcmp(key, "currentEditorId") == 0)
+	// 	pd->lua->pushBytes((char *)ctx->hdr.currentEditorId, sizeof(ctx->hdr.currentEditorId));
+	else
+		pd->lua->pushNil();
+
+  return 1;
 }
 
 // example for reading fields from the ppm ctx
@@ -162,8 +187,9 @@ static int ppm_decodeFrameToBitmap(lua_State *L)
 
 static const lua_reg libPpm[] =
 {
-	{ "__gc",                ppm_gc },
 	{ "new",                 ppm_new },
+	{ "__gc",                ppm_gc },
+	{ "__index",             ppm_index },
 	{ "getMagic",            ppm_getMagic },
 	{ "getNumFrames",        ppm_getNumFrames },
 	{ "getFps",              ppm_getFps },

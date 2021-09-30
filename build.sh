@@ -11,7 +11,7 @@ if [ -z $CMD ]; then
 fi
 
 if [ $CMD == "sim" ]; then
-  echo "creating simulator build..."
+  echo "compiling simulator build..."
   cd build
   cmake ..
   make
@@ -19,11 +19,16 @@ if [ $CMD == "sim" ]; then
 fi
 
 if [ $CMD == "device" ]; then
-  echo "creating device build..."
+  echo "compiling device build..."
   cd build
   cmake -DCMAKE_TOOLCHAIN_FILE=${SDK}/C_API/buildsupport/arm.cmake ..
   make
   cd ..
+  make pdc
+fi
+
+if [ $CMD == "lua" ]; then
+  echo "compiling lua changes..."
   make pdc
 fi
 
@@ -43,7 +48,6 @@ if [ $CMD == "release" ]; then
     exit 1
   fi
   ./build.sh device
-  rm ./Playnote.pdx/pdex.dylib
   zip -r ./Playnote.pdx.zip ./Playnote.pdx
   gh release create v${2} --draft './Playnote.pdx.zip#Playnote PDX'
   rm ./Playnote.pdx.zip
