@@ -94,27 +94,30 @@ function PlayerScreen:afterEnter()
   PlayerScreen.super.afterEnter(self)
   gfxUtils:drawBgGrid()
   self:update()
+  playdate.display.setRefreshRate(50)
 end
 
 function PlayerScreen:setCurrentFrame(i)
   if i > 0 and i <= numFrames then
     self.currentFrame = i
+    if not (i == self.prevFrame) then
+      ppm:drawFrame(i)
+      self.prevFrame = self.currentFrame
+    end
   end
 end
 
 function PlayerScreen:update()
-  gfx.setDrawOffset(0, 0)
-  if not (self.currentFrame == self.prevFrame) then
-    ppm:decodeFrameToBitmap(self.currentFrame, layer)
-    self.prevFrame = self.currentFrame
-  end
-  -- draw frame 
-  layer:draw(72, 16)
-  -- local counterText = string.format("%03d/%03d", math.floor(i), 75);
-  gfx.setColor(gfx.kColorWhite)
-  gfx.fillRoundRect(PLAYDATE_W - 84, PLAYDATE_H - 26, 80, 22, 4)
+  playdate.drawFPS(0, 240 -16)
 
-  gfx.fillRoundRect((PLAYDATE_W / 2) - 80, PLAYDATE_H - 26, 160, 16, 4)
+  -- draw frame 
+  -- layer:draw(72, 16)
+
+  -- local counterText = string.format("%03d/%03d", math.floor(i), 75);
+  -- gfx.setColor(gfx.kColorWhite)
+  -- gfx.fillRoundRect(PLAYDATE_W - 84, PLAYDATE_H - 26, 80, 22, 4)
+
+  -- gfx.fillRoundRect((PLAYDATE_W / 2) - 80, PLAYDATE_H - 26, 160, 16, 4)
 
   -- TODO: proper frame tming
   if self.isPlaying then

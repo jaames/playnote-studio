@@ -1,5 +1,15 @@
 #include "ppm_video.h"
 
+// seems to be a tiny bit faster than memcpy for filling layer buffers
+static void setChunks(void* ptr, u32 c, size_t n)
+{
+	u32* p = ptr;
+	while(n > 0) {
+		*p++ = c;
+		n -= 4;
+	}
+}
+
 void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
 {
 	u8 *data;
@@ -16,8 +26,12 @@ void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
 	/* Copy the last decoded layer to the last, last decoded one. */
 	for (u8 layer = 0; layer < LAYERS; layer++)
 	{
-		memcpy(ctx->prevLayers[layer], ctx->layers[layer], SCREEN_SIZE);
-		memset(ctx->layers[layer], 0, SCREEN_SIZE);
+		// swap layer buffer pointers instead of using memcpy
+		u8* tmp = ctx->prevLayers[layer];
+		ctx->prevLayers[layer] = ctx->layers[layer];
+		ctx->layers[layer] = tmp;
+		// zero-fill current layer buffers
+		setChunks(ctx->layers[layer], 0, SCREEN_SIZE);
 	}
 
 	ctx->prevFrame = frame;
@@ -62,12 +76,13 @@ void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
 	for (u8 layer = 0; layer < LAYERS;        layer++)
 	for (u8 line  = 0; line  < SCREEN_HEIGHT; line++)
 	{
+		u8* layerBuffer = ctx->layers[layer];
 		offset = line * SCREEN_WIDTH;
 
 		switch (layerLines[layer][line])
 		{
 			case 2: /* Fill entire line with colour, then decompress. */
-				memset(&ctx->layers[layer][offset], 1, SCREEN_WIDTH);
+				setChunks(&layerBuffer[offset], 0x01010101, SCREEN_WIDTH);
 			case 1: /* Decompress line. */
 				lineFlags = __builtin_bswap32(*(u32 *)data);
 				data += sizeof(u32);
@@ -105,20 +120,25 @@ void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
 	   This also supports the ability to move frames to a different position if that flag is set. */
 	if (!hdr.isKeyFrame)
 	{
-		for (u16 y = 0; y < SCREEN_HEIGHT; y++)
+		register int src = 0;
+		register int dst =  0;
+		int yMin = MAX(0, moveByY);
+		int yMax = MIN(SCREEN_HEIGHT - moveByY, SCREEN_HEIGHT);
+		int xMin = MAX(0, moveByX);
+		int xMax = MIN(SCREEN_WIDTH - moveByX, SCREEN_WIDTH);
+		u8* layerA = ctx->layers[0];
+		u8* layerB = ctx->layers[1];
+		u8* layerAPrev = ctx->prevLayers[0];
+		u8* layerBPrev = ctx->prevLayers[1];
+
+		for (u16 y = yMin; y < yMax; y++)
 		{
-			/* Vertical bounds check. */
-			if (y - moveByY < 0) continue;
-			if (y - moveByY >= SCREEN_HEIGHT) break;
-
-			for (u16 x = 0; x < SCREEN_WIDTH; x++)
+			for (u16 x = xMin; x < xMax; x++)
 			{
-				/* Horizontal bounds check. */
-				if (x - moveByX < 0) continue;
-				if (x - moveByX >= SCREEN_WIDTH) break;
-
-				ctx->layers[0][PIXEL(x, y)] ^= ctx->prevLayers[0][PIXEL(x, y) - PIXEL(moveByX, moveByY)];
-				ctx->layers[1][PIXEL(x, y)] ^= ctx->prevLayers[1][PIXEL(x, y) - PIXEL(moveByX, moveByY)];
+				dst = PIXEL(x, y);
+				src = dst - PIXEL(moveByX, moveByY);
+				layerA[src] ^= layerAPrev[dst];
+				layerB[src] ^= layerBPrev[dst];
 			}
 		}
 	}

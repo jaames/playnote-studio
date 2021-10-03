@@ -126,6 +126,48 @@ static int ppm_decodeFrame(lua_State *L)
   return 0;
 }
 
+// 
+static int ppm_drawFrame(lua_State *L)
+{
+	ppm_ctx_t *ctx = getPpmCtx(1);
+	int frameIndex = pd->lua->getArgInt(2) - 1;
+	u8 *frameBuffer = pd->graphics->getFrame();
+
+	ppmVideoDecodeFrame(ctx, (u16)frameIndex);
+
+	u8* layerA = ctx->layers[0];
+	u8* layerB = ctx->layers[1];
+
+	int dstPtr = 0;
+	int srcPtr = 0;
+	u8 chunk = 0;
+
+	static int stride = 52;
+	static int startLine = 16;
+	static int startByte = 72 / 8;
+
+	for (int y = 0; y < SCREEN_HEIGHT; y++)
+	{
+		dstPtr = (startLine + y) * stride + startByte;
+		for (int c = 0; c < 32; c += 1)
+		{
+			chunk = 0xFF; // all bits start out white
+			for (int shift = 0; shift < 8; shift++)
+			{
+				// set a bit to black if it corresponds to a black pixel
+				if (layerA[srcPtr] == 1 || layerB[srcPtr] == 1)
+					chunk ^= (0x80 >> shift);
+				srcPtr++;
+			}
+			frameBuffer[dstPtr++] = chunk;
+		}
+	}
+
+	pd->graphics->markUpdatedRows(startLine, startLine + SCREEN_HEIGHT);
+
+	return 0;
+}
+
 // decode a frame at a given index
 // frame index begins at 1 - lua-style
 static int ppm_decodeFrameToBitmap(lua_State *L)
@@ -194,6 +236,7 @@ static const lua_reg libPpm[] =
 	{ "getNumFrames",        ppm_getNumFrames },
 	{ "getFps",              ppm_getFps },
 	{ "decodeFrame",         ppm_decodeFrame },
+	{ "drawFrame",           ppm_drawFrame },
 	{ "decodeFrameToBitmap", ppm_decodeFrameToBitmap },
 	{ NULL,                  NULL }
 };
