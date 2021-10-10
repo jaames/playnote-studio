@@ -1,4 +1,5 @@
 import 'CoreLibs/object'
+import './noteManager'
 
 class('ScreenBase').extends()
 

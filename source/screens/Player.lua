@@ -4,6 +4,7 @@ import 'CoreLibs/object'
 
 import './ScreenBase'
 import '../screenManager.lua'
+import '../noteManager.lua'
 import '../gfxUtils.lua'
 import '../utils.lua'
 
@@ -12,10 +13,10 @@ local gfx <const> = playdate.graphics
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 
-local ppm = PpmParser.new("./ppm/fdd.ppm")
-local numFrames = ppm.numFrames
+local ppm = nil
+local numFrames = 0
 
-local layer = gfx.image.new(256, 192)
+-- local layer = gfx.image.new(256, 192)
 
 class('PlayerScreen').extends(ScreenBase)
 
@@ -53,7 +54,7 @@ function PlayerScreen:init()
       end
     end,
     BButtonUp = function()
-      screenManager:setScreen('home')
+      screenManager:setScreen('notelist')
     end,
     cranked = function(change, acceleratedChange)
       local newAngle = self.currentCrankAngle + change
@@ -90,15 +91,33 @@ function PlayerScreen:transitionLeave(t)
   end
 end
 
+function PlayerScreen:beforeEnter()
+  PlayerScreen.super.beforeEnter(self)
+  print(noteManager.currentNote)
+  ppm = PpmParser.new(noteManager.currentNote)
+  numFrames = ppm.numFrames
+  self.currentFrame = 1
+end
+
 function PlayerScreen:afterEnter()
   PlayerScreen.super.afterEnter(self)
   gfxUtils:drawBgGrid()
   self:update()
-  playdate.display.setRefreshRate(50)
+  -- playdate.display.setRefreshRate(30)
+end
+
+function PlayerScreen:beforeLeave()
+  PlayerScreen.super.beforeLeave(self)
+  -- playdate.display.setRefreshRate(30)
+  self.isPlaying = false
+end
+
+function PlayerScreen:afterLeave()
+  PlayerScreen.super.afterLeave(self)
 end
 
 function PlayerScreen:setCurrentFrame(i)
-  if i > 0 and i <= numFrames then
+  if ppm and i > 0 and i <= numFrames then
     self.currentFrame = i
     if not (i == self.prevFrame) then
       ppm:drawFrame(i)

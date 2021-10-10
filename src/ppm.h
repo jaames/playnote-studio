@@ -104,8 +104,18 @@ typedef struct ppm_ctx_t
 	float bgmFrameRate;
 } ppm_ctx_t;
 
+typedef struct tmb_ctx_t
+{
+	ppm_header_t hdr;
+	u8 thumbnail[THUMBNAIL_LENGTH];
+} tmb_ctx_t;
+
 #pragma pack(pop)
 
-int ppmInit(ppm_ctx_t *ctx, u8 *ppm, int len);
-void ppmGetThumbnail(ppm_ctx_t *ctx, u32 *out);
+int  ppmInit(ppm_ctx_t *ctx, u8 *ppm, int len);
+// void ppmGetThumbnail(ppm_ctx_t *ctx, u32 *out);
 void ppmDone(ppm_ctx_t *ctx);
+int  tmbInit(tmb_ctx_t *ctx, u8 *ppm, int len);
+void tmbGetThumbnail(tmb_ctx_t *ctx, u8 *out);
+void tmbDone(tmb_ctx_t *ctx);
+char *fsidFromStr(u8 fsid[8]);

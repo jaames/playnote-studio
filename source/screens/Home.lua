@@ -36,7 +36,7 @@ function HomeScreen:init()
       
     end,
     AButtonUp = function()
-      screenManager:setScreen('player')
+      screenManager:setScreen('notelist')
     end,
     cranked = function(change, acceleratedChange)
       self.scrollY = utils:clampScroll(self.scrollY + change, 0, 240)

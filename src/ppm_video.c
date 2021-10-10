@@ -4,7 +4,8 @@
 static void setChunks(void* ptr, u32 c, size_t n)
 {
 	u32* p = ptr;
-	while(n > 0) {
+	while(n > 0) 
+	{
 		*p++ = c;
 		n -= 4;
 	}
@@ -91,9 +92,14 @@ void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
 				{
 					if (lineFlags & 0x80000000)
 					{
-						for (u8 px = 0; px < 8; px++)
-							ctx->layers[layer][px + offset] = (*data >> px) & 1;
-
+						ctx->layers[layer][offset + 0] = (*data >> 0) & 1;
+						ctx->layers[layer][offset + 1] = (*data >> 1) & 1;
+						ctx->layers[layer][offset + 2] = (*data >> 2) & 1;
+						ctx->layers[layer][offset + 3] = (*data >> 3) & 1;
+						ctx->layers[layer][offset + 4] = (*data >> 4) & 1;
+						ctx->layers[layer][offset + 5] = (*data >> 5) & 1;
+						ctx->layers[layer][offset + 6] = (*data >> 6) & 1;
+						ctx->layers[layer][offset + 7] = (*data >> 7) & 1;
 						data++;
 					}
 
@@ -105,9 +111,14 @@ void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
 			case 3: /* Not compressed, read raw 1-bit line. */
 				while (offset < (line + 1u) * SCREEN_WIDTH)
 				{
-					for (u8 px = 0; px < 8; px++)
-						ctx->layers[layer][px + offset] = (*data >> px) & 1;
-
+					ctx->layers[layer][offset + 0] = (*data >> 0) & 1;
+					ctx->layers[layer][offset + 1] = (*data >> 1) & 1;
+					ctx->layers[layer][offset + 2] = (*data >> 2) & 1;
+					ctx->layers[layer][offset + 3] = (*data >> 3) & 1;
+					ctx->layers[layer][offset + 4] = (*data >> 4) & 1;
+					ctx->layers[layer][offset + 5] = (*data >> 5) & 1;
+					ctx->layers[layer][offset + 6] = (*data >> 6) & 1;
+					ctx->layers[layer][offset + 7] = (*data >> 7) & 1;
 					data++;
 					offset += 8;
 				}
@@ -120,20 +131,18 @@ void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
 	   This also supports the ability to move frames to a different position if that flag is set. */
 	if (!hdr.isKeyFrame)
 	{
-		register int src = 0;
-		register int dst =  0;
-		int yMin = MAX(0, moveByY);
+		int src = 0;
+		int dst = 0;
 		int yMax = MIN(SCREEN_HEIGHT - moveByY, SCREEN_HEIGHT);
-		int xMin = MAX(0, moveByX);
 		int xMax = MIN(SCREEN_WIDTH - moveByX, SCREEN_WIDTH);
 		u8* layerA = ctx->layers[0];
 		u8* layerB = ctx->layers[1];
 		u8* layerAPrev = ctx->prevLayers[0];
 		u8* layerBPrev = ctx->prevLayers[1];
 
-		for (u16 y = yMin; y < yMax; y++)
+		for (int y = MAX(0, moveByY); y < yMax; y++)
 		{
-			for (u16 x = xMin; x < xMax; x++)
+			for (int x = MAX(0, moveByX); x < xMax; x++)
 			{
 				dst = PIXEL(x, y);
 				src = dst - PIXEL(moveByX, moveByY);

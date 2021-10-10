@@ -110,18 +110,15 @@ int ppmInit(ppm_ctx_t *ctx, u8 *ppm, int len)
 	return -1;
 }
 
-void ppmGetThumbnail(ppm_ctx_t *ctx, u32 *out)
+char *fsidFromStr(u8 fsid[8])
 {
-	u8 *rawData = ctx->thumbnail;
+	static char str[32];
+	memset(str, 0, 32);
+	
+	for(int i = 7; i >= 0; i--)
+		sprintf(str, "%s%02X", str, (fsid[i] & 0xFF));
 
-	for (int y = 0; y < 48; y += 8)
-	for (int x = 0; x < 64; x += 8)
-	for (int l = 0; l <  8; l += 1)
-	for (int p = 0; p <  8; p += 2)
-	{
-		out[(y + l) * 64 + (x + p + 0)] = ppmThumbnailPalette[*rawData  & 0xf];
-		out[(y + l) * 64 + (x + p + 1)] = ppmThumbnailPalette[*rawData++ >> 4];
-	}
+	return str;
 }
 
 void ppmDone(ppm_ctx_t *ctx)
@@ -141,5 +138,41 @@ void ppmDone(ppm_ctx_t *ctx)
 	{
 		pd_free(ctx->layers[i]);
 		pd_free(ctx->prevLayers[i]);
+	}
+}
+
+int tmbInit(tmb_ctx_t *ctx, u8 *ppm, int len)
+{
+	u8 *start = ppm;
+	
+	if (len < sizeof(ppm_header_t))
+		return 0;
+
+	memcpy(&ctx->hdr, ppm, sizeof(ppm_header_t));
+	ppm += sizeof(ppm_header_t);
+	
+	if (strncmp(ctx->hdr.magic, "PARA", 4) != 0)
+		return 1;
+	
+	if (ppm - start + sizeof(ctx->thumbnail) > len)
+		return 2;
+	
+	memcpy(ctx->thumbnail, ppm, sizeof(ctx->thumbnail));
+	ppm += sizeof(ctx->thumbnail);
+
+	return -1;
+}
+
+void tmbGetThumbnail(tmb_ctx_t *ctx, u8 *out)
+{
+	u8 *rawData = ctx->thumbnail;
+
+	for (int y = 0; y < 48; y += 8)
+	for (int x = 0; x < 64; x += 8)
+	for (int l = 0; l <  8; l += 1)
+	for (int p = 0; p <  8; p += 2)
+	{
+		out[(y + l) * 64 + (x + p + 0)] = *rawData  & 0xf;
+		out[(y + l) * 64 + (x + p + 1)] = *rawData++ >> 4;
 	}
 }

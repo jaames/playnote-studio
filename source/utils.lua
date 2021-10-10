@@ -22,3 +22,9 @@ function utils:clampScroll(pos, start, height)
   end
   return pos
 end
+
+function utils:clearArray(t)
+  for k in pairs(t) do
+    t[k] = nil
+  end
+end

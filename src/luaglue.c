@@ -11,6 +11,7 @@
 static PlaydateAPI *pd = NULL;
 
 static const lua_reg libPpm[];
+static const lua_reg libTmb[];
 
 void registerExt(PlaydateAPI *playdate)
 {
@@ -19,7 +20,10 @@ void registerExt(PlaydateAPI *playdate)
 	const char *err;
 
 	if (!pd->lua->registerClass("PpmParser", libPpm, NULL, 0, &err))
-		pd->system->logToConsole("%s:%i: registerClass failed, %s", __FILE__, __LINE__, err);
+		pd->system->logToConsole("%s:%i: registering ppm lib failed, %s", __FILE__, __LINE__, err);
+
+	if (!pd->lua->registerClass("TmbParser", libTmb, NULL, 0, &err))
+		pd->system->logToConsole("%s:%i: registering tmb lib failed, %s", __FILE__, __LINE__, err);
 
 	pd_setRealloc(pd->system->realloc);
 }
@@ -64,6 +68,8 @@ static int ppm_gc(lua_State *L)
 {
 	ppm_ctx_t *ctx = getPpmCtx(1);
 	ppmDone(ctx);
+	pd_free(ctx);
+	// pd->system->logToConsole("ppm free");
   return 0;
 }
 
@@ -238,5 +244,101 @@ static const lua_reg libPpm[] =
 	{ "decodeFrame",         ppm_decodeFrame },
 	{ "drawFrame",           ppm_drawFrame },
 	{ "decodeFrameToBitmap", ppm_decodeFrameToBitmap },
+	{ NULL,                  NULL }
+};
+
+static tmb_ctx_t *getTmbCtx(int n) { return pd->lua->getArgObject(n, "TmbParser", NULL); }
+
+static int tmb_new(lua_State *L)
+{
+	const char *filePath = pd->lua->getArgString(1);
+
+	int fsize = 0x06A0;
+	u8 *tmb = pd_malloc(fsize);
+
+	SDFile *f = pd->file->open(filePath, kFileRead | kFileReadData);
+	pd->file->read(f, tmb, fsize);
+	pd->file->close(f);
+
+	tmb_ctx_t *ctx = pd_malloc(sizeof(tmb_ctx_t));
+	int err = tmbInit(ctx, tmb, fsize);
+	pd_free(tmb);
+
+	if (err != -1)
+	{
+		pd->system->error("tmbInit error: %d", err);
+		pd->lua->pushNil();
+		return 1;
+	}
+
+	pd->lua->pushObject(ctx, "TmbParser", 0);
+	return 1;
+}
+
+// called when lua garbage-collects a class instance
+static int tmb_gc(lua_State *L)
+{
+	tmb_ctx_t *ctx = getTmbCtx(1);
+	pd_free(ctx);
+	pd->system->logToConsole("tmb free");
+  return 0;
+}
+
+static int tmb_toBitmap(lua_State *L)
+{
+	tmb_ctx_t *ctx = getTmbCtx(1);
+
+	u8 *pixels = pd_malloc(64 * 48);
+
+	int width = 0;
+	int height = 0;
+	int rowBytes = 0;
+	int hasMask = 0;
+	u8* bitmapData;
+	
+	LCDBitmap *bitmap = pd->graphics->newBitmap(64, 48, kColorBlack);
+	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &hasMask, &bitmapData);
+
+	tmbGetThumbnail(ctx, pixels);
+
+	u8 chunk = 0;
+	u8 px = 0;
+	bool oddLine = false;
+	int srcOffset = 0;
+	int dstOffset = 0;
+	while (dstOffset < height * rowBytes)
+	{
+		chunk = 0xFF; // all pixels start out white
+		for (int shift = 0; shift < 8; shift++)
+		{
+			px = ppmThumbnailPaletteGray[pixels[srcOffset++]];
+			oddLine = (srcOffset - 1) % 128 < 64;
+			// set a bit to black if it corresponds to a black pixel
+			if (px == 0)
+				chunk ^= (0x80 >> shift);
+			// dark grey - inverse polka pattern
+			else if (px == 1 && (!oddLine || srcOffset % 2 == 0))
+				chunk ^= (0x80 >> shift);
+			// mid grey - checkerboard pattern
+			else if (px == 2 && srcOffset % 2 == (oddLine ? 1 : 0))
+				chunk ^= (0x80 >> shift);
+			// light grey - polka pattern
+			else if (px == 3 && (oddLine && srcOffset % 2 == 1))
+				chunk ^= (0x80 >> shift);
+		}
+		bitmapData[dstOffset++] = chunk;
+	}
+
+	pd_free(pixels);
+	pd->lua->pushBitmap(bitmap);
+	return 1;
+}
+
+static const lua_reg libTmb[] =
+{
+	{ "new",                 tmb_new },
+	{ "__gc",                tmb_gc },
+	// { "__index",             ppm_index },
+	{ "toBitmap",        		 tmb_toBitmap },
 	{ NULL,                  NULL }
 };

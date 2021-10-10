@@ -1,17 +1,13 @@
 ## TODO
 
-- Get list of Flipnotes
-- Flipnote list on main menu
 - Player timeline bar
 - Player counter
 - Player play/pause with timer
 - Player crank playback
 - Player frame-by-frame
-- Create layer bitmap in C and keep the alphamap around, implement draw() function in C
 - Player support for Flipnotes that use a black bg
 - Player support for dithering red/blue colors to contrast them against the pen color
 - Player audio
-- Grid of thumbnails instead of Flipnote list
 - Bundle sample Flipnotes and add credits for the creators
 
 ## Playnote Studio
@@ -31,6 +27,7 @@ For convenience (and because I'm a big dumb-dumb idiot that keeps forgetting thi
 
  - **`./build.sh sim`** - Produces a .pdx build that will run in the Playdate Simulator, but won't run on device
  - **`./build.sh device`** - Produces a .pdx build that will run in the Playdate Simulator and will run on device
+ - **`./build.sh lua`** - Produces a .pdx build that will run on device, but skips C compilation for faster Lua development
  - **`./build.sh clean`** - Runs `make clean`
  - **`./build.sh refresh`** - Sometimes the compiler doesn't seem to update the embedded C code when doing a new build, or it will produce an empty pdex.bin. I'm not entirely sure what causes this, but this command should clean up any build files so that things will behave again after this happens.
 
