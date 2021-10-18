@@ -98,8 +98,8 @@ typedef struct ppm_ctx_t
 	u8  *layers[LAYERS];
 	u8  *prevLayers[LAYERS];
 	u16 prevFrame;
-	u32 layerColours[LAYERS];
-	u32 paperColour;
+	u8  layerColours[LAYERS];
+	u8  paperColour;
 	float frameRate;
 	float bgmFrameRate;
 } ppm_ctx_t;

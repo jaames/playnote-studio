@@ -146,27 +146,42 @@ static int ppm_drawFrame(lua_State *L)
 
 	int dstPtr = 0;
 	int srcPtr = 0;
-	u8 chunk = 0;
+	register u8 chunk = 0;
 
 	static int stride = 52;
 	static int startLine = 16;
 	static int startByte = 72 / 8;
 
+	bool oddLine = false;
+	// bool isLayerARedBlue = ctx->layerColours[0] > 1;
+	// bool isLayerBRedBlue = ctx->layerColours[1] > 1;
+
 	for (int y = 0; y < SCREEN_HEIGHT; y++)
 	{
 		dstPtr = (startLine + y) * stride + startByte;
-		for (int c = 0; c < 32; c += 1)
-		{
-			chunk = 0xFF; // all bits start out white
-			for (int shift = 0; shift < 8; shift++)
-			{
-				// set a bit to black if it corresponds to a black pixel
-				if (layerA[srcPtr] == 1 || layerB[srcPtr] == 1)
-					chunk ^= (0x80 >> shift);
-				srcPtr++;
-			}
-			frameBuffer[dstPtr++] = chunk;
-		}
+		oddLine = (srcPtr - 1) % 512 < 256;
+
+// pack 8 pixels into a one-byte chunk
+for (int c = 0; c < 32; c += 1)
+{
+		// all pixels start out white
+	chunk = 0xFF;
+	for (int shift = 0; shift < 8; shift++, srcPtr++)
+	{
+		// flip bit to black if the pixel is > 0
+		if (layerA[srcPtr] || layerB[srcPtr])
+			chunk &= patternMaskNone[shift];
+		// same for layer b, but with a half-dither pattern for contrast
+		// else if (layerB[srcPtr])
+		// 	chunk &= (oddLine ? patternMaskCheckerboardOdd : patternMaskCheckerboardEven)[shift];
+	}
+	// invert chunk if paper is black
+	if (ctx->paperColour == 0)
+		chunk = ~chunk;
+
+	frameBuffer[dstPtr++] = chunk;
+}
+
 	}
 
 	pd->graphics->markUpdatedRows(startLine, startLine + SCREEN_HEIGHT);
@@ -280,7 +295,7 @@ static int tmb_gc(lua_State *L)
 {
 	tmb_ctx_t *ctx = getTmbCtx(1);
 	pd_free(ctx);
-	pd->system->logToConsole("tmb free");
+	// pd->system->logToConsole("tmb free");
   return 0;
 }
 
