@@ -5,7 +5,6 @@
 - Player play/pause with timer
 - Player crank playback
 - Player frame-by-frame
-- Player support for Flipnotes that use a black bg
 - Player support for dithering red/blue colors to contrast them against the pen color
 - Player audio
 - Bundle sample Flipnotes and add credits for the creators

@@ -9,7 +9,7 @@ import '../utils.lua'
 
 local gfx <const> = playdate.graphics
 
-local creditsFont <const> =gfx.font.newFamily({
+local creditsFont <const> = gfx.font.newFamily({
   [gfx.font.kVariantBold]   = './fonts/Asheville-Sans-14-Bold',
   [gfx.font.kVariantNormal] = './fonts/Asheville-Sans-14-Bold',
   [gfx.font.kVariantItalic] = './fonts/Asheville-Sans-14-Light'
@@ -54,7 +54,7 @@ function CreditsScreen:transitionEnter(t)
 end
 
 function CreditsScreen:transitionLeave(t)
-  if (t < 0.5) then
+  if t < 0.5 then
     self:update()
     gfxUtils:drawWhiteFade(1 - t * 2)
   end

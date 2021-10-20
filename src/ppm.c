@@ -102,7 +102,7 @@ int ppmInit(ppm_ctx_t *ctx, u8 *ppm, int len)
 		ctx->prevLayers[i] = pd_calloc(SCREEN_SIZE, 1);
 	}
 
-	ctx->prevFrame = 0;
+	ctx->prevFrame = -1;
 
 	ctx->frameRate    = speedTable[8 - ctx->sndHdr.playbackSpeed];
 	ctx->bgmFrameRate = speedTable[8 - ctx->sndHdr.recordedSpeed];

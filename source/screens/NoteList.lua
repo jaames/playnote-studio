@@ -25,6 +25,7 @@ function NoteListScreen:init()
   self.currPage = 1
   self.currFilepaths = table.create(noteManager.notesPerPage, 0)
   self.currThumbBitmaps = table.create(noteManager.notesPerPage, 0)
+  self.notesOnCurrPage = 0
 
   self.hasPrevPage = false
   self.prevThumbBitmaps = table.create(noteManager.notesPerPage, 0)
@@ -39,28 +40,29 @@ function NoteListScreen:init()
   
   self.inputHandlers = {
     leftButtonDown = function()
-      self.selectedCol -= 1
-      if self.selectedCol < 0 then
+      if self.selectedCol == 0 then
         self:setCurrentPage(self.currPage - 1)
+      else
+        self:setSelected(self.selectedRow, self.selectedCol - 1)
       end
     end,
     rightButtonDown = function()
-      self.selectedCol += 1
-      if self.selectedCol > 3 then
+      if self.selectedCol == 3 then
         self:setCurrentPage(self.currPage + 1)
+      else
+        self:setSelected(self.selectedRow, self.selectedCol + 1)
       end
     end,
     upButtonDown = function()
-      self.selectedRow -= 1
+      self:setSelected(self.selectedRow - 1, self.selectedCol)
     end,
     downButtonDown = function()
-      self.selectedRow += 1
+      self:setSelected(self.selectedRow + 1, self.selectedCol)
     end,
     BButtonUp = function()
       screenManager:setScreen('home')
     end,
     AButtonUp = function()
-      -- TODO: select note, then go to player screen
       local i = self.selectedRow * 4 + self.selectedCol + 1
       local path = self.currFilepaths[i]
       noteManager:setCurrentNote(path)
@@ -92,6 +94,15 @@ function NoteListScreen:transitionLeave(t)
   end
 end
 
+function NoteListScreen:setSelected(row, col)
+  local numNotes = self.notesOnCurrPage
+  row = math.max(0, math.min(2, row))
+  col = math.max(0, math.min(3, col))
+  local index = math.min((row * 4 + col) + 1, numNotes) - 1
+  self.selectedRow = math.floor(index / 4)
+  self.selectedCol = index % 4
+end
+
 function NoteListScreen:setCurrentPage(pageIndex)
   if self.isTransitionActive then return end
   if pageIndex < 1 then return end
@@ -115,6 +126,8 @@ function NoteListScreen:setCurrentPage(pageIndex)
     tmb = nil
     k = k + 1
   end
+  -- notes on page used for nagivation
+  self.notesOnCurrPage = k - 1
   -- remove any unused bitmap slots for the new page, if there wasn't enough to fill the page
   for j = k, #self.currThumbBitmaps, 1 do
     self.currThumbBitmaps[j] = nil
@@ -139,9 +152,9 @@ function NoteListScreen:setCurrentPage(pageIndex)
         self.prevThumbBitmaps[i] = nil
       end
       if self.transitionDir == -1 then
-        self.selectedCol = 3
+        self:setSelected(self.selectedRow, 3)
       else
-        self.selectedCol = 0
+        self:setSelected(self.selectedRow, 0)
       end
     end
   end
@@ -156,7 +169,7 @@ function NoteListScreen:drawGrid(xOffset, bitmaps)
   local nRows <const> = 3
   local nCols <const> = 4
   local baseX <const> = 48
-  local baseY <const> = 40
+  local baseY <const> = 32
   local i = 1
   for row = 0, nRows - 1, 1 do
     for col = 0, nCols - 1, 1 do

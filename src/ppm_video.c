@@ -19,6 +19,9 @@ void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
 	u8 layerLines[LAYERS][SCREEN_HEIGHT];
 	ppm_frame_header_t hdr;
 
+	if (ctx->prevFrame == frame)
+		return;
+
 	/* If seeking backwards, decode previous frames until a keyframe is reached. */
 	if (frame && ctx->prevFrame != frame - 1 &&
 		!(*(ppm_frame_header_t *)&ctx->videoData[ctx->videoOffsets[frame]]).isKeyFrame)
@@ -155,26 +158,53 @@ void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
 		u8* layerB = ctx->layers[1];
 		u8* prevLayerA = ctx->prevLayers[0];
 		u8* prevLayerB = ctx->prevLayers[1];
-		u16 src = 0;
-		// translation offset is constant
-		u16 offs = PIXEL(moveByX, moveByY);
-		// pre calc x range, so we don't need to do it for each pixel
-		u16 xMin = MAX(moveByX, 0);
-		// u16 xMax = MIN(SCREEN_WIDTH - moveByX, SCREEN_WIDTH);
-
-		for (u16 y = MAX(moveByY, 0); y < SCREEN_HEIGHT; y++)
+		int src = 0;
+		int dst = 0;
+		for (u16 y = 0; y < SCREEN_HEIGHT; y++)
 		{
+			/* Vertical bounds check. */
+			if (y - moveByY < 0) continue;
 			if (y - moveByY >= SCREEN_HEIGHT) break;
-			src = PIXEL(xMin, y);
-			for (u16 x = xMin; x < SCREEN_WIDTH; x++)
+
+			for (u16 x = 0; x < SCREEN_WIDTH; x++)
 			{
+				/* Horizontal bounds check. */
+				if (x - moveByX < 0) continue;
 				if (x - moveByX >= SCREEN_WIDTH) break;
-				layerA[src] ^= prevLayerA[src - offs];
-				layerB[src] ^= prevLayerB[src - offs];
-				src++;
+				dst = PIXEL(x, y);
+				src = dst - PIXEL(moveByX, moveByY);
+				layerA[dst] ^= prevLayerA[src];
+				layerB[dst] ^= prevLayerB[src];
 			}
 		}
 	}
+	// TODO: replace above with faster code once issues with brainslice test note are resolved
+	// else if (!hdr.isKeyFrame)
+	// {
+	// 	u8* layerA = ctx->layers[0];
+	// 	u8* layerB = ctx->layers[1];
+	// 	u8* prevLayerA = ctx->prevLayers[0];
+	// 	u8* prevLayerB = ctx->prevLayers[1];
+	// 	u16 src = 0;
+	// 	// translation offset is constant
+	// 	u16 offs = PIXEL(moveByX, moveByY);
+	// 	// pre calc x range, so we don't need to do it for each pixel
+	// 	u16 xMin = MAX(moveByX, 0);
+	// 	// u16 xMax = MIN(SCREEN_WIDTH - moveByX, SCREEN_WIDTH);
+
+	// 	for (u16 y = MAX(moveByY, 0); y < SCREEN_HEIGHT; y++)
+	// 	{
+	// 		if (y - moveByY >= SCREEN_HEIGHT) break;
+	// 		src = PIXEL(xMin, y);
+	// 		for (u16 x = xMin; x < SCREEN_WIDTH; x++)
+	// 		{
+	// 			if (x - moveByX >= SCREEN_WIDTH) break;
+	// 			layerA[src] ^= prevLayerA[src - offs];
+	// 			layerB[src] ^= prevLayerB[src - offs];
+	// 			src++;
+	// 		}
+	// 	}
+	// }
 }
 
 int ppmVideoRenderFrame(ppm_ctx_t *ctx, u32 *out, u16 frame)

@@ -97,7 +97,7 @@ typedef struct ppm_ctx_t
 	u8  *videoData;
 	u8  *layers[LAYERS];
 	u8  *prevLayers[LAYERS];
-	u16 prevFrame;
+	s16 prevFrame;
 	u8  layerColours[LAYERS];
 	u8  paperColour;
 	float frameRate;

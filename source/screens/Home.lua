@@ -1,6 +1,8 @@
 import 'CoreLibs/object'
 import 'CoreLibs/graphics'
 import 'CoreLibs/animation'
+import 'CoreLibs/timer'
+-- import 'CoreLibs/frameTimer'
 
 import './ScreenBase'
 import '../screenManager.lua'
@@ -12,6 +14,9 @@ local gfx <const> = playdate.graphics
 local logo <const> = gfx.image.new('./img/logo')
 local clock <const> = gfx.image.new('./img/clock')
 local clockFont <const> = gfx.font.new('./fonts/ugomemo_numbers_8px')
+
+local PLAYDATE_W <const> = 400
+local PLAYDATE_H <const> = 240
 
 class('HomeScreen').extends(ScreenBase)
 
@@ -69,11 +74,12 @@ function HomeScreen:beforeEnter()
 end
 
 function HomeScreen:update()
+
   gfx.setDrawOffset(0, self.scrollY)
   -- draw background
   gfxUtils:drawBgGrid()
   -- draw main logo
-  logo:draw(52, 58)
+  logo:draw(52, 52)
   -- clock
   self.clockBlink:update()
   local sep = self.clockBlink.on and ":" or " "
@@ -89,4 +95,7 @@ function HomeScreen:update()
   gfx.setColor(gfx.kColorBlack)
   gfx.setLineWidth(1)
   gfx.drawRect(8 - 1, 8 - 1, 160, 24)
+  -- button
+
+  -- gfx.drawTextAligned('Press (A) to view Flipnotes', PLAYDATE_W / 2, PLAYDATE_H - 40, kTextAlignment.center)
 end

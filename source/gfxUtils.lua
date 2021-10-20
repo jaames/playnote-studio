@@ -1,9 +1,15 @@
 import 'CoreLibs/graphics'
 import 'CoreLibs/timer'
+import 'CoreLibs/nineslice'
 
 gfxUtils = {}
 
 local gfx <const> = playdate.graphics
+
+local buttonImg_default <const> = gfx.nineSlice.new('./img/button_default', 6, 6, 4, 4)
+local buttonImg_heavy <const> = gfx.nineSlice.new('./img/button_heavy', 6, 6, 4, 4)
+local buttonFont <const> = gfx.font.new('./fonts/Asheville-Sans-14-Bold')
+
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 
@@ -39,4 +45,24 @@ function gfxUtils:drawWhiteFade(white)
   gfx.setColor(gfx.kColorWhite)
   gfx.setDitherPattern(white, gfx.image.kDitherTypeBayer8x8)
   gfx.fillRect(-xOffset, -yOffset, PLAYDATE_W, PLAYDATE_H)
+end
+
+function gfxUtils:drawButton(x, y, w, h, isHeavy)
+  isHeavy = isHeavy or false
+  if isHeavy then
+    buttonImg_heavy:drawInRect(x, y, w, h)
+  else
+    buttonImg_default:drawInRect(x, y, w, h)
+  end
+end
+
+function gfxUtils:drawButtonWithText(text, x, y, w, h, isHeavy)
+  local _, textH = gfx.getTextSize(text)
+  local textY = y + (h / 2 - textH)
+  gfxUtils:drawButton(x, y, w, h, isHeavy)
+  gfx.setFontTracking(2)
+  -- gfx.drawTextInRect(text, x + 1, textY + 2, w, h, nil, nil, kTextAlignment.center, buttonFont)
+  gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+  gfx.drawTextInRect(text, x, textY, w, h, nil, nil, kTextAlignment.center, buttonFont)
+  gfx.setImageDrawMode(0)
 end

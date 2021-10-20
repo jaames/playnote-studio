@@ -81,10 +81,12 @@ static int ppm_index(lua_State *L)
 	ppm_ctx_t *ctx = getPpmCtx(1);
 	const char* key = pd->lua->getArgString(2);
 
-	if (strcmp(key, "frameRate") == 0)
+	if (strcmp(key, "frameRate") == 0 || strcmp(key, "fps") == 0)
 		pd->lua->pushFloat(ctx->frameRate);
 	else if (strcmp(key, "numFrames") == 0)
 		pd->lua->pushInt(ctx->hdr.numFrames);
+	else if (strcmp(key, "loop") == 0)
+		pd->lua->pushBool(ctx->hdr.numFrames);
 	// else if (strcmp(key, "isLocked") == 0)
 	// 	pd->lua->pushInt(ctx->hdr.isLocked);
 	// else if (strcmp(key, "currentEditor") == 0)
@@ -132,59 +134,54 @@ static int ppm_decodeFrame(lua_State *L)
   return 0;
 }
 
-// 
+// draw a given frame into the framebuffer
 static int ppm_drawFrame(lua_State *L)
 {
 	ppm_ctx_t *ctx = getPpmCtx(1);
-	int frameIndex = pd->lua->getArgInt(2) - 1;
+	int frameIndex = pd->lua->getArgInt(2) - 1; // starts at 1 in lua
+	int updateLines = pd->lua->getArgBool(3);
 	u8 *frameBuffer = pd->graphics->getFrame();
-
+	// framebuffer attributes
+	int stride = 52;
+	int startLine = 16;
+	int startByte = 72 / 8;
+	// 
 	ppmVideoDecodeFrame(ctx, (u16)frameIndex);
-
+	int dst = 0;
+	int src = 0;
+	u8 chunk = 0;
+	u8 patternOffset = 8;
 	u8* layerA = ctx->layers[0];
 	u8* layerB = ctx->layers[1];
+	u8* layerAPattern = patternMaskNone;
+	u8* layerBPattern = patternMaskChecker;
 
-	int dstPtr = 0;
-	int srcPtr = 0;
-	register u8 chunk = 0;
-
-	static int stride = 52;
-	static int startLine = 16;
-	static int startByte = 72 / 8;
-
-	bool oddLine = false;
-	// bool isLayerARedBlue = ctx->layerColours[0] > 1;
-	// bool isLayerBRedBlue = ctx->layerColours[1] > 1;
-
-	for (int y = 0; y < SCREEN_HEIGHT; y++)
+	for (u8 y = 0; y < SCREEN_HEIGHT; y++)
 	{
-		dstPtr = (startLine + y) * stride + startByte;
-		oddLine = (srcPtr - 1) % 512 < 256;
-
-// pack 8 pixels into a one-byte chunk
-for (int c = 0; c < 32; c += 1)
-{
-		// all pixels start out white
-	chunk = 0xFF;
-	for (int shift = 0; shift < 8; shift++, srcPtr++)
-	{
-		// flip bit to black if the pixel is > 0
-		if (layerA[srcPtr] || layerB[srcPtr])
-			chunk &= patternMaskNone[shift];
-		// same for layer b, but with a half-dither pattern for contrast
-		// else if (layerB[srcPtr])
-		// 	chunk &= (oddLine ? patternMaskCheckerboardOdd : patternMaskCheckerboardEven)[shift];
-	}
-	// invert chunk if paper is black
-	if (ctx->paperColour == 0)
-		chunk = ~chunk;
-
-	frameBuffer[dstPtr++] = chunk;
-}
-
+		dst = (startLine + y) * stride + startByte;
+		patternOffset = patternOffset == 8 ? 0 : 8;
+		// pack 8 pixels into a one-byte chunk
+		for (u8 c = 0; c < 32; c += 1)
+		{
+			// all pixels start out white
+			chunk = 0xFF;
+			for (u8 shift = 0; shift < 8; shift++, src++)
+			{
+				// flip bit to black if the pixel is > 0
+				if (layerA[src])
+					chunk &= layerAPattern[patternOffset + shift];
+				else if (layerB[src])
+					chunk &= layerBPattern[patternOffset + shift];
+			}
+			// invert chunk if paper is black
+			if (ctx->paperColour == 0)
+				chunk = ~chunk;
+			frameBuffer[dst++] = chunk;
+		}
 	}
 
-	pd->graphics->markUpdatedRows(startLine, startLine + SCREEN_HEIGHT);
+	if (updateLines)
+		pd->graphics->markUpdatedRows(startLine, startLine + SCREEN_HEIGHT);
 
 	return 0;
 }
@@ -302,8 +299,7 @@ static int tmb_gc(lua_State *L)
 static int tmb_toBitmap(lua_State *L)
 {
 	tmb_ctx_t *ctx = getTmbCtx(1);
-
-	u8 *pixels = pd_malloc(64 * 48);
+	u8 *pixels = pd_malloc(THUMBNAIL_WIDTH * THUMBNAIL_HEIGHT);
 
 	int width = 0;
 	int height = 0;
@@ -311,37 +307,41 @@ static int tmb_toBitmap(lua_State *L)
 	int hasMask = 0;
 	u8* bitmapData;
 	
-	LCDBitmap *bitmap = pd->graphics->newBitmap(64, 48, kColorBlack);
+	LCDBitmap *bitmap = pd->graphics->newBitmap(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, kColorBlack);
 	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &hasMask, &bitmapData);
 
 	tmbGetThumbnail(ctx, pixels);
 
 	u8 chunk = 0;
-	u8 px = 0;
-	bool oddLine = false;
-	int srcOffset = 0;
-	int dstOffset = 0;
-	while (dstOffset < height * rowBytes)
+	u8 patternOffset = 8;
+	u16 src = 0;
+	u16 dst = 0;
+	for (u8 y = 0; y < THUMBNAIL_HEIGHT; y++)
 	{
-		chunk = 0xFF; // all pixels start out white
-		for (int shift = 0; shift < 8; shift++)
+		patternOffset = patternOffset == 8 ? 0 : 8;
+		for (u8 x = 0; x < THUMBNAIL_WIDTH; x += 8)
 		{
-			px = ppmThumbnailPaletteGray[pixels[srcOffset++]];
-			oddLine = (srcOffset - 1) % 128 < 64;
-			// set a bit to black if it corresponds to a black pixel
-			if (px == 0)
-				chunk ^= (0x80 >> shift);
-			// dark grey - inverse polka pattern
-			else if (px == 1 && (!oddLine || srcOffset % 2 == 0))
-				chunk ^= (0x80 >> shift);
-			// mid grey - checkerboard pattern
-			else if (px == 2 && srcOffset % 2 == (oddLine ? 1 : 0))
-				chunk ^= (0x80 >> shift);
-			// light grey - polka pattern
-			else if (px == 3 && (oddLine && srcOffset % 2 == 1))
-				chunk ^= (0x80 >> shift);
+			chunk = 0xFF; // all pixels start out white
+			for (u8 shift = 0; shift < 8; shift++)
+			{
+				switch (ppmThumbnailPaletteGray[pixels[src++]])
+				{
+					case 0:
+						chunk &= patternMaskNone[patternOffset + shift];
+						break;
+					case 1:
+						chunk &= patternMaskInvPolka[patternOffset + shift];
+						break;
+					case 2:
+						chunk &= patternMaskChecker[patternOffset + shift];
+						break;
+					case 3:
+						chunk &= patternMaskPolka[patternOffset + shift];
+						break;
+				}
+			}
+			bitmapData[dst++] = chunk;
 		}
-		bitmapData[dstOffset++] = chunk;
 	}
 
 	pd_free(pixels);
