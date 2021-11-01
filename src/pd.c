@@ -2,11 +2,6 @@
 
 void *(*pd_realloc)(void* ptr, size_t size);
 
-void pd_setRealloc(void *(*realloc)(void *ptr, size_t size))
-{
-	pd_realloc = realloc;
-}
-
 void *pd_calloc(size_t numElem, size_t elSize)
 {
 	void *p;
@@ -15,4 +10,9 @@ void *pd_calloc(size_t numElem, size_t elSize)
 		return (p);
 	memset(p, 0, numElem * elSize);
 	return (p);
+}
+
+void pd_setRealloc(void *(*realloc)(void *ptr, size_t size))
+{
+	pd_realloc = realloc;
 }

@@ -3,10 +3,12 @@
 - Player timeline bar
 - Player counter
 - Player play/pause with timer
-- Player crank playback
-- Player frame-by-frame
-- Player support for dithering red/blue colors to contrast them against the pen color
+- Some kinda prompt on the main menu
+- Customizable dithering per note
 - Player audio
+- Switching between folders
+- Settings screen with version info, about, and credits
+- Instructions in settings
 - Bundle sample Flipnotes and add credits for the creators
 
 ## Playnote Studio

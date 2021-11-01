@@ -69,7 +69,7 @@ static int ppm_gc(lua_State *L)
 	ppm_ctx_t *ctx = getPpmCtx(1);
 	ppmDone(ctx);
 	pd_free(ctx);
-	// pd->system->logToConsole("ppm free");
+	pd->system->logToConsole("ppm free");
   return 0;
 }
 
@@ -140,32 +140,34 @@ static int ppm_drawFrame(lua_State *L)
 	ppm_ctx_t *ctx = getPpmCtx(1);
 	int frameIndex = pd->lua->getArgInt(2) - 1; // starts at 1 in lua
 	int updateLines = pd->lua->getArgBool(3);
-	u8 *frameBuffer = pd->graphics->getFrame();
-	// framebuffer attributes
-	int stride = 52;
-	int startLine = 16;
-	int startByte = 72 / 8;
+	void *frameBuffer = pd->graphics->getFrame();
+	// initial frame data start position
+	// startY = 16
+	// startX = 72
+	// stride = 52
+	frameBuffer = (u32*)(frameBuffer + 16 * 52 + 9);
 	// 
 	ppmVideoDecodeFrame(ctx, (u16)frameIndex);
-	int dst = 0;
+	u8 *layerA = ctx->layers[0];
+	u8 *layerB = ctx->layers[1];
+
+	const u32 *layerAPattern = patternMaskNone;
+	const u32 *layerBPattern = patternMaskChecker;
+	u8 patternOffset = 32;
+
+	u32 chunk = 0;
 	int src = 0;
-	u8 chunk = 0;
-	u8 patternOffset = 8;
-	u8* layerA = ctx->layers[0];
-	u8* layerB = ctx->layers[1];
-	u8* layerAPattern = patternMaskNone;
-	u8* layerBPattern = patternMaskChecker;
 
 	for (u8 y = 0; y < SCREEN_HEIGHT; y++)
 	{
-		dst = (startLine + y) * stride + startByte;
-		patternOffset = patternOffset == 8 ? 0 : 8;
-		// pack 8 pixels into a one-byte chunk
-		for (u8 c = 0; c < 32; c += 1)
+		// shift pattern between even and odd row
+		patternOffset = patternOffset == 32 ? 0 : 32;
+		// pack 32 pixels into a 4-byte chunk
+		for (u8 c = 0; c < 8; c += 1)
 		{
 			// all pixels start out white
-			chunk = 0xFF;
-			for (u8 shift = 0; shift < 8; shift++, src++)
+			chunk = 0xFFFFFFFF;
+			for (u8 shift = 0; shift < 32; shift++, src++)
 			{
 				// flip bit to black if the pixel is > 0
 				if (layerA[src])
@@ -176,12 +178,14 @@ static int ppm_drawFrame(lua_State *L)
 			// invert chunk if paper is black
 			if (ctx->paperColour == 0)
 				chunk = ~chunk;
-			frameBuffer[dst++] = chunk;
+			*(u32 *)frameBuffer = chunk;
+			frameBuffer += 4;
 		}
+		frameBuffer += 20;
 	}
 
 	if (updateLines)
-		pd->graphics->markUpdatedRows(startLine, startLine + SCREEN_HEIGHT);
+		pd->graphics->markUpdatedRows(16, 16 + SCREEN_HEIGHT);
 
 	return 0;
 }
@@ -292,7 +296,7 @@ static int tmb_gc(lua_State *L)
 {
 	tmb_ctx_t *ctx = getTmbCtx(1);
 	pd_free(ctx);
-	// pd->system->logToConsole("tmb free");
+	pd->system->logToConsole("tmb free");
   return 0;
 }
 
@@ -305,39 +309,45 @@ static int tmb_toBitmap(lua_State *L)
 	int height = 0;
 	int rowBytes = 0;
 	int hasMask = 0;
-	u8* bitmapData;
+	u32 *bitmapData;
 	
 	LCDBitmap *bitmap = pd->graphics->newBitmap(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, kColorBlack);
-	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &hasMask, &bitmapData);
+	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &hasMask, (u8 **)&bitmapData);
 
 	tmbGetThumbnail(ctx, pixels);
 
-	u8 chunk = 0;
-	u8 patternOffset = 8;
+	u32 chunk = 0;
+	u8 patternOffset = 32;
 	u16 src = 0;
 	u16 dst = 0;
 	for (u8 y = 0; y < THUMBNAIL_HEIGHT; y++)
 	{
-		patternOffset = patternOffset == 8 ? 0 : 8;
-		for (u8 x = 0; x < THUMBNAIL_WIDTH; x += 8)
+		patternOffset = patternOffset == 32 ? 0 : 32;
+		for (u8 x = 0; x < THUMBNAIL_WIDTH; x += 32)
 		{
-			chunk = 0xFF; // all pixels start out white
-			for (u8 shift = 0; shift < 8; shift++)
+			// all pixels start out white
+			chunk = 0xFFFFFFFF;
+			for (u8 shift = 0; shift < 32; shift++)
 			{
 				switch (ppmThumbnailPaletteGray[pixels[src++]])
 				{
-					case 0:
+					// black
+					case 0: 
 						chunk &= patternMaskNone[patternOffset + shift];
 						break;
+					// dark gray
 					case 1:
 						chunk &= patternMaskInvPolka[patternOffset + shift];
 						break;
+					// mid gray
 					case 2:
 						chunk &= patternMaskChecker[patternOffset + shift];
 						break;
+					// light gray
 					case 3:
 						chunk &= patternMaskPolka[patternOffset + shift];
 						break;
+					// 4 = white, do nothing
 				}
 			}
 			bitmapData[dst++] = chunk;
