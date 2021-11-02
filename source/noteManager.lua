@@ -17,8 +17,8 @@ function noteManager:initFs()
   -- create initial note folder with instructions if it doesn't exist yet
   if not fs.isdir('001') then
     fs.mkdir('001')
-    local readme = fs.open('001/instructions.txt', fs.kFileWrite)
-    readme:write('Drop all of your Flipnote .ppm files into this folder!\nYou can also create more folders alongside this one to organise your Flipnotes.')
+    local readme = fs.open('001/help.txt', fs.kFileWrite)
+    readme:write('Drop all of your Flipnote .ppm files into this folder!\nYou can also organise your Flipnotes by creating more folders next to this one')
     readme:close()
   end
   -- build list of root folders

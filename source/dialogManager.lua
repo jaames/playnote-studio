@@ -23,7 +23,6 @@ local transitionTimer = nil
 
 local inputHandlers = {
   AButtonUp = function ()
-    dialogManager.handleClose()
     dialogManager:hide()
   end
 }
@@ -72,6 +71,7 @@ function dialogManager:hide()
     bgFade = 0
     isTransitionActive = false
     dialogManager.isVisible = false
+    dialogManager.handleClose()
     dialogManager.handleClose = function () end
     -- restore controls
     playdate.inputHandlers.pop()

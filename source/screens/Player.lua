@@ -18,38 +18,57 @@ class('PlayerScreen').extends(ScreenBase)
 
 function PlayerScreen:init()
   PlayerScreen.super.init(self)
-
+  -- ppm playback state stuff
   self.ppm = nil
+  self.currentFrame = 1
+  self.numFrames = 1
   self.loop = true
   self.isPlaying = false
-  self.currentFrame = 1
-
-  self.prevFrameCrankAngle = 0
-  self.currentCrankAngle = 0
-
-  local animTimer = nil
-  local keyTimer = nil
-  
+  self.animTimer = nil -- TODO
+  -- player ui transition stuff
+  self.playTransitionDir = 1
+  self.isPlayTransitionActive = false
+  self.isPlayUiActive = true
+  self.playTransitionTimer = nil
+  self.playTransitionValue = 0
+  -- input stuff
+  self.keyTimer = nil
   self.inputHandlers = {
     leftButtonDown = function()
-      if self.isPlaying then return end
-      local function timerCallback()
-        self:setCurrentFrame(self.currentFrame - 1)
+      if self.isPlaying then
+        return
       end
-      keyTimer = playdate.timer.keyRepeatTimerWithDelay(500, 100, timerCallback)
+      if self.keyTimer then
+        self.keyTimer:remove()
+        self.keyTimer = nil
+      end
+      self.keyTimer = playdate.timer.keyRepeatTimerWithDelay(500, 100, function ()
+        self:setCurrentFrame(self.currentFrame - 1)
+      end)
     end,
     leftButtonUp = function()
-      keyTimer:remove()
+      if self.keyTimer then
+        self.keyTimer:remove()
+        self.keyTimer = nil
+      end
     end,
     rightButtonDown = function()
-      if self.isPlaying then return end
-      local function timerCallback()
-        self:setCurrentFrame(self.currentFrame + 1)
+      if self.isPlaying then
+        return
       end
-      keyTimer = playdate.timer.keyRepeatTimerWithDelay(500, 100, timerCallback)
+      if self.keyTimer then
+        self.keyTimer:remove()
+        self.keyTimer = nil
+      end
+      self.keyTimer = playdate.timer.keyRepeatTimerWithDelay(500, 100, function ()
+        self:setCurrentFrame(self.currentFrame + 1)
+      end)
     end,
     rightButtonUp = function()
-      keyTimer:remove()
+      if self.keyTimer then
+        self.keyTimer:remove()
+        self.keyTimer = nil
+      end
     end,
     downButtonDown = function()
       self:togglePlay()
@@ -66,6 +85,7 @@ end
 function PlayerScreen:transitionEnter(t)
   if t >= 0.5 then
     gfxUtils:drawBgGrid()
+    self.currentFrame = 1
     self:update()
     gfxUtils:drawWhiteFade((t - 0.5) * 2)
   end
@@ -81,6 +101,9 @@ end
 
 function PlayerScreen:beforeEnter()
   PlayerScreen.super.beforeEnter(self)
+  playdate.getCrankTicks(24) -- prevent crank going nuts if it's been moved since this screen was last active
+  self.font = gfx.font.new('./fonts/Asheville-Sans-14-Bold')
+  self:unloadPpm()
   self:loadPpm()
 end
 
@@ -97,6 +120,8 @@ end
 
 function PlayerScreen:afterLeave()
   PlayerScreen.super.afterLeave(self)
+  self:unloadPpm()
+  self.font = nil
 end
 
 function PlayerScreen:loadPpm()
@@ -110,7 +135,18 @@ function PlayerScreen:loadPpm()
   self.animTimer = animTimer
 end
 
+function PlayerScreen:unloadPpm()
+  self:pause()
+  self.ppm = nil
+  if self.animTimer then
+    self.animTimer:remove()
+    self.animTimer = nil
+  end
+end
+
 function PlayerScreen:setCurrentFrame(i)
+  i = math.floor(i)
+  -- if playback can loop, allow the playback to wrap around
   if self.loop then  
     if i > self.numFrames then
       self.currentFrame = 1
@@ -119,22 +155,33 @@ function PlayerScreen:setCurrentFrame(i)
     else
       self.currentFrame = i
     end
+  -- else clamp
   else
     self.currentFrame = math.max(1, math.min(i, self.numFrames))
   end
 end
 
 function PlayerScreen:play()
+  if self.isPlayTransitionActive then return end
   if not self.isPlaying then
     self.isPlaying = true
+    self:transitionUiControls(false)
     playdate.display.setRefreshRate(self.ppm.fps)
+    -- playdate.display.setRefreshRate(50)
   end
 end
 
 function PlayerScreen:pause()
+  if self.isPlayTransitionActive then return end
   if self.isPlaying then
+    if self.keyTimer then
+      self.keyTimer:remove()
+      self.keyTimer = nil
+    end
     self.isPlaying = false
+    self:transitionUiControls(true)
     playdate.display.setRefreshRate(30)
+    playdate.getCrankTicks(24)
   end
 end
 
@@ -146,28 +193,68 @@ function PlayerScreen:togglePlay()
   end
 end
 
-function PlayerScreen:update()
-  
-  -- playdate.drawFPS(0, 240 -16)
+function PlayerScreen:transitionUiControls(show)
+  local transitionTimer
+  if show then
+    transitionTimer = playdate.timer.new(200, 1, 0, playdate.easingFunctions.outBack)
+  else
+    transitionTimer = playdate.timer.new(200, 0, 1, playdate.easingFunctions.inBack)
+  end
+  self.isPlayUiActive = true
+  self.isPlayTransitionActive = true
+  self.playTransitionTimer = transitionTimer
+  self.playTransitionValue = show and 1 or 0
+  -- on timer update
+  transitionTimer.updateCallback = function (timer)
+    self.playTransitionValue = timer.value
+  end
+  -- page transition is done
+  transitionTimer.timerEndedCallback = function ()
+    self.playTransitionValue = show and 0 or 1
+    utils:nextTick(function ()
+      self.isPlayUiActive = show
+      self.isPlayTransitionActive = false
+    end)
+  end
+end
 
-  local frameChange = playdate.getCrankTicks(24)
+function PlayerScreen:update()
+  playdate.drawFPS(0, 240 -16)
   if (not self.isPlaying) then
+    local frameChange = playdate.getCrankTicks(24)
     self:setCurrentFrame(self.currentFrame + frameChange)
   end
-
+  -- this effectively clears the screen
+  -- which is only needed if the ui is moving, everything else is static, so it's faster too not draw the grid
+  if self.isPlayTransitionActive then
+    gfxUtils.drawBgGrid()
+  end
+  -- draw border around the frame
   gfx.setColor(gfx.kColorBlack)
   gfx.drawRect(72 - 2, 16 - 2, 256 + 4, 192 + 4)
   gfx.setColor(gfx.kColorWhite)
   gfx.drawRect(72 - 1, 16 - 1, 256 + 2, 192 + 2)
-
+  -- draw the frame itself
   self.ppm:drawFrame(self.currentFrame, false)
-  
-  -- local counterText = string.format("%03d/%03d", math.floor(i), 75);
-  -- gfx.setColor(gfx.kColorWhite)
-  -- gfx.fillRoundRect(PLAYDATE_W - 84, PLAYDATE_H - 26, 80, 22, 4)
-
-  -- gfx.fillRoundRect((PLAYDATE_W / 2) - 80, PLAYDATE_H - 26, 160, 16, 4)
-
+  -- draw player UIx
+  if self.isPlayUiActive then
+    -- using transition offset
+    gfx.setDrawOffset(0, self.playTransitionValue * 48)
+    -- frame counter
+    gfx.setColor(gfx.kColorWhite)
+    gfx.fillRoundRect(PLAYDATE_W - 104, PLAYDATE_H - 26, 100, 22, 4)
+    -- frame counter text
+    gfx.setFont(self.font)
+    gfx.drawTextAligned(self.currentFrame, PLAYDATE_W - 78, PLAYDATE_H - 24, kTextAlignment.center)
+    gfx.drawTextAligned('/', PLAYDATE_W - 54, PLAYDATE_H - 24, kTextAlignment.center)
+    gfx.drawTextAligned(self.numFrames, PLAYDATE_W - 30, PLAYDATE_H - 24, kTextAlignment.center)
+    -- using transition offset
+    gfx.setDrawOffset(0, self.playTransitionValue * 32)
+    -- frame timeline
+    gfx.fillRoundRect((PLAYDATE_W / 2) - 80, PLAYDATE_H - 24, 160, 16, 4)
+    -- reset offset
+    gfx.setDrawOffset(0, 0)
+  end
   -- TODO: proper frame tming
   if self.isPlaying then
     self:setCurrentFrame(self.currentFrame + 1)

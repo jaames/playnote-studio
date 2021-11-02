@@ -6,9 +6,9 @@ gfxUtils = {}
 
 local gfx <const> = playdate.graphics
 
-local buttonImg_default <const> = gfx.nineSlice.new('./img/button_default', 6, 6, 4, 4)
-local buttonImg_heavy <const> = gfx.nineSlice.new('./img/button_heavy', 6, 6, 4, 4)
-local buttonFont <const> = gfx.font.new('./fonts/Asheville-Sans-14-Bold')
+-- local buttonImg_default <const> = gfx.nineSlice.new('./img/button_default', 6, 6, 4, 4)
+-- local buttonImg_heavy <const> = gfx.nineSlice.new('./img/button_heavy', 6, 6, 4, 4)
+local buttonFont <const> = gfx.getSystemFont(gfx.font.kVariantBold)
 
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
@@ -40,29 +40,47 @@ function gfxUtils:drawBgGrid()
 end
 
 function gfxUtils:drawWhiteFade(white)
-  -- draw offset is used to scroll the page
+  -- draw offset is used to scroll the page, so we wanna ignore this
   local xOffset, yOffset = gfx.getDrawOffset()
   gfx.setColor(gfx.kColorWhite)
   gfx.setDitherPattern(white, gfx.image.kDitherTypeBayer8x8)
   gfx.fillRect(-xOffset, -yOffset, PLAYDATE_W, PLAYDATE_H)
 end
 
-function gfxUtils:drawButton(x, y, w, h, isHeavy)
-  isHeavy = isHeavy or false
-  if isHeavy then
-    buttonImg_heavy:drawInRect(x, y, w, h)
+function gfxUtils:drawButton(x, y, w, h, isSelected)
+  gfx.setColor(gfx.kColorBlack)
+  if isSelected then
+    gfx.fillRoundRect(x - 3, y - 3, w + 6, h + 6, 4)
+    gfx.setColor(gfx.kColorWhite)
+    gfx.drawRoundRect(x - 1, y - 1, w + 2, h + 2, 3)
   else
-    buttonImg_default:drawInRect(x, y, w, h)
+    gfx.fillRoundRect(x, y, w, h, 3)
   end
 end
 
-function gfxUtils:drawButtonWithText(text, x, y, w, h, isHeavy)
-  local _, textH = gfx.getTextSize(text)
-  local textY = y + (h / 2 - textH)
-  gfxUtils:drawButton(x, y, w, h, isHeavy)
+function gfxUtils:drawButtonWithText(text, x, y, w, h, isSelected)
+  gfx.setFont(buttonFont)
   gfx.setFontTracking(2)
-  -- gfx.drawTextInRect(text, x + 1, textY + 2, w, h, nil, nil, kTextAlignment.center, buttonFont)
+  local _, textH = gfx.getTextSize(text)
+  local textY = y + (h / 2) - (textH / 2)
+  gfxUtils:drawButton(x, y, w, h, isSelected)
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  gfx.drawTextInRect(text, x, textY, w, h, nil, nil, kTextAlignment.center, buttonFont)
+  gfx.drawTextInRect(text, x, textY + 1, w, h, nil, nil, kTextAlignment.center)
+  gfx.setImageDrawMode(0)
+end
+
+function gfxUtils:drawButtonWithTextAndIcon(text, icon, x, y, w, h, isSelected)
+  gfx.setFont(buttonFont)
+  gfx.setFontTracking(2)
+  local textW, textH = gfx.getTextSize(text)
+  local iconW, _ = icon:getSize()
+  local totalW = iconW + 8 + textW -- 8 px gap between icon and text
+  local iconX = x + (w / 2) - (totalW / 2)
+  local textY = y + (h / 2) - (textH / 2)
+  local textX = iconX + iconW + 8
+  gfxUtils:drawButton(x, y, w, h, isSelected)
+  icon:drawAnchored(iconX, y + (h / 2), 0, 0.5)
+  gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+  gfx.drawTextInRect(text, textX, textY + 1, w, h, nil, nil, kTextAlignment.left)
   gfx.setImageDrawMode(0)
 end

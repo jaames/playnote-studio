@@ -7,15 +7,17 @@ import './noteManager'
 import './gfxUtils'
 
 import './screens/Home'
-import './screens/Credits'
-import './screens/Player'
 import './screens/NoteList'
+import './screens/Player'
+import './screens/Settings'
+import './screens/Credits'
 
 playdate.display.setRefreshRate(30)
 
 screenManager:registerScreen('home',     HomeScreen())
 screenManager:registerScreen('notelist', NoteListScreen())
 screenManager:registerScreen('player',   PlayerScreen())
+screenManager:registerScreen('settings', SettingsScreen())
 screenManager:registerScreen('credits',  CreditsScreen())
 
 screenManager:setScreen('home')
@@ -23,6 +25,6 @@ screenManager:setScreen('home')
 function playdate.update()
   screenManager:update()
   dialogManager:update()
-  playdate.timer:updateTimers()
-  -- playdate.frameTimer.updateTimers()
+  playdate.timer.updateTimers()
+  playdate.frameTimer.updateTimers()
 end

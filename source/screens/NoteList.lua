@@ -9,7 +9,6 @@ import '../gfxUtils.lua'
 import '../utils.lua'
 
 local gfx <const> = playdate.graphics
-local pageFont <const> = gfx.font.new('./fonts/ugomemo_numbers_8px')
 
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
@@ -59,10 +58,10 @@ function NoteListScreen:init()
     downButtonDown = function()
       self:setSelected(self.selectedRow + 1, self.selectedCol)
     end,
-    BButtonUp = function()
+    BButtonDown = function()
       screenManager:setScreen('home')
     end,
-    AButtonUp = function()
+    AButtonDown = function()
       local i = self.selectedRow * 4 + self.selectedCol + 1
       local path = self.currFilepaths[i]
       noteManager:setCurrentNote(path)
@@ -74,23 +73,16 @@ end
 function NoteListScreen:beforeEnter()
   NoteListScreen.super.beforeEnter(self)
   self:setCurrentPage(self.currPage)
+  self.pageFont = gfx.font.new('./fonts/ugomemo_numbers_8px')
 end
 
 function NoteListScreen:afterLeave()
+  NoteListScreen.super.afterLeave(self)
   self.hasPrevPage = false -- prevent initial transition when returning to this page
-end
-
-function NoteListScreen:transitionEnter(t)
-  if t >= 0.5 then
-    self:update()
-    gfxUtils:drawWhiteFade((t - 0.5) * 2)
-  end
-end
-
-function NoteListScreen:transitionLeave(t)
-  if (t < 0.5) then
-    self:update()
-    gfxUtils:drawWhiteFade(1 - t * 2)
+  self.pageFont = nil
+  if self.transitionTimer then
+    self.transitionTimer:remove()
+    self.transitionTimer = nil
   end
 end
 
@@ -104,10 +96,11 @@ function NoteListScreen:setSelected(row, col)
 end
 
 function NoteListScreen:setCurrentPage(pageIndex)
-  if self.isTransitionActive then return end
-  if pageIndex < 1 then return end
-  if pageIndex > noteManager.numPages then return end
-  
+  -- navigation guard
+  if self.isTransitionActive or pageIndex < 1 or pageIndex > noteManager.numPages then 
+    return
+  end
+  -- get paths and thumbnails for the requested page
   local page = noteManager:getPage(pageIndex)
   -- cleanup all old bitmaps
   for i = 1, #self.prevThumbBitmaps, 1 do
@@ -118,19 +111,19 @@ function NoteListScreen:setCurrentPage(pageIndex)
     self.prevThumbBitmaps[i] = self.currThumbBitmaps[i]
   end
   -- generate bitmaps for new page
-  local k = 1
+  local j = 1
   for path in pairs(page) do
     local tmb = page[path]
-    self.currThumbBitmaps[k] = tmb:toBitmap()
-    self.currFilepaths[k] = path
+    self.currThumbBitmaps[j] = tmb:toBitmap()
+    self.currFilepaths[j] = path
     tmb = nil
-    k = k + 1
+    j = j + 1
   end
   -- notes on page used for nagivation
-  self.notesOnCurrPage = k - 1
+  self.notesOnCurrPage = j - 1
   -- remove any unused bitmap slots for the new page, if there wasn't enough to fill the page
-  for j = k, #self.currThumbBitmaps, 1 do
-    self.currThumbBitmaps[j] = nil
+  for k = j, #self.currThumbBitmaps, 1 do
+    self.currThumbBitmaps[k] = nil
   end
   -- transition time!
   if self.hasPrevPage then
@@ -151,6 +144,8 @@ function NoteListScreen:setCurrentPage(pageIndex)
       for i = 1, #self.prevThumbBitmaps, 1 do
         self.prevThumbBitmaps[i] = nil
       end
+      self.prevThumbBitmaps = table.create(noteManager.notesPerPage, 0)
+      -- update selection
       if self.transitionDir == -1 then
         self:setSelected(self.selectedRow, 3)
       else
@@ -207,7 +202,7 @@ function NoteListScreen:update()
   gfxUtils:drawBgGrid()
   -- page counter
   local pageString = string.format("%d/%d", self.currPage, noteManager.numPages)
-  gfx.setFont(pageFont)
+  gfx.setFont(self.pageFont)
   gfx.setFontTracking(2)
   gfx.setColor(gfx.kColorWhite)
   gfx.fillRect(PLAYDATE_W - 63, PLAYDATE_H - 23, 64, 24)

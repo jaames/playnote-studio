@@ -19,7 +19,7 @@ function screenManager:registerScreen(id, screen)
 end
 
 function screenManager:setScreen(id)
-  if (isTransitionActive) then
+  if isTransitionActive then
     print('page transition already active!!!')
     return
   end
@@ -45,6 +45,8 @@ function screenManager:setScreen(id)
 
   -- page transition is done
   transitionTimer.timerEndedCallback = function ()
+    if hasPrevScreen then prevScreen:transitionLeave(1, activeScreenId) end
+    activeScreen:transitionEnter(1, prevScreenId)
     if hasPrevScreen then prevScreen:afterLeave() end
     activeScreen:afterEnter()
     isTransitionActive = false
@@ -57,3 +59,14 @@ function screenManager:update()
     activeScreen:update()
   end
 end
+
+-- -- allow current screen to save anything if the game is about to be closed
+-- function playdate.gameWillTerminate()
+--   activeScreen:beforeLeave()
+--   activeScreen:afterLeave()
+-- end
+-- -- and when the device is about to be locked
+-- function playdate.deviceWillLock()
+--   activeScreen:beforeLeave()
+--   activeScreen:afterLeave()
+-- end
