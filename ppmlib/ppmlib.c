@@ -2,21 +2,18 @@
 
 #include "pd_api.h"
 
-#include "luaglue.h"
-#include "pd.h"
+#include "ppmlib.h"
+#include "platform.h"
 #include "types.h"
 #include "ppm.h"
-#include "ppm_video.h"
-
-static PlaydateAPI *pd = NULL;
+#include "video.h"
+#include "dither.h"
 
 static const lua_reg libPpm[];
 static const lua_reg libTmb[];
 
-void registerExt(PlaydateAPI *playdate)
+void registerPpmlib()
 {
-	pd = playdate;
-
 	const char *err;
 
 	if (!pd->lua->registerClass("PpmParser", libPpm, NULL, 0, &err))
@@ -24,11 +21,12 @@ void registerExt(PlaydateAPI *playdate)
 
 	if (!pd->lua->registerClass("TmbParser", libTmb, NULL, 0, &err))
 		pd->system->logToConsole("%s:%i: registering tmb lib failed, %s", __FILE__, __LINE__, err);
-
-	pd_setRealloc(pd->system->realloc);
 }
 
-static ppm_ctx_t *getPpmCtx(int n) { return pd->lua->getArgObject(n, "PpmParser", NULL); }
+static ppm_ctx_t *getPpmCtx(int n) 
+{
+	return pd->lua->getArgObject(n, "PpmParser", NULL);
+}
 
 static int ppm_new(lua_State *L)
 {
@@ -47,10 +45,6 @@ static int ppm_new(lua_State *L)
 	ppm_ctx_t *ctx = pd_malloc(sizeof(ppm_ctx_t));
 	int err = ppmInit(ctx, ppm, fsize);
 	pd_free(ppm);
-
-	#if TARGET_PLAYDATE
-		pd->system->logToConsole("target playdate");
-	#endif
 
 	if (err != -1)
 	{
@@ -151,8 +145,8 @@ static int ppm_drawFrame(lua_State *L)
 	u8 *layerA = ctx->layers[0];
 	u8 *layerB = ctx->layers[1];
 
-	const u32 *layerAPattern = patternMaskNone;
-	const u32 *layerBPattern = patternMaskChecker;
+	const u32 *layerAPattern = ditherMaskNone;
+	const u32 *layerBPattern = ditherMaskChecker;
 	u8 patternOffset = 32;
 
 	u32 chunk = 0;
@@ -305,6 +299,8 @@ static int tmb_toBitmap(lua_State *L)
 	tmb_ctx_t *ctx = getTmbCtx(1);
 	u8 *pixels = pd_malloc(THUMBNAIL_WIDTH * THUMBNAIL_HEIGHT);
 
+	pd_log("AAAAA");
+
 	int width = 0;
 	int height = 0;
 	int rowBytes = 0;
@@ -333,19 +329,19 @@ static int tmb_toBitmap(lua_State *L)
 				{
 					// black
 					case 0: 
-						chunk &= patternMaskNone[patternOffset + shift];
+						chunk &= ditherMaskNone[patternOffset + shift];
 						break;
 					// dark gray
 					case 1:
-						chunk &= patternMaskInvPolka[patternOffset + shift];
+						chunk &= ditherMaskInvPolka[patternOffset + shift];
 						break;
 					// mid gray
 					case 2:
-						chunk &= patternMaskChecker[patternOffset + shift];
+						chunk &= ditherMaskChecker[patternOffset + shift];
 						break;
 					// light gray
 					case 3:
-						chunk &= patternMaskPolka[patternOffset + shift];
+						chunk &= ditherMaskPolka[patternOffset + shift];
 						break;
 					// 4 = white, do nothing
 				}

@@ -11,19 +11,19 @@ SDK = $(shell egrep '^\s*SDKRoot' ~/.Playdate/config | head -n 1 | cut -c9-)
 # ex: VPATH += src1:src2
 ######
 
-VPATH += src
+VPATH += ppmlib
+VPATH += extension
 
 # List C source files here
 SRC = \
-	src/main.c \
-	src/pd.c \
-	src/luaglue.c \
-	src/ppm_video.c \
-	src/ppm.c
+	extension/main.c \
+	ppmlib/ppmlib.c \
+	ppmlib/video.c \
+	ppmlib/ppm.c
 # src/ppm_audio.c
 
 # List all user directories here
-UINCDIR = src
+UINCDIR = extension ppmlib
 
 # List user asm files
 UASRC = 

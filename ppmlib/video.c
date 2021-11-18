@@ -1,7 +1,7 @@
-#include "ppm_video.h"
+#include "video.h"
 
 // seems to be a tiny bit faster than memcpy for filling layer buffers
-static void setChunks(void* ptr, u32 c, size_t n)
+static void setChunks(void *ptr, u32 c, size_t n)
 {
 	u32* p = ptr;
 	while(n > 0) 
@@ -134,7 +134,7 @@ void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
 	/* If this frame isn't a keyframe, XOR with the previously decoded frame to fill in the missing pixels. */
 
 	/* Faster branch for if the frame isn't translated, XOR multiple pixels at once,
-	   interestingly doing u64 XORs seems to be slightly faster than u32, even though the playdate is 32-bit!
+	   interestingly doing u64 XORs seems to be slightly faster than u32, even though the playdate is 32-bit?
 	 */
 	if (!hdr.isKeyFrame && moveByY == 0 && moveByX == 0)
 	{

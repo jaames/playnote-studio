@@ -28,7 +28,7 @@
 
 #include "pd_api.h"
 
-#include "ppm_palette.h"
+#include "palette.h"
 #include "types.h"
 
 static const float speedTable[] =

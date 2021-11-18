@@ -1,5 +1,5 @@
-#include "ppm_audio.h"
-#include "pd.h"
+#include "audio.h"
+#include "platform.h"
 
 /* Decodes an IMA-ADPCM sample to a PCM-16 one. */
 static s16 ppmAudioDecodeSample(u8 sample)
