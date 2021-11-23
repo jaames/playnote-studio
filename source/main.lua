@@ -20,7 +20,7 @@ screenManager:registerScreen('player',   PlayerScreen())
 screenManager:registerScreen('settings', SettingsScreen())
 screenManager:registerScreen('credits',  CreditsScreen())
 
-screenManager:setScreen('home')
+screenManager:setScreen('home', screenManager.BOOTUP)
 
 function playdate.update()
   screenManager:update()

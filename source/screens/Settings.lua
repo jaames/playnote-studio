@@ -30,7 +30,7 @@ function SettingsScreen:init()
       item:onClick(item)
     end,
     BButtonDown = function()
-      screenManager:setScreen('home')
+      screenManager:setScreen('home', screenManager.CROSSFADE)
     end,
     cranked = function(change, acceleratedChange)
       local x, y = self.uiView:getScrollPosition()
@@ -87,7 +87,7 @@ function SettingsScreen:beforeEnter()
         item.button.isSelected = false
       end,
       onClick = function (item)
-        screenManager:setScreen('credits')
+        screenManager:setScreen('credits', screenManager.CROSSFADE)
       end
     },
     {

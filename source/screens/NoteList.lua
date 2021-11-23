@@ -60,13 +60,13 @@ function NoteListScreen:init()
       self:setSelected(self.selectedRow + 1, self.selectedCol)
     end,
     BButtonDown = function()
-      screenManager:setScreen('home')
+      screenManager:setScreen('home', screenManager.CROSSFADE)
     end,
     AButtonDown = function()
       local i = self.selectedRow * 4 + self.selectedCol + 1
       local path = self.currFilepaths[i]
       noteManager:setCurrentNote(path)
-      screenManager:setScreen('player')
+      screenManager:setScreen('player', screenManager.CROSSFADE)
     end,
   }
 end

@@ -23,7 +23,7 @@ function CreditsScreen:init()
   self.autoScroll = false
   self.inputHandlers = {
     BButtonDown = function()
-      screenManager:setScreen('settings')
+      screenManager:setScreen('settings', screenManager.CROSSFADE)
     end,
     cranked = function(change, acceleratedChange)
       self.autoScroll = false
