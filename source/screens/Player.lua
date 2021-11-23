@@ -4,16 +4,20 @@ import 'CoreLibs/timer'
 import 'CoreLibs/crank'
 
 import './ScreenBase'
-import '../screenManager.lua'
-import '../noteManager.lua'
+
+import '../components/Timeline.lua'
+
+import '../services/screens.lua'
+import '../services/notes.lua'
 import '../gfxUtils.lua'
 import '../utils.lua'
 
-local gfx <const> = playdate.graphics
-
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
+local gfx <const> = playdate.graphics
+local counterFont <const> = gfx.font.new('./fonts/CounterFont')
 
+PlayerScreen = {}
 class('PlayerScreen').extends(ScreenBase)
 
 function PlayerScreen:init()
@@ -80,6 +84,7 @@ function PlayerScreen:init()
       screenManager:setScreen('notelist')
     end
   }
+  self.timeline = Timeline((PLAYDATE_W / 2) - 82, PLAYDATE_H - 26, 164, 20)
 end
 
 function PlayerScreen:transitionEnter(t)
@@ -102,7 +107,6 @@ end
 function PlayerScreen:beforeEnter()
   PlayerScreen.super.beforeEnter(self)
   playdate.getCrankTicks(24) -- prevent crank going nuts if it's been moved since this screen was last active
-  self.font = gfx.font.new('./fonts/Asheville-Sans-14-Bold')
   self:unloadPpm()
   self:loadPpm()
 end
@@ -121,7 +125,6 @@ end
 function PlayerScreen:afterLeave()
   PlayerScreen.super.afterLeave(self)
   self:unloadPpm()
-  self.font = nil
 end
 
 function PlayerScreen:loadPpm()
@@ -159,6 +162,7 @@ function PlayerScreen:setCurrentFrame(i)
   else
     self.currentFrame = math.max(1, math.min(i, self.numFrames))
   end
+  self.timeline.progress = (self.currentFrame - 1) / (self.numFrames - 1)
 end
 
 function PlayerScreen:play()
@@ -244,14 +248,14 @@ function PlayerScreen:update()
     gfx.setColor(gfx.kColorWhite)
     gfx.fillRoundRect(PLAYDATE_W - 104, PLAYDATE_H - 26, 100, 22, 4)
     -- frame counter text
-    gfx.setFont(self.font)
+    gfx.setFont(counterFont)
     gfx.drawTextAligned(self.currentFrame, PLAYDATE_W - 78, PLAYDATE_H - 24, kTextAlignment.center)
     gfx.drawTextAligned('/', PLAYDATE_W - 54, PLAYDATE_H - 24, kTextAlignment.center)
     gfx.drawTextAligned(self.numFrames, PLAYDATE_W - 30, PLAYDATE_H - 24, kTextAlignment.center)
     -- using transition offset
     gfx.setDrawOffset(0, self.playTransitionValue * 32)
     -- frame timeline
-    gfx.fillRoundRect((PLAYDATE_W / 2) - 80, PLAYDATE_H - 24, 160, 16, 4)
+    self.timeline:draw()
     -- reset offset
     gfx.setDrawOffset(0, 0)
   end

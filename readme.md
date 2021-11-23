@@ -1,15 +1,14 @@
 ## TODO
 
-- Player timeline bar
-- Player counter
+- Take loop flag from Flipnote
 - Player play/pause with timer
-- Some kinda prompt on the main menu
 - Customizable dithering per note
 - Player audio
 - Switching between folders
-- Settings screen with version info, about, and credits
+- Flipnote details
 - Instructions in settings
 - Bundle sample Flipnotes and add credits for the creators
+- Website
 
 ## Playnote Studio
 
@@ -18,7 +17,7 @@ Play animations from the DSiWare version of Flipnote Studio on your Playdate!
 ## Special Thanks
 
 - [Simon](https://github.com/simontime) for kindly letting me use his C PPM library and answering my dumb C questions while I was trying to port it to the Playdate.
-- [Matt](https://github.com/gingerbeardman) for helping me get access to the Playdate Developer Preview!
+- [Matt](https://github.com/gingerbeardman) for helping me get into to the Playdate Developer Preview!
 
 ## Building
 

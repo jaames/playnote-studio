@@ -3,53 +3,65 @@ import 'CoreLibs/graphics'
 import 'CoreLibs/ui'
 
 import './ScreenBase'
-import '../screenManager.lua'
-import '../configManager.lua'
-import '../dialogManager.lua'
+import '../services/screens.lua'
+import '../services/config.lua'
+import '../services/dialog.lua'
 import '../gfxUtils.lua'
 
 local gfx <const> = playdate.graphics
 
+SettingsScreen = {}
 class('SettingsScreen').extends(ScreenBase)
 
 function SettingsScreen:init()
   SettingsScreen.super.init(self)
   -- init config file, makes self.config available
   configManager:init()
-  
-  -- TODO: calculate
-  self.scrollY = 0
-  self.pageHeight = 400
   self.inputHandlers = {
     upButtonDown = function ()
-      self.settingsUiView:selectPreviousRow(false, true)
+      self:selectPrev()
     end,
     downButtonDown = function ()
-      self.settingsUiView:selectNextRow(false, true)
+      self:selectNext()
     end,
     AButtonDown = function()
-      local row = self.settingsUiView:getSelectedRow()
-      local item = self.settingsItems[row]
-      item:onSelect(item)
+      local row = self.uiView:getSelectedRow()
+      local item = self.items[row]
+      item:onClick(item)
     end,
     BButtonDown = function()
       screenManager:setScreen('home')
     end,
     cranked = function(change, acceleratedChange)
-      self.scrollY = utils:clampScroll(self.scrollY + change, 0, self.pageHeight)
+      local x, y = self.uiView:getScrollPosition()
+      self.uiView:setScrollPosition(x, y - change, false)
     end,
   }
 end
 
 function SettingsScreen:beforeEnter()
   SettingsScreen.super.beforeEnter(self)
+  self.selectedItem = nil
   -- set up setting items
-  local settingsItems <const> = {
+  local items <const> = {
     {
       type = 'button',
-      label = 'About',
-      onSelect = function (item)
-        local aboutText = '\n'
+      init = function(item)
+        local button = Button(0, 0, 336, 48)
+        button:setText('About')
+        item.button = button
+      end,
+      draw = function(item, x, y)
+        item.button:drawAt(x, y)
+      end,
+      select = function (item)
+        item.button.isSelected = true
+      end,
+      deselect = function (item)
+        item.button.isSelected = false
+      end,
+      onClick = function (item)
+        local aboutText = ''
           .. '*Playnote Studio*\n'
           .. 'https://playnote.studio\n'
           .. '\n'
@@ -60,66 +72,133 @@ function SettingsScreen:beforeEnter()
     },
     {
       type = 'button',
-      label = 'Credits',
-      onSelect = function (item)
+      init = function(item)
+        local button = Button(0, 0, 336, 48)
+        button:setText('Credits')
+        item.button = button
+      end,
+      draw = function(item, x, y)
+        item.button:drawAt(x, y)
+      end,
+      select = function (item)
+        item.button.isSelected = true
+      end,
+      deselect = function (item)
+        item.button.isSelected = false
+      end,
+      onClick = function (item)
         screenManager:setScreen('credits')
       end
     },
     {
       type = 'button',
-      label = configManager.enableSoundEffects and 'Sound Effects: On' or 'Sound Effects: Off',
-      onSelect = function (item)
+      init = function(item)
+        local button = Button(0, 0, 336, 48)
+        button:setText(configManager.enableSoundEffects and 'Sound Effects: On' or 'Sound Effects: Off')
+        item.button = button
+      end,
+      draw = function(item, x, y)
+        item.button:drawAt(x, y)
+      end,
+      select = function (item)
+        item.button.isSelected = true
+      end,
+      deselect = function (item)
+        item.button.isSelected = false
+      end,
+      onClick = function (item)
         configManager.enableSoundEffects = not configManager.enableSoundEffects
-        item.label = configManager.enableSoundEffects and 'Sound Effects: On' or 'Sound Effects: Off'
+        item.button:setText(configManager.enableSoundEffects and 'Sound Effects: On' or 'Sound Effects: Off')
       end
     },
     {
       type = 'button',
-      label = configManager.lang == 'jp' and 'Lang: Japanese' or 'Lang: English',
-      onSelect = function (item)
+      init = function(item)
+        local button = Button(0, 0, 336, 48)
+        button:setText(configManager.lang == 'jp' and 'Lang: Japanese' or 'Lang: English')
+        item.button = button
+      end,
+      draw = function(item, x, y)
+        item.button:drawAt(x, y)
+      end,
+      select = function (item)
+        item.button.isSelected = true
+      end,
+      deselect = function (item)
+        item.button.isSelected = false
+      end,
+      onClick = function (item)
         configManager.lang = configManager.lang == 'en' and 'jp' or 'en'
-        item.label = configManager.lang == 'jp' and 'Lang: Japanese' or 'Lang: English'
+        item.button:setText(configManager.lang == 'jp' and 'Lang: Japanese' or 'Lang: English')
       end
     },
     {
       type = 'button',
-      label = 'Reset Settings',
-      onSelect = function (item)
+      init = function(item)
+        local button = Button(0, 0, 336, 48)
+        button:setText('Reset Settings')
+        item.button = button
+      end,
+      draw = function(item, x, y)
+        item.button:drawAt(x, y)
+      end,
+      select = function (item)
+        item.button.isSelected = true
+      end,
+      deselect = function (item)
+        item.button.isSelected = false
+      end,
+      onClick = function (item)
         dialogManager.handleClose = function ()
           configManager:reset()
           self:beforeEnter()
         end
-        dialogManager:show('Settings will be reset, press A to be confirm')
+        dialogManager:confirm('*Settings will be cleared*')
       end
     }
   }
-  -- set up settings ui view
-  local settingsUiView <const> = playdate.ui.gridview.new(336, 48)
-  settingsUiView:setNumberOfColumns(1)
-  settingsUiView:setNumberOfRows(#settingsItems)
-  settingsUiView:setContentInset(28, 28, 0, 0)
-  settingsUiView:setCellPadding(4, 4, 4, 4)
-  -- settingsUiView.scrollCellsToCenter = false
-  
-  self.settingsItems = settingsItems
-  self.settingsUiView = settingsUiView
-
-  local o = settingsUiView.setScrollPosition
-  local s = self
-
-  function settingsUiView:setScrollPosition(x, y, animated)
-    s.scrollY = -y
-    print(x, y, animated)
+  -- init ui components
+  for _, item in pairs(items) do
+    item.init(item)
   end
+  -- set up settings ui view
+  local uiView <const> = playdate.ui.gridview.new(336, 48)
+  uiView:setNumberOfRows(#items)
+  uiView:setContentInset(28, 28, 12, 12)
+  uiView:setCellPadding(4, 4, 4, 4)
+  
+  self.items = items
+  self.uiView = uiView
+  self:_updateSelectedItem(1)
 
-  settingsUiView:setSelectedRow(1)
+  function uiView:drawCell(section, row, column, selected, x, y, width, height)
+    local item <const> = items[row]
+    playdate.graphics.setClipRect(0, 0, 400, 240)
+    item.draw(item, x, y)
+  end
+end
 
-  function settingsUiView:drawCell(section, row, column, selected, x, y, width, height)
-    local item <const> = settingsItems[row]
+function SettingsScreen:selectNext()
+  self.uiView:selectNextRow(false, true)
+  local i = self.uiView:getSelectedRow()
+  self:_updateSelectedItem(i)
+end
 
-    if item.type == 'button' then
-      gfxUtils:drawButtonWithText(item.label, x, y, width, height, selected)
-    end
+function SettingsScreen:selectPrev()
+  self.uiView:selectPreviousRow(false, true)
+  local i = self.uiView:getSelectedRow()
+  self:_updateSelectedItem(i)
+end
+
+function SettingsScreen:_updateSelectedItem(i)
+  local curr = self.selectedItem
+  if curr ~= nil then
+    curr.deselect(curr)
+  end
+  local next = self.items[i]
+  if next ~= nil then
+    next.select(next)
+    self.selectedItem = next
   end
 end
 
@@ -130,7 +209,7 @@ function SettingsScreen:afterLeave()
 end
 
 function SettingsScreen:update()
-  gfx.setDrawOffset(0, self.scrollY)
-  gfxUtils:drawBgGrid()
-  self.settingsUiView:drawInRect(0, 0, 400, 240)
+  gfx.setDrawOffset(0, 0)
+  gfxUtils:drawBgGridWithOffset(0)
+  self.uiView:drawInRect(0, 0, 400, 240)
 end

@@ -1,9 +1,9 @@
 import 'CoreLibs/timer'
 -- import 'CoreLibs/frameTimer'
 
-import './screenManager'
-import './dialogManager'
-import './noteManager'
+import './services/screens'
+import './services/dialog'
+import './services/notes'
 import './gfxUtils'
 
 import './screens/Home'

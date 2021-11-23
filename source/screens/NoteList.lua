@@ -3,17 +3,18 @@ import 'CoreLibs/timer'
 import 'CoreLibs/object'
 
 import './ScreenBase'
-import '../screenManager.lua'
-import '../noteManager.lua'
+import '../services/screens.lua'
+import '../services/notes.lua'
 import '../gfxUtils.lua'
 import '../utils.lua'
 
-local gfx <const> = playdate.graphics
-
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
+local gfx <const> = playdate.graphics
+
 local TRANSITION_DUR <const> = 250
 
+NoteListScreen = {}
 class('NoteListScreen').extends(ScreenBase)
 
 function NoteListScreen:init()

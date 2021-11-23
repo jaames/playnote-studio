@@ -3,7 +3,7 @@ import 'CoreLibs/frameTimer'
 
 utils = {}
 
--- execute callbacck function on next frame
+-- execute callback function on next frame
 function utils:nextTick(callback)
   playdate.frameTimer.new(1, callback)
 end
@@ -19,6 +19,17 @@ function utils:readTextFile(path)
   end
   f:close()
   return text
+end
+
+function utils:isInternalFolder(name)
+  return (
+    name == 'data/' or
+    name == 'fonts/' or
+    name == 'img/' or
+    name == 'components/' or
+    name == 'screens/' or
+    name == 'services/'
+  )
 end
 
 -- clamp scroll position pos between start (usually 0) and height (usually page height)

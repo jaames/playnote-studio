@@ -1,5 +1,6 @@
 import 'CoreLibs/object'
 
+ScreenBase = {}
 class('ScreenBase').extends()
 
 function ScreenBase:init()
@@ -44,4 +45,5 @@ function ScreenBase:afterLeave()
 end
 
 function ScreenBase:update()
+  
 end

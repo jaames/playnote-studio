@@ -3,7 +3,7 @@ import 'CoreLibs/graphics'
 import 'CoreLibs/animation'
 
 import './ScreenBase'
-import '../screenManager.lua'
+import '../services/screens.lua'
 import '../gfxUtils.lua'
 import '../utils.lua'
 
@@ -14,6 +14,7 @@ local normalFont <const> = gfx.getSystemFont(gfx.font.kVariantNormal)
 local SCROLL_START <const> = 200
 local SCROLL_AUTO_STEP <const> = -2
 
+CreditsScreen = {}
 class('CreditsScreen').extends(ScreenBase)
 
 function CreditsScreen:init()
@@ -26,7 +27,7 @@ function CreditsScreen:init()
     end,
     cranked = function(change, acceleratedChange)
       self.autoScroll = false
-      self.scrollY = utils:clampScroll(self.scrollY + change, SCROLL_START, self.creditsHeight)
+      self.scrollY = utils:clampScroll(self.scrollY + change, SCROLL_START, self.creditsRect.h)
     end,
   }
 end
@@ -37,9 +38,9 @@ function CreditsScreen:beforeEnter()
   gfx.setFont(boldFont, gfx.font.kVariantNormal)
   gfx.setFont(normalFont, gfx.font.kVariantItalic)
   self.scrollY = SCROLL_START
-  self.creditsText = utils:readTextFile('./credits.txt')
+  self.creditsText = utils:readTextFile('./data/credits.txt')
   local _, creditsHeight = gfx.getTextSize(self.creditsText)
-  self.creditsHeight = creditsHeight
+  self.creditsRect = playdate.geometry.rect.new(10, 0, 400 - 20, creditsHeight)
 end
 
 function CreditsScreen:afterEnter()
@@ -63,11 +64,10 @@ function CreditsScreen:update()
   gfx.setFont(boldFont, gfx.font.kVariantNormal)
   gfx.setFont(normalFont, gfx.font.kVariantItalic)
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  local rect = playdate.geometry.rect.new(10, 0, 400 - 20, self.creditsHeight)
-  gfx.drawTextInRect(self.creditsText, rect, nil, nil, kTextAlignment.center)
+  gfx.drawTextInRect(self.creditsText, self.creditsRect, nil, nil, kTextAlignment.center)
   gfx.setImageDrawMode(0)
   -- auto scroll
   if self.autoScroll then
-    self.scrollY = utils:clampScroll(self.scrollY + SCROLL_AUTO_STEP, SCROLL_START, self.creditsHeight)
+    self.scrollY = utils:clampScroll(self.scrollY + SCROLL_AUTO_STEP, SCROLL_START, self.creditsRect.h)
   end
 end

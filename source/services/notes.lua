@@ -25,7 +25,7 @@ function noteManager:initFs()
   local list = fs.listFiles('/')
   for i = 1, #list, 1 do
     local name = list[i]
-    if (string.sub(name, -1) == '/') and not (name == 'fonts/' or name == 'img/' or name == 'screens/') then
+    if (string.sub(name, -1) == '/') and not utils:isInternalFolder(name) then
       table.insert(noteManager.folderList, name)
     end
   end
