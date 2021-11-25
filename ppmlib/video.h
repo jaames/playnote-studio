@@ -8,6 +8,6 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame);
+void ppmVideoDecodeFrame(ppm_ctx_t* ctx, u16 frame);
 
-int ppmVideoRenderFrame(ppm_ctx_t *ctx, u32 *out, u16 frame);
+int ppmVideoRenderFrame(ppm_ctx_t* ctx, u32* out, u16 frame);

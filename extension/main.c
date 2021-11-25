@@ -3,8 +3,9 @@
 
 PlaydateAPI *pd = NULL;
 
-int eventHandler(PlaydateAPI *playdate, PDSystemEvent event, uint32_t arg) {
-  if(event == kEventInitLua) {
+int eventHandler(PlaydateAPI *playdate, PDSystemEvent event, uint32_t arg)
+{
+  if (event == kEventInitLua) {
     pd = playdate;
     registerPpmlib();
   }

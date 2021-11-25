@@ -34,5 +34,5 @@ static const s16 stepTable[] =
 static s32 predictor;
 static s8  stepIndex;
 
-u32 ppmAudioNumSamples(ppm_ctx_t *ctx);
-void ppmAudioRender(ppm_ctx_t *ctx, s16 *out);
+u32 ppmAudioNumSamples(ppm_ctx_t* ctx);
+void ppmAudioRender(ppm_ctx_t* ctx, s16* out);

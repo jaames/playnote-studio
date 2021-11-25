@@ -90,13 +90,13 @@ typedef struct ppm_ctx_t
 	ppm_animation_header_t animHdr;
 	ppm_sound_header_t     sndHdr;
 	u8  thumbnail[THUMBNAIL_LENGTH];
-	u8  *audioFrames;
-	u32 *videoOffsets;
-	u8  *bgmData;
-	u8  *seData[3];
-	u8  *videoData;
-	u8  *layers[LAYERS];
-	u8  *prevLayers[LAYERS];
+	u8*  audioFrames;
+	u32* videoOffsets;
+	u8*  bgmData;
+	u8*  seData[3];
+	u8*  videoData;
+	u8*  layers[LAYERS];
+	u8*  prevLayers[LAYERS];
 	s16 prevFrame;
 	u8  layerColours[LAYERS];
 	u8  paperColour;
@@ -112,10 +112,10 @@ typedef struct tmb_ctx_t
 
 #pragma pack(pop)
 
-int  ppmInit(ppm_ctx_t *ctx, u8 *ppm, int len);
-// void ppmGetThumbnail(ppm_ctx_t *ctx, u32 *out);
-void ppmDone(ppm_ctx_t *ctx);
-int  tmbInit(tmb_ctx_t *ctx, u8 *ppm, int len);
-void tmbGetThumbnail(tmb_ctx_t *ctx, u8 *out);
-void tmbDone(tmb_ctx_t *ctx);
-char *fsidFromStr(u8 fsid[8]);
+int  ppmInit(ppm_ctx_t* ctx, u8* ppm, int len);
+// void ppmGetThumbnail(ppm_ctx_t* ctx, u32* out);
+void ppmDone(ppm_ctx_t* ctx);
+int  tmbInit(tmb_ctx_t* ctx, u8* ppm, int len);
+void tmbGetThumbnail(tmb_ctx_t* ctx, u8* out);
+void tmbDone(tmb_ctx_t* ctx);
+char* fsidFromStr(u8 fsid[8]);

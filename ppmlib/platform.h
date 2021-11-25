@@ -6,6 +6,7 @@
 
 extern PlaydateAPI* pd;
 
+// memory management
 #ifndef pd_alloc
 #define pd_alloc(s) pd->system->realloc(NULL, (s))
 #endif
@@ -22,10 +23,10 @@ extern PlaydateAPI* pd;
 #define pd_free(ptr) pd->system->realloc((ptr), 0)
 #endif
 
+// loging
 #ifndef pd_log
 #define pd_log(s, ...) pd->system->logToConsole((s), ##__VA_ARGS__)
 #endif
-
 #ifndef pd_error
 #define pd_error(s, ...) pd->system->error((s), ##__VA_ARGS__)
 #endif

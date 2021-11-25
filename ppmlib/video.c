@@ -1,7 +1,8 @@
 #include "video.h"
+#include "platform.h"
 
 // seems to be a tiny bit faster than memcpy for filling layer buffers
-static void setChunks(void *ptr, u32 c, size_t n)
+static void setChunks(void* ptr, u32 c, size_t n)
 {
 	u32* p = ptr;
 	while(n > 0) 
@@ -11,9 +12,9 @@ static void setChunks(void *ptr, u32 c, size_t n)
 	}
 }
 
-void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
+void ppmVideoDecodeFrame(ppm_ctx_t* ctx, u16 frame)
 {
-	u8 *data;
+	u8* data;
 	s8 moveByX, moveByY;
 	u32 lineFlags, offset;
 	u8 layerLines[LAYERS][SCREEN_HEIGHT];
@@ -24,7 +25,7 @@ void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
 
 	/* If seeking backwards, decode previous frames until a keyframe is reached. */
 	if (frame && ctx->prevFrame != frame - 1 &&
-		!(*(ppm_frame_header_t *)&ctx->videoData[ctx->videoOffsets[frame]]).isKeyFrame)
+		!(*(ppm_frame_header_t*)&ctx->videoData[ctx->videoOffsets[frame]]).isKeyFrame)
 		ppmVideoDecodeFrame(ctx, frame - 1);
 
 	/* Copy the last decoded layer to the last, last decoded one. */
@@ -42,7 +43,7 @@ void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
 
 	data = &ctx->videoData[ctx->videoOffsets[frame]];
 
-	hdr = *(ppm_frame_header_t *)&data[0];
+	hdr = *(ppm_frame_header_t* )&data[0];
 
 	/* Do we move the frame? If so, read X and Y. */
 	moveByX = hdr.doMove ? data[1] : 0;
@@ -207,7 +208,7 @@ void ppmVideoDecodeFrame(ppm_ctx_t *ctx, u16 frame)
 	// }
 }
 
-int ppmVideoRenderFrame(ppm_ctx_t *ctx, u32 *out, u16 frame)
+int ppmVideoRenderFrame(ppm_ctx_t* ctx, u32* out, u16 frame)
 {
 	if (frame >= ctx->hdr.numFrames)
 		return 0;

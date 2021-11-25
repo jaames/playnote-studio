@@ -22,7 +22,7 @@ static s16 ppmAudioDecodeSample(u8 sample)
 }
 
 /* Decodes a raw IMA-ADPCM buffer to PCM-16. */
-void ppmAudioDecodeBuffer(const u8 *in, s16 *out, u32 length)
+void ppmAudioDecodeBuffer(const u8* in, s16* out, u32 length)
 {
 	predictor = 0;
 	stepIndex = 0;
@@ -35,7 +35,7 @@ void ppmAudioDecodeBuffer(const u8 *in, s16 *out, u32 length)
 }
 
 /* Zero-order hold interpolation + volume adjustment. */
-void ppmAudioProcess(const s16 *in, s16 *out, u32 samples, u32 srcFreq, int add)
+void ppmAudioProcess(const s16* in, s16* out, u32 samples, u32 srcFreq, int add)
 {
 	const u32 adjFreq = (srcFreq << 8) / DS_SAMPLE_RATE;
 
@@ -55,16 +55,16 @@ void ppmAudioProcess(const s16 *in, s16 *out, u32 samples, u32 srcFreq, int add)
 	}
 }
 
-u32 ppmAudioNumSamples(ppm_ctx_t *ctx)
+u32 ppmAudioNumSamples(ppm_ctx_t* ctx)
 {
 	return ctx->hdr.numFrames * (u32)round(SAMPLE_RATE / ctx->frameRate) * 4;
 }
 
-void ppmAudioRender(ppm_ctx_t *ctx, s16 *out)
+void ppmAudioRender(ppm_ctx_t* ctx, s16* out)
 {
 	u32 samplesPerFrame, bgmSampleRate;
 	u32 trackLengths[4];
-	s16 *bgm, *se[3];
+	s16* bgm, *se[3];
 
 	/* Calculate the number of audio samples to render per frame. */
 	samplesPerFrame = (u32)round(SAMPLE_RATE / ctx->frameRate);
