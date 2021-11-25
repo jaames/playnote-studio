@@ -20,14 +20,16 @@ end
 
 function screenManager:setScreen(id, Transition)
   if isTransitionActive then
-    print('page transition already active!!!')
+    print('Page transition already active!!!')
     return
   end
+
+  isTransitionActive = true
+
   local hasPrevScreen = activeScreen ~= nil
   prevScreen = activeScreen
   activeScreen = SCREENS[id]
-
-  isTransitionActive = true
+  
   if hasPrevScreen then prevScreen:beforeLeave() end
   activeScreen:beforeEnter()
 

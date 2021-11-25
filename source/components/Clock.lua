@@ -2,7 +2,7 @@ import 'CoreLibs/object'
 import 'CoreLibs/graphics'
 
 local gfx <const> = playdate.graphics
-local font <const> = gfx.font.new('./fonts/ugomemo_numbers_8px')
+local font <const> = gfx.font.new('./fonts/UgoNumber_8')
 local clockGfx <const> = gfx.image.new('./img/clock')
 
 Clock = {}

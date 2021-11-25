@@ -12,7 +12,7 @@ function ScreenBase:beforeEnter()
 end
 
 function ScreenBase:afterEnter()
-  playdate.inputHandlers.push(self.inputHandlers)
+  playdate.inputHandlers.push(self.inputHandlers, true)
 end
 
 function ScreenBase:beforeLeave()

@@ -71,15 +71,16 @@ function dialogManager:show(text, type)
   -- setup transition
   isTransitionActive = true
   transitionTimer = playdate.timer.new(TRANSITION_DUR, 0, 1)
+  y = PLAYDATE_H
   -- on timer update
   transitionTimer.updateCallback = function (timer)
     y = PLAYDATE_H - playdate.easingFunctions.outBack(timer.value, 0, PLAYDATE_H, 1)
-    bgFade = math.max(0, timer.value - 0.5)
+    bgFade = 0.5 - timer.value * 0.25
   end
   -- page transition is done
   transitionTimer.timerEndedCallback = function ()
     y = 0
-    bgFade = 0.5
+    bgFade = 0.25
     isTransitionActive = false
     playdate.inputHandlers.pop()
     playdate.inputHandlers.push(inputHandlers[currentType], true)
@@ -94,12 +95,12 @@ function dialogManager:hide()
   -- on timer update
   transitionTimer.updateCallback = function (timer)
     y = playdate.easingFunctions.inBack(timer.value, 0, PLAYDATE_H, 1)
-    bgFade = math.max(0, 0.5 - timer.value)
+    bgFade = 0.5 - (1 - timer.value) * 0.25
   end
   -- page transition is done
   transitionTimer.timerEndedCallback = function ()
     y = PLAYDATE_H
-    bgFade = 0
+    bgFade = 0.5
     isTransitionActive = false
     dialogManager.isVisible = false
     dialogManager.handleClose = function () end
@@ -114,9 +115,10 @@ function dialogManager:update()
     local textY = PLAYDATE_H / 2 - (currentTextHeight + 28 + 8) / 2
     local buttonY = textY + currentTextHeight + 16
     -- fade over background
-    gfx.setDrawOffset(0, 0)
-    gfx.setColor(gfx.kColorBlack)
-    gfx.setDitherPattern(1 - bgFade, gfx.image.kDitherTypeBayer8x8)
+    gfxUtils:drawWhiteFade(bgFade)
+    -- gfx.setDrawOffset(0, 0)
+    -- gfx.setColor(gfx.kColorBlack)
+    -- gfx.setDitherPattern(1 - bgFade, gfx.image.kDitherTypeBayer8x8)
     -- panel bg
     gfx.setDrawOffset(0, y)
     gfx.fillRect(0, 0, PLAYDATE_W, PLAYDATE_H)

@@ -8,6 +8,9 @@ import '../services/config.lua'
 import '../services/dialog.lua'
 import '../gfxUtils.lua'
 
+import '../components/Button.lua'
+import '../components/Select.lua'
+
 local gfx <const> = playdate.graphics
 
 SettingsScreen = {}
@@ -44,8 +47,8 @@ function SettingsScreen:beforeEnter()
   self.selectedItem = nil
   -- set up setting items
   local items <const> = {
+    -- ABOUT BUTTON
     {
-      type = 'button',
       init = function(item)
         local button = Button(0, 0, 336, 48)
         button:setText('About')
@@ -70,8 +73,8 @@ function SettingsScreen:beforeEnter()
         dialogManager:show(aboutText)
       end
     },
+    -- CREDITS BUTTON
     {
-      type = 'button',
       init = function(item)
         local button = Button(0, 0, 336, 48)
         button:setText('Credits')
@@ -90,50 +93,63 @@ function SettingsScreen:beforeEnter()
         screenManager:setScreen('credits', screenManager.CROSSFADE)
       end
     },
+    -- SOUND EFFECTS ON/OFF
     {
-      type = 'button',
       init = function(item)
-        local button = Button(0, 0, 336, 48)
-        button:setText(configManager.enableSoundEffects and 'Sound Effects: On' or 'Sound Effects: Off')
-        item.button = button
+        local select = Select(0, 0, 336, 48)
+        select:setText('Sound Effects')
+        select:addOption(true,  'Sound Effects On',  'On')
+        select:addOption(false, 'Sound Effects Off', 'Off')
+        select:setValue(configManager.enableSoundEffects)
+        function select:onChange(value)
+          configManager.enableSoundEffects = value
+        end
+        item.selectButton = select
       end,
       draw = function(item, x, y)
-        item.button:drawAt(x, y)
+        item.selectButton:drawAt(x, y)
       end,
       select = function (item)
-        item.button.isSelected = true
+        item.selectButton.isSelected = true
       end,
       deselect = function (item)
-        item.button.isSelected = false
+        item.selectButton.isSelected = false
       end,
       onClick = function (item)
-        configManager.enableSoundEffects = not configManager.enableSoundEffects
-        item.button:setText(configManager.enableSoundEffects and 'Sound Effects: On' or 'Sound Effects: Off')
+        item.selectButton:openMenu()
       end
     },
+    -- LANGUAGE SELECT
     {
-      type = 'button',
       init = function(item)
-        local button = Button(0, 0, 336, 48)
-        button:setText(configManager.lang == 'jp' and 'Lang: Japanese' or 'Lang: English')
-        item.button = button
+        local select = Select(0, 0, 336, 48)
+        select:setText('Language')
+        select:addOption('en',    'English (American)', 'EN US')
+        select:addOption('en_gb', 'English (British)',  'EN GB')
+        select:addOption('fr',    'Francais',           'FR')
+        select:addOption('es',    'Espanol',            'ES')
+        select:addOption('jp',    '日本語',              'JP')
+        select:setValue(configManager.lang)
+        function select:onChange(value)
+          configManager.lang = value
+        end
+        item.selectButton = select
       end,
       draw = function(item, x, y)
-        item.button:drawAt(x, y)
+        item.selectButton:drawAt(x, y)
       end,
       select = function (item)
-        item.button.isSelected = true
+        item.selectButton.isSelected = true
       end,
       deselect = function (item)
-        item.button.isSelected = false
+        item.selectButton.isSelected = false
       end,
       onClick = function (item)
-        configManager.lang = configManager.lang == 'en' and 'jp' or 'en'
-        item.button:setText(configManager.lang == 'jp' and 'Lang: Japanese' or 'Lang: English')
+        item.selectButton:openMenu()
       end
     },
+    -- RESET SETTINGS
     {
-      type = 'button',
       init = function(item)
         local button = Button(0, 0, 336, 48)
         button:setText('Reset Settings')
@@ -202,10 +218,13 @@ function SettingsScreen:_updateSelectedItem(i)
   end
 end
 
--- autosave on leave
 function SettingsScreen:afterLeave()
   SettingsScreen.super.afterLeave(self)
+  -- autosave on leave
   configManager:save()
+  -- free ui items and view
+  self.items = nil
+  self.uiView = nil
 end
 
 function SettingsScreen:update()

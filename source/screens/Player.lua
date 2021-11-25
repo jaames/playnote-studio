@@ -15,7 +15,7 @@ import '../utils.lua'
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 local gfx <const> = playdate.graphics
-local counterFont <const> = gfx.font.new('./fonts/CounterFont')
+local counterFont <const> = gfx.font.new('./fonts/WhalesharkCounter')
 
 PlayerScreen = {}
 class('PlayerScreen').extends(ScreenBase)

@@ -2,40 +2,24 @@ import 'CoreLibs/object'
 
 -- BASE TRANSITION
 
-TransitionBase = {}
-class('TransitionBase').extends()
+local function makeTransition(duration, easing, onUpdate)
+  return function(a, b, completedCallback)
+    local timer = playdate.timer.new(duration, 0, 1, easing)
 
-function TransitionBase:init(a, b, completedCallback)
-  TransitionBase.super.init(self)
-  local duration, easing = self:getProps()
-  local timer = playdate.timer.new(duration, 0, 1, easing)
+    timer.updateCallback = function ()
+      onUpdate(timer.value, a, b)
+    end
 
-  timer.updateCallback = function ()
-    self:onUpdate(timer.value, a, b)
+    timer.timerEndedCallback = function ()
+      onUpdate(1, a, b)
+      completedCallback()
+    end
   end
-
-  timer.timerEndedCallback = function ()
-    self:onUpdate(1)
-    completedCallback()
-  end
-end
-
-function TransitionBase:getProps()
-  return 250, playdate.easingFunctions.linear
-end
-
-function TransitionBase:onUpdate(t, a, b)
-end
-
-function TransitionBase:onCompleted()
 end
 
 -- CROSSFADE TRANSITION
 
-CrossfadeTransition = {}
-class('CrossfadeTransition').extends(TransitionBase)
-
-function CrossfadeTransition:onUpdate(t, a, b)
+CrossfadeTransition = makeTransition(250, playdate.easingFunctions.linear, function (t, a, b)
   if t < 0.5 and a ~= nil then
     a:update()
     gfxUtils:drawWhiteFade(1 - t * 2)
@@ -44,20 +28,13 @@ function CrossfadeTransition:onUpdate(t, a, b)
     b:update()
     gfxUtils:drawWhiteFade((t - 0.5) * 2)
   end
-end
+end)
 
 -- BOOTUP TRANSITION
 
-BootupTransition = {}
-class('BootupTransition').extends(TransitionBase)
-
-function BootupTransition:getProps()
-  return 400, playdate.easingFunctions.linear
-end
-
-function BootupTransition:onUpdate(t, a, b)
+BootupTransition = makeTransition(320, playdate.easingFunctions.linear, function (t, a, b)
   if b ~= nil then
     b:update()
     gfxUtils:drawWhiteFade(t)
   end
-end
+end)

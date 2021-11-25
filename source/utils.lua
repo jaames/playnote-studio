@@ -21,6 +21,7 @@ function utils:readTextFile(path)
   return text
 end
 
+-- returns true if a given folder is internal
 function utils:isInternalFolder(name)
   return (
     name == 'data/' or
@@ -30,6 +31,10 @@ function utils:isInternalFolder(name)
     name == 'screens/' or
     name == 'services/'
   )
+end
+
+function utils:clamp(val, lower, upper)
+  return math.max(lower, math.min(upper, val))
 end
 
 -- clamp scroll position pos between start (usually 0) and height (usually page height)
@@ -47,4 +52,19 @@ function utils:clearArray(t)
   for k in pairs(t) do
     t[k] = nil
   end
+end
+
+-- ugly as shit draw deferring
+
+local deferredDraws = {}
+
+function utils:deferDraw(callback)
+  table.insert(deferredDraws, callback)
+end
+
+function utils:doDeferredDraws()
+  for _, fn in pairs(deferredDraws) do
+    fn()
+  end
+  deferredDraws = {}
 end

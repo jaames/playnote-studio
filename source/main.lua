@@ -25,6 +25,7 @@ screenManager:setScreen('home', screenManager.BOOTUP)
 function playdate.update()
   screenManager:update()
   dialogManager:update()
+  utils:doDeferredDraws()
   playdate.timer.updateTimers()
   playdate.frameTimer.updateTimers()
 end

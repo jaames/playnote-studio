@@ -2,8 +2,7 @@ import 'CoreLibs/object'
 import 'CoreLibs/graphics'
 
 local gfx <const> = playdate.graphics
-local fontBold <const> = gfx.getSystemFont(gfx.font.kVariantBold)
-local fontNormal <const> = gfx.getSystemFont(gfx.font.kVariantNormal)
+local fontBold <const> = gfx.font.new('./fonts/WhalesharkSans')
 
 Button = {}
 class('Button').extends()
