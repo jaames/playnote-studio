@@ -3,6 +3,7 @@ import 'CoreLibs/timer'
 import 'CoreLibs/object'
 
 import './ScreenBase'
+import '../components/FolderSelect.lua'
 import '../services/screens.lua'
 import '../services/notes.lua'
 import '../gfxUtils.lua'
@@ -10,7 +11,10 @@ import '../utils.lua'
 
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
+local FOLDERSELECT_ROW = -1
 local gfx <const> = playdate.graphics
+local baseFont <const> = gfx.font.new('./fonts/WhalesharkSans')
+local pageCounterFont <const> = gfx.font.new('./fonts/UgoNumber_8')
 
 local TRANSITION_DUR <const> = 250
 
@@ -20,15 +24,16 @@ class('NoteListScreen').extends(ScreenBase)
 function NoteListScreen:init()
   NoteListScreen.super.init(self)
 
-  noteManager:initFs()
+  noteFs:initFs()
 
   self.currPage = 1
-  self.currFilepaths = table.create(noteManager.notesPerPage, 0)
-  self.currThumbBitmaps = table.create(noteManager.notesPerPage, 0)
+  self.currFilepaths = table.create(noteFs.notesPerPage, 0)
+  self.currThumbBitmaps = table.create(noteFs.notesPerPage, 0)
   self.notesOnCurrPage = 0
 
   self.hasPrevPage = false
-  self.prevThumbBitmaps = table.create(noteManager.notesPerPage, 0)
+  self.hasNoNotes = false
+  self.prevThumbBitmaps = table.create(noteFs.notesPerPage, 0)
 
   self.transitionDir = 1
   self.isTransitionActive = false
@@ -63,10 +68,15 @@ function NoteListScreen:init()
       screenManager:setScreen('home', screenManager.CROSSFADE)
     end,
     AButtonDown = function()
-      local i = self.selectedRow * 4 + self.selectedCol + 1
-      local path = self.currFilepaths[i]
-      noteManager:setCurrentNote(path)
-      screenManager:setScreen('player', screenManager.CROSSFADE)
+      -- the file dropdown is selected
+      if self.selectedRow == FOLDERSELECT_ROW then
+        self.folderSelect:openMenu()
+      else
+        local i = self.selectedRow * 4 + self.selectedCol + 1
+        local path = self.currFilepaths[i]
+        noteFs:setCurrentNote(path)
+        screenManager:setScreen('player', screenManager.CROSSFADE)
+      end
     end,
   }
 end
@@ -74,13 +84,23 @@ end
 function NoteListScreen:beforeEnter()
   NoteListScreen.super.beforeEnter(self)
   self:setCurrentPage(self.currPage)
-  self.pageFont = gfx.font.new('./fonts/ugomemo_numbers_8px')
+  -- setup folder select dropdown
+  local folderSelect = FolderSelect(-4, -4, 220, 36)
+  local s = self
+  function folderSelect:onClose (value, index)
+    s.setCurrentFolder(s, value)
+  end
+  for key, name in pairs(noteFs.folderList) do
+    folderSelect:addOption(key, name)
+  end
+  folderSelect:setValue(noteFs.currentFolder)
+
+  self.folderSelect = folderSelect
 end
 
 function NoteListScreen:afterLeave()
   NoteListScreen.super.afterLeave(self)
   self.hasPrevPage = false -- prevent initial transition when returning to this page
-  self.pageFont = nil
   if self.transitionTimer then
     self.transitionTimer:remove()
     self.transitionTimer = nil
@@ -89,20 +109,42 @@ end
 
 function NoteListScreen:setSelected(row, col)
   local numNotes = self.notesOnCurrPage
-  row = math.max(0, math.min(2, row))
-  col = math.max(0, math.min(3, col))
-  local index = math.min((row * 4 + col) + 1, numNotes) - 1
-  self.selectedRow = math.floor(index / 4)
-  self.selectedCol = index % 4
+  if row == FOLDERSELECT_ROW or numNotes == 0 then
+    self.folderSelect.isSelected = true
+    self.selectedRow = FOLDERSELECT_ROW
+  else
+    row = math.max(0, math.min(2, row))
+    col = math.max(0, math.min(3, col))
+    local index = math.min((row * 4 + col) + 1, numNotes) - 1
+    self.selectedRow = math.floor(index / 4)
+    self.selectedCol = index % 4
+    self.folderSelect.isSelected = false
+  end
+end
+
+function NoteListScreen:setCurrentFolder(folder)
+  noteFs:setDirectory(folder)
+  if noteFs.hasNotes then
+    self.hasNoNotes = false
+    self.hasPrevPage = false
+    self:setCurrentPage(1)
+  else
+    self.hasNoNotes = true
+    self.currThumbBitmaps = {}
+    self.currFilepaths = {}
+    self.notesOnCurrPage = 0
+    self.currPage = 0
+    self:setSelected(FOLDERSELECT_ROW, 0) -- only the folder select button can be active
+  end
 end
 
 function NoteListScreen:setCurrentPage(pageIndex)
   -- navigation guard
-  if self.isTransitionActive or pageIndex < 1 or pageIndex > noteManager.numPages then 
+  if self.isTransitionActive or pageIndex < 1 or pageIndex > noteFs.numPages then 
     return
   end
   -- get paths and thumbnails for the requested page
-  local page = noteManager:getPage(pageIndex)
+  local page = noteFs:getPage(pageIndex)
   -- cleanup all old bitmaps
   for i = 1, #self.prevThumbBitmaps, 1 do
     self.prevThumbBitmaps[i] = nil
@@ -145,7 +187,7 @@ function NoteListScreen:setCurrentPage(pageIndex)
       for i = 1, #self.prevThumbBitmaps, 1 do
         self.prevThumbBitmaps[i] = nil
       end
-      self.prevThumbBitmaps = table.create(noteManager.notesPerPage, 0)
+      self.prevThumbBitmaps = table.create(noteFs.notesPerPage, 0)
       -- update selection
       if self.transitionDir == -1 then
         self:setSelected(self.selectedRow, 3)
@@ -165,7 +207,7 @@ function NoteListScreen:drawGrid(xOffset, bitmaps)
   local nRows <const> = 3
   local nCols <const> = 4
   local baseX <const> = 48
-  local baseY <const> = 32
+  local baseY <const> = 40
   local i = 1
   for row = 0, nRows - 1, 1 do
     for col = 0, nCols - 1, 1 do
@@ -201,9 +243,17 @@ end
 function NoteListScreen:update()
   -- page bg
   gfxUtils:drawBgGrid()
+  -- folder select
+  self.folderSelect:draw()
+  -- show "no notes available"
+  if self.hasNoNotes then
+    -- TODO: prettier UI
+    gfx.setFont(baseFont)
+    gfx.drawTextInRect("There's no Flipnotes in this folder.", 0, 80, 400, 40, nil, nil, kTextAlignment.center)
+  end
   -- page counter
-  local pageString = string.format("%d/%d", self.currPage, noteManager.numPages)
-  gfx.setFont(self.pageFont)
+  local pageString = string.format("%d/%d", self.currPage, noteFs.numPages)
+  gfx.setFont(pageCounterFont)
   gfx.setFontTracking(2)
   gfx.setColor(gfx.kColorWhite)
   gfx.fillRect(PLAYDATE_W - 63, PLAYDATE_H - 23, 64, 24)
@@ -211,11 +261,11 @@ function NoteListScreen:update()
   -- grid: right transition
   if self.isTransitionActive and self.transitionDir == 1 then
     self:drawGrid(-self.xOffset, self.prevThumbBitmaps)
-    self:drawGrid(400 - self.xOffset, self.currThumbBitmaps)
+    self:drawGrid(PLAYDATE_W - self.xOffset, self.currThumbBitmaps)
   -- grid: left transition 
   elseif self.isTransitionActive and self.transitionDir == -1 then
     self:drawGrid(self.xOffset, self.prevThumbBitmaps)
-    self:drawGrid(-400 + self.xOffset, self.currThumbBitmaps)
+    self:drawGrid(-PLAYDATE_W + self.xOffset, self.currThumbBitmaps)
   -- grid: rest state
   else
     self:drawGrid(0, self.currThumbBitmaps)

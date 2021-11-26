@@ -3,17 +3,17 @@ import './utils.lua'
 
 local fs <const> = playdate.file
 
-noteManager = {}
+noteFs = {}
 
-noteManager.folderList = {}
-noteManager.currentFolder = ''
-noteManager.notesPerPage = 12
-noteManager.currentNote = nil
+noteFs.folderList = {}
+noteFs.currentFolder = ''
+noteFs.notesPerPage = 12
+noteFs.currentNote = nil
 
 local noteList = {}
-local notesPerPage <const> = noteManager.notesPerPage
+local notesPerPage <const> = noteFs.notesPerPage
 
-function noteManager:initFs()
+function noteFs:initFs()
   -- create initial note folder with instructions if it doesn't exist yet
   if not fs.isdir('001') then
     fs.mkdir('001')
@@ -26,44 +26,46 @@ function noteManager:initFs()
   for i = 1, #list, 1 do
     local name = list[i]
     if (string.sub(name, -1) == '/') and not utils:isInternalFolder(name) then
-      table.insert(noteManager.folderList, name)
+      self.folderList[name] = utils:fixFolderName(name)
     end
   end
   -- set samplememo as initial folder
   if fs.isdir('samplememo') then
-    noteManager:setDirectory('samplememo')
+    self:setDirectory('samplememo/')
   end
 end
 
-function noteManager:setCurrentNote(path)
-  noteManager.currentNote = path
+function noteFs:setCurrentNote(path)
+  self.currentNote = path
 end
 
-function noteManager:setDirectory(dir)
-  noteManager.currentFolder = dir
-  utils:clearArray(noteList)
+function noteFs:setDirectory(dir)
+  assert(self.folderList[dir] ~= nil, 'Folder does not exist')
+  self.currentFolder = dir
+  noteList = {}
   local list = fs.listFiles(dir)
-  for i = 1, #list, 1 do
+  for i = 1, #list do
     local name = list[i]
     if string.sub(name, -3) == 'ppm' then
-      table.insert(noteList, dir .. '/' .. name)
+      table.insert(noteList, dir .. name)
     end
   end
   numNotes, _ = table.getsize(noteList)
-  noteManager.numPages = math.ceil(numNotes / notesPerPage)
+  self.hasNotes = numNotes > 1
+  self.numPages = math.ceil(numNotes / notesPerPage)
 end
 
-function noteManager:getPage(pageIndex)
+function noteFs:getPage(pageIndex)
   local page = table.create(0, notesPerPage)
   local startIndex = ((pageIndex - 1) * notesPerPage) + 1 -- thanks lua, great programming language
   local endIndex = math.min(startIndex + notesPerPage - 1, numNotes)
-  for i = startIndex, endIndex, 1 do
+  for i = startIndex, endIndex do
     local path = noteList[i]
     page[path] = TmbParser.new(path)
   end
   return page
 end
 
-function noteManager:releasePage(pageTable)
+function noteFs:releasePage(pageTable)
   utils:clearArray(pageTable)
 end

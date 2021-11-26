@@ -3,7 +3,7 @@ import 'CoreLibs/timer'
 
 import './services/screens'
 import './services/dialog'
-import './services/notes'
+import './services/noteFs'
 import './gfxUtils'
 
 import './screens/Home'

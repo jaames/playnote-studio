@@ -18,6 +18,7 @@ function Button:init(x, y, w, h)
   self.text = nil
   self.textY = nil
   self.icon = nil
+  self:setText('')
 end
 
 function Button:setText(text)

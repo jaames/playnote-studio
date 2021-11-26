@@ -128,7 +128,7 @@ function PlayerScreen:afterLeave()
 end
 
 function PlayerScreen:loadPpm()
-  self.ppm = PpmParser.new(noteManager.currentNote)
+  self.ppm = PpmParser.new(noteFs.currentNote)
   self.numFrames = self.ppm.numFrames
   self.currentFrame = 1
   self.loop = true -- TODO: take from ppm

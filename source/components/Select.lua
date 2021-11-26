@@ -43,6 +43,10 @@ end
 function Select:onChange(value, index)
 end
 
+-- override this to be notified of a menu close
+function Select:onClose(value, index)
+end
+
 function Select:addOption(value, label, shortLabel)
   table.insert(self.optionLabels, label)
   table.insert(self.optionShortLabels, shortLabel or label)
@@ -123,38 +127,43 @@ function Select:drawAt(x, y)
   local currValueLabel = self.optionShortLabels[self.activeOptionIndex]
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
   gfx.drawTextInRect(currValueLabel, x, y + self.textY, self.w - 8, self.h, nil, nil, kTextAlignment.right)
+  gfx.setImageDrawMode(0)
 
   if self.isOpen then
-    -- use crank to scroll through options
-    local crankChange = playdate.getCrankTicks(6)
-    if crankChange ~= 0 then
-      self:setValueByIndex(self.activeOptionIndex + crankChange, true)
-    end
-    -- draw select menu ui over everything
-    utils:deferDraw(function ()
-      local oX, oY = gfx.getDrawOffset()
-      gfxUtils:drawWhiteFade(self.bgFade)
-      gfx.setDrawOffset(0, self.menuOpenShift)
-      -- draw selection bg
-      local menuX = MENU_X
-      local menuY = MENU_Y - self.menuScroll
-      gfx.setColor(gfx.kColorWhite)
-      gfx.fillRoundRect(MENU_X - 8, MENU_Y - 8, OPTION_WIDTH + 16, OPTION_HEIGHT + 16, (OPTION_HEIGHT + 16) / 2)
-      -- draw option items
-      gfx.setColor(gfx.kColorWhite)
-      for i = 1,self.numOptions do
-        gfx.fillRoundRect(menuX, menuY, OPTION_WIDTH, OPTION_HEIGHT, OPTION_HEIGHT / 2)
-        gfx.setFont(font)
-        gfx.drawTextInRect(self.optionLabels[i], menuX, menuY + 10, OPTION_WIDTH, OPTION_HEIGHT, nil, nil, kTextAlignment.center)
-        menuY = menuY + OPTION_HEIGHT + OPTION_GAP
-      end
-      -- draw selection border
-      gfx.setColor(gfx.kColorBlack)
-      gfx.setLineWidth(2)
-      gfx.drawRoundRect(MENU_X - 4, MENU_Y - 4, OPTION_WIDTH + 8, OPTION_HEIGHT + 8, (OPTION_HEIGHT + 8) / 2)
-      gfx.setDrawOffset(oX, oY)
-    end)
+    self:drawMenu()
   end
+end
+
+function Select:drawMenu()
+  -- use crank to scroll through options
+  local crankChange = playdate.getCrankTicks(6)
+  if crankChange ~= 0 then
+    self:setValueByIndex(self.activeOptionIndex + crankChange, true)
+  end
+  -- draw select menu ui over everything
+  utils:deferDraw(function ()
+    local oX, oY = gfx.getDrawOffset()
+    gfxUtils:drawWhiteFade(self.bgFade)
+    gfx.setDrawOffset(0, self.menuOpenShift)
+    -- draw selection bg
+    local menuX = MENU_X
+    local menuY = MENU_Y - self.menuScroll
+    gfx.setColor(gfx.kColorWhite)
+    gfx.fillRoundRect(MENU_X - 8, MENU_Y - 8, OPTION_WIDTH + 16, OPTION_HEIGHT + 16, (OPTION_HEIGHT + 16) / 2)
+    -- draw option items
+    gfx.setColor(gfx.kColorWhite)
+    for i = 1,self.numOptions do
+      gfx.fillRoundRect(menuX, menuY, OPTION_WIDTH, OPTION_HEIGHT, OPTION_HEIGHT / 2)
+      gfx.setFont(font)
+      gfx.drawTextInRect(self.optionLabels[i], menuX, menuY + 10, OPTION_WIDTH, OPTION_HEIGHT, nil, nil, kTextAlignment.center)
+      menuY = menuY + OPTION_HEIGHT + OPTION_GAP
+    end
+    -- draw selection border
+    gfx.setColor(gfx.kColorBlack)
+    gfx.setLineWidth(2)
+    gfx.drawRoundRect(MENU_X - 4, MENU_Y - 4, OPTION_WIDTH + 8, OPTION_HEIGHT + 8, (OPTION_HEIGHT + 8) / 2)
+    gfx.setDrawOffset(oX, oY)
+  end)
 end
 
 function Select:openMenu()
@@ -223,11 +232,12 @@ end
 function Select:closeMenu()
   if (not self.isOpen) or self.openTransitionActive then return end
 
+  self:onClose(self.activeOptionValue, self.activeOptionIndex)
+
   self.openTransitionActive = true
+  self.menuOpenShift = 0
 
   local timer = playdate.timer.new(MENU_OPEN_DUR, 0, 1)
-
-  self.menuOpenShift = 0
 
   timer.updateCallback = function ()
     self.bgFade = 0.5 - (1 - timer.value) * 0.25

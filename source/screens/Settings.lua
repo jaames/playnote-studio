@@ -222,7 +222,7 @@ function SettingsScreen:afterLeave()
   SettingsScreen.super.afterLeave(self)
   -- autosave on leave
   configManager:save()
-  -- free ui items and view
+  -- free ui items
   self.items = nil
   self.uiView = nil
 end
