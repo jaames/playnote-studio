@@ -7,7 +7,6 @@
 - Switching between folders
 - Flipnote details
 - Instructions in settings
-- Bundle sample Flipnotes and add credits for the creators
 - Website
 
 ## Playnote Studio

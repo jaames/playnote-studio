@@ -8,7 +8,7 @@ import './ScreenBase'
 import '../components/Timeline.lua'
 
 import '../services/screens.lua'
-import '../services/notes.lua'
+import '../services/noteFs.lua'
 import '../gfxUtils.lua'
 import '../utils.lua'
 

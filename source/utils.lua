@@ -3,6 +3,11 @@ import 'CoreLibs/frameTimer'
 
 utils = {}
 
+function utils:escapeText(text)
+  text = string.gsub(text, '_', '__')
+  return string.gsub(text, '*', '**')
+end
+
 -- execute callback function on next frame
 function utils:nextTick(callback)
   playdate.frameTimer.new(1, callback)

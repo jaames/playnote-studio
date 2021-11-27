@@ -5,7 +5,7 @@ import 'CoreLibs/object'
 import './ScreenBase'
 import '../components/FolderSelect.lua'
 import '../services/screens.lua'
-import '../services/notes.lua'
+import '../services/noteFs.lua'
 import '../gfxUtils.lua'
 import '../utils.lua'
 
