@@ -1,7 +1,3 @@
-import 'CoreLibs/graphics'
-import 'CoreLibs/timer'
-import './gfxUtils.lua'
-
 dialogManager = {}
 
 local gfx <const> = playdate.graphics
@@ -10,10 +6,10 @@ local PLAYDATE_H <const> = 240
 local TRANSITION_DUR <const> = 250
 
 local font = gfx.font.new('./fonts/Asheville-Sans-14-Bold')
-local fontFamily <const> = gfx.font.newFamily({
-  [gfx.font.kVariantBold]   = './fonts/Asheville-Sans-14-Bold',
-  [gfx.font.kVariantNormal] = './fonts/Asheville-Sans-14-Light'
-})
+local fontFamily = {
+  [gfx.font.kVariantBold]   = gfx.font.new('./fonts/WhalesharkSans'),
+  [gfx.font.kVariantNormal] = gfx.getSystemFont(gfx.font.kVariantNormal)
+}
 
 local buttonAIcon = gfx.image.new('./img/button_a')
 local buttonBIcon = gfx.image.new('./img/button_b')

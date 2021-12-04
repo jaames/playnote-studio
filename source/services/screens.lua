@@ -1,7 +1,3 @@
-import 'CoreLibs/graphics'
-import 'CoreLibs/timer'
-import 'transitions.lua'
-
 screenManager = {}
 
 local SCREENS = {}
@@ -14,7 +10,7 @@ local isTransitionActive = false
 screenManager.CROSSFADE = CrossfadeTransition
 screenManager.BOOTUP = BootupTransition
 
-function screenManager:registerScreen(id, screen)
+function screenManager:register(id, screen)
   SCREENS[id] = screen
 end
 

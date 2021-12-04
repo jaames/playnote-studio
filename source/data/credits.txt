@@ -6,39 +6,52 @@ _https://playnote.studio_
 
 
 
-Built and Designed by
+%CREDITS_HEADER_JAMES%
 
 James Daniel
 _twitter.com/rakujira_
 _github.com/jaames_
 
 
-PPM Parser
+%CREDITS_HEADER_PARSER%
 
 Simon Aarons
 _twitter.com/ItsSimonTime_
 _github.com/simontime_
 
 
-Special Thanks
+%CREDITS_HEADER_SOUND%
+
+TODO
+
+
+%CREDITS_HEADER_TRANSLATION%
+
+TODO
+
+
+%CREDITS_HEADER_THANKS%
 
 Matt Sephton
 _twitter.com/gingerbeardman_
 
+Rob from Sudomemo
+_www.sudomemo.net_
+
+Austin Burk
+_github.com/sudofox_
+_twitter.com/AustinSudomemo_
+
 Kaeru Team
 _kaeru.world_
 
-Sudomemo
-_sudomemo.net_
 
-
-*Flipnote Artists*
-
+%CREDITS_HEADER_ARTISTS%
 
 $ARTIST_CREDITS
 
-*Flipnote Research*
 
+%CREDITS_HEADER_RESEARCH%
 
 Ugomemo Research Crew
 
@@ -52,7 +65,7 @@ harimau__tigris
 _profile.hatena.ne.jp/harimau__tigris_
 
 
-Audio
+%CREDITS_HEADER_AUDIO%
 
 Simon Aarons
 _github.com/simontime_
@@ -62,7 +75,7 @@ Midmad
 WDLMaster
 
 
-Documentation
+%CREDITS_HEADER_DOCS%
 
 steven
 
@@ -76,13 +89,13 @@ James Daniel
 _github.com/jaames_
 
 
-Packet Captures
+%CREDITS_HEADER_PACKETS%
 
 Lauren Kelly
 _github.com/thejsa_
 
 
-Miscellaneous
+%CREDITS_HEADER_MISC%
 
 Shutterbug
 _github.com/shutterbug2000_
@@ -91,8 +104,7 @@ Austin Burk
 _github.com/sudofox_
 
 
-_Flipnote Studio is © Nintendo_
-_This project is not affiliated with or endorsed by them in any way_
+_%CREDITS_LEGAL%_
 
 
 
@@ -100,7 +112,8 @@ _This project is not affiliated with or endorsed by them in any way_
 
 
 
-Keep on Flipnoting! 
+%CREDITS_END% 
+
 
 
 

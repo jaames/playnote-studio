@@ -1,17 +1,3 @@
-import 'CoreLibs/graphics'
-import 'CoreLibs/object'
-import 'CoreLibs/timer'
-import 'CoreLibs/crank'
-
-import './ScreenBase'
-
-import '../components/Timeline.lua'
-
-import '../services/screens.lua'
-import '../services/noteFs.lua'
-import '../gfxUtils.lua'
-import '../utils.lua'
-
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 local gfx <const> = playdate.graphics

@@ -1,16 +1,3 @@
-import 'CoreLibs/object'
-import 'CoreLibs/graphics'
-import 'CoreLibs/ui'
-
-import './ScreenBase'
-import '../services/screens.lua'
-import '../services/config.lua'
-import '../services/dialog.lua'
-import '../gfxUtils.lua'
-
-import '../components/Button.lua'
-import '../components/Select.lua'
-
 local gfx <const> = playdate.graphics
 
 SettingsScreen = {}
@@ -18,8 +5,6 @@ class('SettingsScreen').extends(ScreenBase)
 
 function SettingsScreen:init()
   SettingsScreen.super.init(self)
-  -- init config file, makes self.config available
-  configManager:init()
   self.inputHandlers = {
     upButtonDown = function ()
       self:selectPrev()
@@ -51,7 +36,7 @@ function SettingsScreen:beforeEnter()
     {
       init = function(item)
         local button = Button(0, 0, 336, 48)
-        button:setText('About')
+        button:setText(locales:getText('SETTINGS_ABOUT'))
         item.button = button
       end,
       draw = function(item, x, y)
@@ -68,8 +53,8 @@ function SettingsScreen:beforeEnter()
           .. '*Playnote Studio*\n'
           .. 'https://playnote.studio\n'
           .. '\n'
-          .. 'Version ' .. playdate.metadata.version .. '\n'
-          .. 'Built by James Daniel'
+          .. locales:getTextFormatted('ABOUT_VERSION', playdate.metadata.version) .. '\n'
+          .. locales:getTextFormatted('ABOUT_BUILT_BY', 'James Daniel')
         dialogManager:show(aboutText)
       end
     },
@@ -77,7 +62,7 @@ function SettingsScreen:beforeEnter()
     {
       init = function(item)
         local button = Button(0, 0, 336, 48)
-        button:setText('Credits')
+        button:setText(locales:getText('SETTINGS_CREDITS'))
         item.button = button
       end,
       draw = function(item, x, y)
@@ -97,12 +82,12 @@ function SettingsScreen:beforeEnter()
     {
       init = function(item)
         local select = Select(0, 0, 336, 48)
-        select:setText('Sound Effects')
-        select:addOption(true,  'Sound Effects On',  'On')
-        select:addOption(false, 'Sound Effects Off', 'Off')
-        select:setValue(configManager.enableSoundEffects)
+        select:setText(locales:getText('SETTINGS_SOUND'))
+        select:addOption(true,  locales:getText('SETTINGS_SOUND_ON'),  locales:getText('SETTINGS_ON'))
+        select:addOption(false, locales:getText('SETTINGS_SOUND_OFF'), locales:getText('SETTINGS_OFF'))
+        select:setValue(config.enableSoundEffects)
         function select:onChange(value)
-          configManager.enableSoundEffects = value
+          config.enableSoundEffects = value
         end
         item.selectButton = select
       end,
@@ -123,15 +108,14 @@ function SettingsScreen:beforeEnter()
     {
       init = function(item)
         local select = Select(0, 0, 336, 48)
-        select:setText('Language')
-        select:addOption('en',    'English (American)', 'EN US')
-        select:addOption('en_gb', 'English (British)',  'EN GB')
-        select:addOption('fr',    'Francais',           'FR')
-        select:addOption('es',    'Espanol',            'ES')
-        select:addOption('jp',    '日本語',              'JP')
-        select:setValue(configManager.lang)
+        local langs = locales:getAvailableLanguages()
+        select:setText(locales:getText('SETTINGS_LANGUAGE'))
+        for key, name in pairs(langs) do
+          select:addOption(key, name, string.upper(key))
+        end
+        select:setValue(config.lang)
         function select:onChange(value)
-          configManager.lang = value
+          config.lang = value
         end
         item.selectButton = select
       end,
@@ -152,7 +136,7 @@ function SettingsScreen:beforeEnter()
     {
       init = function(item)
         local button = Button(0, 0, 336, 48)
-        button:setText('Reset Settings')
+        button:setText(locales:getText('SETTINGS_RESET'))
         item.button = button
       end,
       draw = function(item, x, y)
@@ -166,10 +150,10 @@ function SettingsScreen:beforeEnter()
       end,
       onClick = function (item)
         dialogManager.handleClose = function ()
-          configManager:reset()
+          config:reset()
           self:beforeEnter()
         end
-        dialogManager:confirm('*Settings will be cleared*')
+        dialogManager:confirm(locales:getText('SETTINGS_RESET_CONFIRM'))
       end
     }
   }
@@ -221,7 +205,7 @@ end
 function SettingsScreen:afterLeave()
   SettingsScreen.super.afterLeave(self)
   -- autosave on leave
-  configManager:save()
+  config:save()
   -- free ui items
   self.items = nil
   self.uiView = nil

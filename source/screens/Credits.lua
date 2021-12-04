@@ -1,13 +1,3 @@
-import 'CoreLibs/object'
-import 'CoreLibs/graphics'
-import 'CoreLibs/animation'
-
-import './ScreenBase'
-import '../services/screens.lua'
-import '../services/noteFs.lua'
-import '../gfxUtils.lua'
-import '../utils.lua'
-
 local gfx <const> = playdate.graphics
 local tinyFont <const> = gfx.getSystemFont(gfx.font.kVariantNormal)
 local normalFont <const> = gfx.font.new('./fonts/WhalesharkSans')
@@ -23,13 +13,15 @@ function CreditsScreen:init()
   CreditsScreen.super.init(self)
   -- don't scroll to begin with
   self.autoScroll = false
+  self.scrollY = 0
+  self.creditsTexture = nil
   self.inputHandlers = {
     BButtonDown = function()
       screenManager:setScreen('settings', screenManager.CROSSFADE)
     end,
     cranked = function(change, acceleratedChange)
       self.autoScroll = false
-      self.scrollY = utils:clampScroll(self.scrollY + change, SCROLL_START, self.creditsRect.h)
+      self.scrollY = utils:clampScroll(self.scrollY + change, SCROLL_START, self.creditsHeight)
     end,
   }
 end
@@ -50,6 +42,11 @@ end
 function CreditsScreen:getCreditsText()
   local text = utils:readTextFile('./data/credits.txt')
   local artistCredits = self:getArtistCredits()
+  -- replace translation keys
+  text = string.gsub(text, '%%([%w_]+)%%', function (key)
+    return locales:getText(key)
+  end)
+  -- replace variables
   text = string.gsub(text, '$ARTIST_CREDITS', artistCredits)
   text = string.gsub(text, '$VERSION', playdate.metadata.version)
   return text
@@ -57,26 +54,34 @@ end
 
 function CreditsScreen:beforeEnter()
   CreditsScreen.super.beforeEnter(self)
+  self.scrollY = SCROLL_START
   gfx.setFontFamily({
     [gfx.font.kVariantNormal] = normalFont,
     [gfx.font.kVariantBold] = boldFont,
     [gfx.font.kVariantItalic] = tinyFont
   })
-  self.creditsText = self:getCreditsText()
-  self.scrollY = SCROLL_START
-  local _, creditsHeight = gfx.getTextSize(self.creditsText)
-  self.creditsRect = playdate.geometry.rect.new(10, 0, 400 - 20, creditsHeight)
+  local text = self:getCreditsText()
+  local _, height = gfx.getTextSize(text)
+  local cache = gfx.image.new(400, height, gfx.kColorBlack)
+  local rect = playdate.geometry.rect.new(10, 0, 400 - 20, height)
+  gfx.pushContext(cache)
+  gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+  gfx.drawTextInRect(text, rect, nil, nil, kTextAlignment.center)
+  gfx.setImageDrawMode(0)
+  gfx.popContext()
+  self.creditsHeight = height
+  self.creditsTexture = cache
 end
 
 function CreditsScreen:afterEnter()
   CreditsScreen.super.afterEnter(self)
-  -- begin scrolling
+  -- begin scrolling after enter transition
   self.autoScroll = true
 end
 
 function CreditsScreen:afterLeave()
   CreditsScreen.super.afterLeave(self)
-  self.creditsText = nil
+  self.creditsTexture = nil
 end
 
 function CreditsScreen:update()
@@ -84,17 +89,9 @@ function CreditsScreen:update()
   -- draw background
   gfx.setBackgroundColor(gfx.kColorBlack)
   gfx.clear()
-  -- draw text
-  gfx.setFontFamily({
-    [gfx.font.kVariantNormal] = normalFont,
-    [gfx.font.kVariantBold] = boldFont,
-    [gfx.font.kVariantItalic] = tinyFont
-  })
-  gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  gfx.drawTextInRect(self.creditsText, self.creditsRect, nil, nil, kTextAlignment.center)
-  gfx.setImageDrawMode(0)
+  self.creditsTexture:draw(0, 0)
   -- auto scroll
   if self.autoScroll then
-    self.scrollY = utils:clampScroll(self.scrollY + SCROLL_AUTO_STEP, SCROLL_START, self.creditsRect.h)
+    self.scrollY = utils:clampScroll(self.scrollY + SCROLL_AUTO_STEP, SCROLL_START, self.creditsHeight)
   end
 end

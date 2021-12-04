@@ -1,6 +1,3 @@
-import 'CoreLibs/object'
-import './utils.lua'
-
 local fs <const> = playdate.file
 
 noteFs = {}
@@ -13,7 +10,7 @@ noteFs.currentNote = nil
 local noteList = {}
 local notesPerPage <const> = noteFs.notesPerPage
 
-function noteFs:initFs()
+function noteFs:init()
   -- create initial note folder with instructions if it doesn't exist yet
   if not fs.isdir('001') then
     fs.mkdir('001')

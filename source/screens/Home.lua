@@ -1,18 +1,3 @@
-import 'CoreLibs/object'
-import 'CoreLibs/graphics'
-import 'CoreLibs/animation'
-import 'CoreLibs/timer'
-
-import './ScreenBase'
-
-import '../components/Button.lua'
-import '../components/Clock.lua'
-
-import '../services/screens.lua'
-import '../services/dialog.lua'
-import '../gfxUtils.lua'
-import '../utils.lua'
-
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 local gfx <const> = playdate.graphics
@@ -28,12 +13,10 @@ function HomeScreen:init()
   HomeScreen.super.init(self)
 
   self.viewButton = Button(PLAYDATE_W / 2 - 98, PLAYDATE_H - 52, 196, 34)
-  self.viewButton:setText('View Flipnotes')
   self.viewButton:setIcon(viewButtonGfx)
   self.viewButton.isSelected = true
 
   self.settingsButton = Button(PLAYDATE_W - 120, 8, 112, 24)
-  self.settingsButton:setText('Settings')
   self.settingsButton:setIcon(settingsButtonGfx)
 
   self.clock = Clock(8, 8, 160, 24)
@@ -59,6 +42,12 @@ function HomeScreen:init()
       end
     end
   }
+end
+
+function HomeScreen:beforeEnter()
+  HomeScreen.super.beforeEnter(self)
+  self.viewButton:setText(locales:getText('HOME_VIEW'))
+  self.settingsButton:setText(locales:getText('HOME_SETTINGS'))
 end
 
 function HomeScreen:transitionEnter(t, id)

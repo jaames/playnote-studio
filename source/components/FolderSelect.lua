@@ -1,6 +1,3 @@
-import 'CoreLibs/object'
-import 'CoreLibs/graphics'
-
 import './Select.lua'
 
 local gfx <const> = playdate.graphics

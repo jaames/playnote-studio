@@ -1,7 +1,3 @@
-import 'CoreLibs/graphics'
-import 'CoreLibs/timer'
-import 'CoreLibs/nineslice'
-
 gfxUtils = {}
 
 local gfx <const> = playdate.graphics

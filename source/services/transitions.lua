@@ -1,5 +1,3 @@
-import 'CoreLibs/object'
-
 -- BASE TRANSITION
 
 local function makeTransition(duration, easing, onUpdate)

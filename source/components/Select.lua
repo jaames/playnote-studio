@@ -1,9 +1,3 @@
-import 'CoreLibs/object'
-import 'CoreLibs/graphics'
-import 'CoreLibs/ui'
-import 'CoreLibs/timer'
-import 'CoreLibs/math'
-
 import './Button.lua'
 
 local gfx <const> = playdate.graphics

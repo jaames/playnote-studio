@@ -1,6 +1,3 @@
-import 'CoreLibs/object'
-import 'CoreLibs/frameTimer'
-
 utils = {}
 
 function utils:escapeText(text)

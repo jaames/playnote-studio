@@ -1,5 +1,3 @@
-import 'CoreLibs/object'
-
 ScreenBase = {}
 class('ScreenBase').extends()
 

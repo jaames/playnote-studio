@@ -1,6 +1,6 @@
-import 'CoreLibs/graphics'
+local gfx <const> = playdate.graphics
 
-configManager = {}
+config = {}
 
 local CONFIG_VERSION <const> = 1
 local DATASTORE_KEY <const> = 'config'
@@ -9,7 +9,10 @@ local DEFAULT_CONFIG <const> = {
   initialPdxVersion = playdate.metadata.version,
   initialPdxBuild = playdate.metadata.buildNumber,
   initialApiVersion = playdate.apiVersion(),
-  lang = 'en',
+  lang = ({
+    [gfx.font.kLanguageEnglish] = 'en',
+    [gfx.font.kLanguageJapanese] = 'jp'
+  })[playdate.getSystemLanguage()],
   enableSoundEffects = true,
 }
 
@@ -24,60 +27,60 @@ function readConfigFile()
   return playdate.datastore.read(DATASTORE_KEY)
 end
 
-function configManager:init()
-  local config = readConfigFile()
+function config:init()
+  local configFile = readConfigFile()
   -- write default config to file if it doesn't yet exist
-  if config == nil then 
-    config = DEFAULT_CONFIG
-    saveConfigFile(config)
+  if configFile == nil then 
+    configFile = DEFAULT_CONFIG
+    saveConfigFile(configFile)
   -- upgrade config if the version has been updated
-  elseif not config.configVersion or config.configVersion < CONFIG_VERSION then
-    configManager:upgrade()
+  elseif not configFile.configVersion or configFile.configVersion < CONFIG_VERSION then
+    config:upgrade()
   end
-  -- make config values available on configManager
+  -- make config values available on config
+  for k in pairs(configFile) do
+    config[k] = configFile[k]
+  end
+end
+
+function config:save()
+  local configFile = {}
   for k in pairs(config) do
-    configManager[k] = config[k]
-  end
-end
-
-function configManager:save()
-  local config = {}
-  for k in pairs(configManager) do
-    if type(configManager[k]) ~= 'function' then
-      config[k] = configManager[k]
+    if type(config[k]) ~= 'function' then
+      configFile[k] = config[k]
     end
   end
-  saveConfigFile(config)
+  saveConfigFile(configFile)
 end
 
-function configManager:reset()
-  for k in pairs(configManager) do
-    if type(configManager[k]) ~= 'function' then
-      configManager[k] = nil
+function config:reset()
+  for k in pairs(config) do
+    if type(config[k]) ~= 'function' then
+      config[k] = nil
     end
   end
   for k in pairs(DEFAULT_CONFIG) do
-    configManager[k] = DEFAULT_CONFIG[k]
+    config[k] = DEFAULT_CONFIG[k]
   end
-  configManager:save()
+  config:save()
 end
 
-function configManager:upgrade()
-  local config = {}
+function config:upgrade()
+  local configFile = {}
   for k in pairs(DEFAULT_CONFIG) do
-    if config[k] == nil then
-      config[k] = DEFAULT_CONFIG[k]
+    if configFile[k] == nil then
+      configFile[k] = DEFAULT_CONFIG[k]
     end
   end
-  config.configVersion = CONFIG_VERSION
-  saveConfigFile(config)
+  configFile.configVersion = CONFIG_VERSION
+  saveConfigFile(configFile)
 end
 
 -- autosave everything if the game is about to be closed
 function playdate.gameWillTerminate()
-  configManager:save()
+  config:save()
 end
 -- and when the device is about to be locked
 function playdate.deviceWillLock()
-  configManager:save()
+  config:save()
 end

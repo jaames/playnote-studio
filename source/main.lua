@@ -1,11 +1,29 @@
+import 'CoreLibs/math'
+import 'CoreLibs/object'
+import 'CoreLibs/graphics'
+import 'CoreLibs/nineslice'
+import 'CoreLibs/ui'
+import 'CoreLibs/crank'
 import 'CoreLibs/timer'
--- import 'CoreLibs/frameTimer'
+import 'CoreLibs/frameTimer'
+import 'CoreLibs/animation'
 
+import './services/config'
+import './services/locales'
+import './services/noteFs'
+import './services/transitions'
 import './services/screens'
 import './services/dialog'
-import './services/noteFs'
-import './gfxUtils'
+import './utils/utils'
+import './utils/gfxUtils'
 
+import './components/Button'
+import './components/Select'
+import './components/FolderSelect'
+import './components/Clock'
+import './components/Timeline'
+
+import './screens/Screenbase'
 import './screens/Home'
 import './screens/NoteList'
 import './screens/Player'
@@ -14,11 +32,15 @@ import './screens/Credits'
 
 playdate.display.setRefreshRate(30)
 
-screenManager:registerScreen('home',     HomeScreen())
-screenManager:registerScreen('notelist', NoteListScreen())
-screenManager:registerScreen('player',   PlayerScreen())
-screenManager:registerScreen('settings', SettingsScreen())
-screenManager:registerScreen('credits',  CreditsScreen())
+config:init()
+locales:init()
+noteFs:init()
+
+screenManager:register('home',     HomeScreen())
+screenManager:register('notelist', NoteListScreen())
+screenManager:register('player',   PlayerScreen())
+screenManager:register('settings', SettingsScreen())
+screenManager:register('credits',  CreditsScreen())
 
 screenManager:setScreen('home', screenManager.BOOTUP)
 

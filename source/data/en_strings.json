@@ -1,0 +1,53 @@
+{
+  "APP_TITLE": "Playnote Studio",
+
+  "HOME_VIEW": "View Flipnotes",
+  "HOME_SETTINGS": "Settings",
+  "HOME_DATE_FORMAT": "DD/MM/YYYY",
+  "HOME_TIME_FORMAT": "HH:SS",
+
+  "SETTINGS_ABOUT": "About",
+  "SETTINGS_CREDITS": "Credits",
+  "SETTINGS_SOUND": "Sound Effects",
+  "SETTINGS_LANGUAGE": "Language",
+  "SETTINGS_RESET": "Reset Settings",
+  "SETTINGS_ON": "On",
+  "SETTINGS_OFF": "Off",
+  "SETTINGS_SOUND_ON": "Sound Effects On",
+  "SETTINGS_SOUND_OFF": "Sound Effects Off",
+  "SETTINGS_RESET_CONFIRM": "*Settings will be cleared*",
+
+  "ABOUT_VERSION": "Version %d",
+  "ABOUT_BUILT_BY": "Built by %s",
+
+  "CREDITS_HEADER_JAMES": "Programming and UI Design",
+  "CREDITS_HEADER_PARSER": "PPM Parser",
+  "CREDITS_HEADER_SOUND": "Sound Design",
+  "CREDITS_HEADER_TRANSLATION": "Translation",
+  "CREDITS_HEADER_THANKS": "Special Thanks",
+  "CREDITS_HEADER_ARTISTS": "Flipnote Artists",
+  "CREDITS_HEADER_RESEARCH": "Flipnote Research",
+  "CREDITS_HEADER_UGOCREW": "Ugomemo Research Crew",
+  "CREDITS_HEADER_AUDIO": "Audio",
+  "CREDITS_HEADER_DOCS": "Documentation",
+  "CREDITS_HEADER_PACKETS": "Packet Captures",
+  "CREDITS_HEADER_MISC": "Miscellaneous",
+  "CREDITS_LEGAL": "Flipnote Studio is © Nintendo\nThis project is not endorsed by or affiliated with them in any way",
+  "CREDITS_END": "Keep on Flipnoting!",
+
+  "VIEW_FOLDERNAME_PICKS": "Playnote Picks",
+  "VIEW_DETAILS": "Flipnote Details",
+  "VIEW_NO_FLIPNOTES": "There's no Flipnotes in this Folder",
+
+  "DETAILS_AUTHOR": "Author",
+  "DETAILS_CREATED": "Created",
+  "DETAILS_DATE_FORMAT": "DD/MM/YYYY",
+  "DETAILS_FRAME_COUNT": "Frame count",
+  "DETAILS_FILE_SIZE": "File size",
+
+  "DITHER_LAYER1": "Layer 1",
+  "DITHER_LAYER2": "Layer 2",
+  "DITHER_COLOUR_BLACK": "Black",
+  "DITHER_COLOUR_RED": "Red",
+  "DITHER_COLOR_BLUE": "Blue"
+}

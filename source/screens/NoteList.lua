@@ -1,14 +1,3 @@
-import 'CoreLibs/graphics'
-import 'CoreLibs/timer'
-import 'CoreLibs/object'
-
-import './ScreenBase'
-import '../components/FolderSelect.lua'
-import '../services/screens.lua'
-import '../services/noteFs.lua'
-import '../gfxUtils.lua'
-import '../utils.lua'
-
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 local FOLDERSELECT_ROW = -1
@@ -23,8 +12,6 @@ class('NoteListScreen').extends(ScreenBase)
 
 function NoteListScreen:init()
   NoteListScreen.super.init(self)
-
-  noteFs:initFs()
 
   self.currPage = 1
   self.currFilepaths = table.create(noteFs.notesPerPage, 0)
@@ -245,14 +232,14 @@ function NoteListScreen:update()
   gfxUtils:drawBgGrid()
   -- folder select
   self.folderSelect:draw()
-  -- show "no notes available"
+  -- show 'no notes available'
   if self.hasNoNotes then
     -- TODO: prettier UI
     gfx.setFont(baseFont)
-    gfx.drawTextInRect("There's no Flipnotes in this folder.", 0, 80, 400, 40, nil, nil, kTextAlignment.center)
+    gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES'), 0, 80, 400, 40, nil, nil, kTextAlignment.center)
   end
   -- page counter
-  local pageString = string.format("%d/%d", self.currPage, noteFs.numPages)
+  local pageString = string.format('%d/%d', self.currPage, noteFs.numPages)
   gfx.setFont(pageCounterFont)
   gfx.setFontTracking(2)
   gfx.setColor(gfx.kColorWhite)
