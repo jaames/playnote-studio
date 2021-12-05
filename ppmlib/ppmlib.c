@@ -69,7 +69,7 @@ static int ppm_gc(lua_State* L)
 	ppm_ctx_t* ctx = getPpmCtx(1);
 	ppmDone(ctx);
 	pd_free(ctx);
-	pd_log("ppm free");
+	// pd_log("ppm free");
   return 0;
 }
 
@@ -178,7 +178,7 @@ static int ppm_drawFrame(lua_State* L)
 			// invert chunk if paper is black
 			if (ctx->paperColour == 0)
 				chunk = ~chunk;
-			*(u32* )frameBuffer = chunk;
+			*(u32*)frameBuffer = chunk;
 			frameBuffer += 4;
 		}
 		frameBuffer += 20;
@@ -296,7 +296,7 @@ static int tmb_gc(lua_State* L)
 {
 	tmb_ctx_t* ctx = getTmbCtx(1);
 	pd_free(ctx);
-	pd_log("tmb free");
+	// pd_log("tmb free");
   return 0;
 }
 
@@ -322,28 +322,33 @@ static int tmb_toBitmap(lua_State* L)
 	u16 dst = 0;
 	for (u8 y = 0; y < THUMBNAIL_HEIGHT; y++)
 	{
+		// each pattern is 32 * 2 pixels, or 2 lines of 32 pixels
+		// for every line in the image, we want to flip between the two pattern lines
 		patternOffset = patternOffset == 32 ? 0 : 32;
+		// pack 32 pixels horizontally
 		for (u8 x = 0; x < THUMBNAIL_WIDTH; x += 32)
 		{
 			// all pixels start out white
 			chunk = 0xFFFFFFFF;
 			for (u8 shift = 0; shift < 32; shift++)
 			{
+				// convert the thumbnail image (which uses paleted color) to 1 bit
+				// patterns are used to mask specific pixels and produce dithering
 				switch (ppmThumbnailPaletteGray[pixels[src++]])
 				{
 					// black
 					case 0: 
 						chunk &= ditherMaskNone[patternOffset + shift];
 						break;
-					// dark gray
+					// dark gray (polka pattern, inverted)
 					case 1:
 						chunk &= ditherMaskInvPolka[patternOffset + shift];
 						break;
-					// mid gray
+					// mid gray (checkerboard pattern)
 					case 2:
 						chunk &= ditherMaskChecker[patternOffset + shift];
 						break;
-					// light gray
+					// light gray (polka pattern)
 					case 3:
 						chunk &= ditherMaskPolka[patternOffset + shift];
 						break;

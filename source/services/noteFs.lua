@@ -3,6 +3,7 @@ local fs <const> = playdate.file
 noteFs = {}
 
 noteFs.folderList = {}
+noteFs.folderPaths = {}
 noteFs.currentFolder = ''
 noteFs.notesPerPage = 12
 noteFs.currentNote = nil
@@ -18,40 +19,53 @@ function noteFs:init()
     readme:write('Drop all of your Flipnote .ppm files into this folder!\nYou can also organise your Flipnotes by creating more folders next to this one')
     readme:close()
   end
-  -- build list of root folders
-  local list = fs.listFiles('/')
-  for i = 1, #list, 1 do
-    local name = list[i]
-    if (string.sub(name, -1) == '/') and not utils:isInternalFolder(name) then
-      self.folderList[name] = self:getFolderName(name)
+  -- get list of all files and folders in the root directory,
+  -- filter out files, or folders that are part of the app's internal folder structure
+  -- then add the path and resolved name to folderList
+  local folderList = {}
+  for _, path in ipairs(fs.listFiles('/')) do
+    if (string.sub(path, -1) == '/') and not fsUtils:isInternalFolder(path) then
+      table.insert(self.folderPaths, path)
+      table.insert(folderList, {
+        path = path,
+        name = self:getFolderName(path)
+      })
     end
   end
+  -- sort folderList so that ones with custom titles come first
+  table.sort(folderList, function (a, b)
+    if string.sub(a.name, -1) ~= '/' then
+      return true
+    end
+    return false
+  end)
+  self.folderList = folderList
   -- set samplememo as initial folder
   assert(fs.isdir('samplememo'), 'Sample Flipnote folder is missing?')
   self:setDirectory('samplememo/')
   self:getArtistCredits()
 end
 
-function noteFs:getFolderMeta(folder)
-  local jsonPath = folder .. 'playnote.json'
+function noteFs:getFolderMeta(folderPath)
+  local jsonPath = folderPath .. 'playnote.json'
   if fs.exists(jsonPath) then
     return json.decodeFile(jsonPath)
   end
   return nil
 end
 
-function noteFs:getFolderName(folder)
-  local meta = self:getFolderMeta(folder)
+function noteFs:getFolderName(folderPath)
+  local meta = self:getFolderMeta(folderPath)
   if meta ~= nil and meta.folderTitle	~= nil then
-    return utils:escapeText(meta.folderTitle)
+    return stringUtils:escape(meta.folderTitle)
   end
-  return utils:escapeText(utils:fixFolderName(folder))
+  return stringUtils:escape(fsUtils:fixFolderName(folderPath))
 end
 
 function noteFs:getArtistCredits()
   local creditList = {}
-  for folder, _ in pairs(self.folderList) do
-    local meta = self:getFolderMeta(folder)
+  for _, path in ipairs(self.folderPaths) do
+    local meta = self:getFolderMeta(path)
     if meta ~= nil and meta.credits	~= nil then
       for _, item in ipairs(meta.credits) do
         local id = item.id
@@ -65,15 +79,14 @@ function noteFs:getArtistCredits()
   return creditList
 end
 
-function noteFs:setDirectory(folder)
-  assert(self.folderList[folder] ~= nil, 'Folder does not exist')
-  self.currentFolder = folder
+function noteFs:setDirectory(folderPath)
+  assert(table.indexOfElement(self.folderPaths, folderPath) ~= nil, 'Folder does not exist')
+  self.currentFolder = folderPath
   noteList = {}
-  local list = fs.listFiles(folder)
-  for i = 1, #list do
-    local name = list[i]
+  local list = fs.listFiles(folderPath)
+  for _, name in ipairs(list) do
     if string.sub(name, -3) == 'ppm' then
-      table.insert(noteList, folder .. name)
+      table.insert(noteList, folderPath .. name)
     end
   end
   numNotes, _ = table.getsize(noteList)
@@ -81,8 +94,8 @@ function noteFs:setDirectory(folder)
   self.numPages = math.ceil(numNotes / notesPerPage)
 end
 
-function noteFs:setCurrentNote(path)
-  self.currentNote = path
+function noteFs:setCurrentNote(notePath)
+  self.currentNote = notePath
 end
 
 function noteFs:getPage(pageIndex)

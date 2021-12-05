@@ -77,8 +77,9 @@ function NoteListScreen:beforeEnter()
   function folderSelect:onClose (value, index)
     s.setCurrentFolder(s, value)
   end
-  for key, name in pairs(noteFs.folderList) do
-    folderSelect:addOption(key, name)
+  print(noteFs.folderList)
+  for _, folderItem in ipairs(noteFs.folderList) do
+    folderSelect:addOption(folderItem.path, folderItem.name)
   end
   folderSelect:setValue(noteFs.currentFolder)
 

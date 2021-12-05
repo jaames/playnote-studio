@@ -30,9 +30,9 @@ function CreditsScreen:getArtistCredits()
   local text = ''
   local credits = noteFs:getArtistCredits()
   for _, artist in pairs(credits) do
-    text = text .. utils:escapeText(artist.name) .. '\n'
+    text = text .. stringUtils:escape(artist.name) .. '\n'
     for _, link in ipairs(artist.links) do
-      text = text .. '_' .. utils:escapeText(link) .. '_\n'
+      text = text .. '_' .. stringUtils:escape(link) .. '_\n'
     end
     text = text .. '\n'
   end
@@ -40,15 +40,14 @@ function CreditsScreen:getArtistCredits()
 end
 
 function CreditsScreen:getCreditsText()
-  local text = utils:readTextFile('./data/credits.txt')
+  local text = fsUtils:readText('./data/credits.txt')
   local artistCredits = self:getArtistCredits()
-  -- replace translation keys
-  text = string.gsub(text, '%%([%w_]+)%%', function (key)
-    return locales:getText(key)
-  end)
-  -- replace variables
-  text = string.gsub(text, '$ARTIST_CREDITS', artistCredits)
-  text = string.gsub(text, '$VERSION', playdate.metadata.version)
+  -- replace placeholders in credits text
+  text = locales:replaceKeysInText(text)
+  text = stringUtils:replaceVars(text, {
+    VERSION = playdate.metadata.version,
+    ARTIST_CREDITS = artistCredits
+  })
   return text
 end
 

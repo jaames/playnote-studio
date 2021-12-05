@@ -49,6 +49,10 @@ function locales:getText(stringKey)
   return stringKey
 end
 
+function locales:replaceKeysInText(text)
+  return string.gsub(text, '%%([%w_]+)%%', self.currStrings)
+end
+
 function locales:getTextFormatted(key, ...)
   local str = self:getText(key)
   return string.format(str, ...)
