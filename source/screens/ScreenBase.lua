@@ -3,6 +3,7 @@ class('ScreenBase').extends()
 
 function ScreenBase:init()
   ScreenBase.super.init(self)
+  self.id = nil
   self.inputHandlers = {}
 end
 
@@ -18,6 +19,11 @@ function ScreenBase:beforeLeave()
 end
 
 function ScreenBase:afterLeave()
+end
+
+function ScreenBase:reload()
+  self:afterLeave()
+  self:beforeEnter()
 end
 
 function ScreenBase:update()

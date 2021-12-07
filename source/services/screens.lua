@@ -1,4 +1,4 @@
-screenManager = {}
+screens = {}
 
 local SCREENS = {}
 
@@ -7,14 +7,12 @@ local activeScreen = nil
 
 local isTransitionActive = false
 
-screenManager.CROSSFADE = CrossfadeTransition
-screenManager.BOOTUP = BootupTransition
-
-function screenManager:register(id, screen)
-  SCREENS[id] = screen
+function screens:register(id, screenInst)
+  SCREENS[id] = screenInst
+  screenInst.id = id
 end
 
-function screenManager:setScreen(id, Transition)
+function screens:setScreen(id, Transition)
   if isTransitionActive then
     print('Page transition already active!!!')
     return
@@ -37,7 +35,7 @@ function screenManager:setScreen(id, Transition)
 
 end
 
-function screenManager:update()
+function screens:update()
   if not isTransitionActive then
     activeScreen:update()
   end

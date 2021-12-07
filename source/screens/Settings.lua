@@ -18,7 +18,7 @@ function SettingsScreen:init()
       item:onClick(item)
     end,
     BButtonDown = function()
-      screenManager:setScreen('home', screenManager.CROSSFADE)
+      screens:setScreen('home', transitions.CROSSFADE)
     end,
     cranked = function(change, acceleratedChange)
       local x, y = self.uiView:getScrollPosition()
@@ -30,6 +30,7 @@ end
 function SettingsScreen:beforeEnter()
   SettingsScreen.super.beforeEnter(self)
   self.selectedItem = nil
+  local scr = self
   -- set up setting items
   local items <const> = {
     -- ABOUT BUTTON
@@ -55,7 +56,7 @@ function SettingsScreen:beforeEnter()
           .. '\n'
           .. locales:getTextFormatted('ABOUT_VERSION', playdate.metadata.version) .. '\n'
           .. locales:getTextFormatted('ABOUT_BUILT_BY', 'James Daniel')
-        dialogManager:show(aboutText)
+        dialog:show(aboutText)
       end
     },
     -- CREDITS BUTTON
@@ -75,7 +76,7 @@ function SettingsScreen:beforeEnter()
         item.button.isSelected = false
       end,
       onClick = function (item)
-        screenManager:setScreen('credits', screenManager.CROSSFADE)
+        screens:setScreen('credits', transitions.CROSSFADE)
       end
     },
     -- SOUND EFFECTS ON/OFF
@@ -110,12 +111,14 @@ function SettingsScreen:beforeEnter()
         local select = Select(0, 0, 336, 48)
         local langs = locales:getAvailableLanguages()
         select:setText(locales:getText('SETTINGS_LANGUAGE'))
-        for key, name in pairs(langs) do
-          select:addOption(key, name, string.upper(key))
+        for i, lang in ipairs(langs) do
+          select:addOption(lang.key, lang.name, string.upper(lang.key))
         end
-        select:setValue(config.lang)
-        function select:onChange(value)
-          config.lang = value
+        select:setValue(locales:getLanguage())
+        function select:onClose(value)
+          locales:setLanguage(value)
+          -- todo: wait until select menu is closed, keep selection state, reload w transition
+          scr:reload()
         end
         item.selectButton = select
       end,
@@ -149,11 +152,11 @@ function SettingsScreen:beforeEnter()
         item.button.isSelected = false
       end,
       onClick = function (item)
-        dialogManager.handleClose = function ()
+        dialog.handleClose = function ()
           config:reset()
-          self:beforeEnter()
+          SettingsScreen:reload()
         end
-        dialogManager:confirm(locales:getText('SETTINGS_RESET_CONFIRM'))
+        dialog:confirm(locales:getText('SETTINGS_RESET_CONFIRM'))
       end
     }
   }

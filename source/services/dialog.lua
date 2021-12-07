@@ -1,4 +1,4 @@
-dialogManager = {}
+dialog = {}
 
 local gfx <const> = playdate.graphics
 local PLAYDATE_W <const> = 400
@@ -26,42 +26,42 @@ local transitionTimer = nil
 local inputHandlers = {
   alert = {
     AButtonDown = function ()
-      dialogManager.handleClose()
-      dialogManager:hide()
+      dialog.handleClose()
+      dialog:hide()
     end,
     BButtonDown = function ()
-      dialogManager.handleClose()
-      dialogManager:hide()
+      dialog.handleClose()
+      dialog:hide()
     end
   },
   confirm = {
     AButtonDown = function ()
-      dialogManager.handleClose()
-      dialogManager:hide()
+      dialog.handleClose()
+      dialog:hide()
     end,
     BButtonDown = function ()
-      dialogManager:hide()
+      dialog:hide()
     end
   }
 }
 
-dialogManager.handleClose = function () end
+dialog.handleClose = function () end
 
-function dialogManager:alert(text)
-  dialogManager:show(text, 'alert')
+function dialog:alert(text)
+  dialog:show(text, 'alert')
 end
 
-function dialogManager:confirm(text)
-  dialogManager:show(text, 'confirm')
+function dialog:confirm(text)
+  dialog:show(text, 'confirm')
 end
 
-function dialogManager:show(text, type)
-  if dialogManager.isVisible or isTransitionActive then return end
+function dialog:show(text, type)
+  if dialog.isVisible or isTransitionActive then return end
   -- setup state
   currentType = type or 'alert'
   currentText = text
   _, currentTextHeight = gfx.getTextSizeForMaxWidth(text, PLAYDATE_W - 64, nil, font)
-  dialogManager.isVisible = true
+  dialog.isVisible = true
   -- disable input
   playdate.inputHandlers.push({}, true)
   -- setup transition
@@ -83,8 +83,8 @@ function dialogManager:show(text, type)
   end
 end
 
-function dialogManager:hide()
-  if not dialogManager.isVisible or isTransitionActive then return end
+function dialog:hide()
+  if not dialog.isVisible or isTransitionActive then return end
   -- setup transition
   isTransitionActive = true
   transitionTimer = playdate.timer.new(TRANSITION_DUR, 0, 1)
@@ -98,20 +98,20 @@ function dialogManager:hide()
     y = PLAYDATE_H
     bgFade = 0.5
     isTransitionActive = false
-    dialogManager.isVisible = false
-    dialogManager.handleClose = function () end
+    dialog.isVisible = false
+    dialog.handleClose = function () end
     -- restore controls
     playdate.inputHandlers.pop()
   end
 end
 
-function dialogManager:update()
-  if dialogManager.isVisible then
+function dialog:update()
+  if dialog.isVisible then
     local offsetX, offsetY = gfx.getDrawOffset()
     local textY = PLAYDATE_H / 2 - (currentTextHeight + 28 + 8) / 2
     local buttonY = textY + currentTextHeight + 16
     -- fade over background
-    gfxUtils:drawWhiteFade(bgFade)
+    gfxUtils:drawBlackFade(bgFade)
     -- gfx.setDrawOffset(0, 0)
     -- gfx.setColor(gfx.kColorBlack)
     -- gfx.setDitherPattern(1 - bgFade, gfx.image.kDitherTypeBayer8x8)

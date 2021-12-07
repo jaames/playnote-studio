@@ -47,3 +47,11 @@ function gfxUtils:drawWhiteFade(white)
   gfx.setDitherPattern(white, gfx.image.kDitherTypeBayer8x8)
   gfx.fillRect(-xOffset, -yOffset, PLAYDATE_W, PLAYDATE_H)
 end
+
+function gfxUtils:drawBlackFade(black)
+  -- draw offset is used to scroll the page, so we wanna ignore this
+  local xOffset, yOffset = gfx.getDrawOffset()
+  gfx.setColor(gfx.kColorBlack)
+  gfx.setDitherPattern(black, gfx.image.kDitherTypeBayer8x8)
+  gfx.fillRect(-xOffset, -yOffset, PLAYDATE_W, PLAYDATE_H)
+end

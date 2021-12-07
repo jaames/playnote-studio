@@ -19,7 +19,7 @@ function HomeScreen:init()
   self.settingsButton = Button(PLAYDATE_W - 120, 8, 112, 24)
   self.settingsButton:setIcon(settingsButtonGfx)
 
-  self.clock = Clock(8, 8, 160, 24)
+  self.clock = Clock(8, 8, 152, 24)
 
   self.inputHandlers = {
     upButtonDown = function ()
@@ -36,9 +36,9 @@ function HomeScreen:init()
     end,
     AButtonDown = function()
       if self.viewButton.isSelected then
-        screenManager:setScreen('notelist', screenManager.CROSSFADE)
+        screens:setScreen('notelist', transitions.CROSSFADE)
       elseif self.settingsButton.isSelected then
-        screenManager:setScreen('settings', screenManager.CROSSFADE)
+        screens:setScreen('settings', transitions.CROSSFADE)
       end
     end
   }
@@ -48,18 +48,6 @@ function HomeScreen:beforeEnter()
   HomeScreen.super.beforeEnter(self)
   self.viewButton:setText(locales:getText('HOME_VIEW'))
   self.settingsButton:setText(locales:getText('HOME_SETTINGS'))
-end
-
-function HomeScreen:transitionEnter(t, id)
-  -- initial entrance
-  if id == nil then
-    self:update()
-    gfxUtils:drawWhiteFade(t)
-  -- inter-page transition
-  elseif t >= 0.5 then
-    self:update()
-    gfxUtils:drawWhiteFade((t - 0.5) * 2)
-  end
 end
 
 function HomeScreen:update()

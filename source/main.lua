@@ -11,9 +11,10 @@ import 'CoreLibs/animation'
 import './services/config'
 import './services/locales'
 import './services/noteFs'
-import './services/transitions'
 import './services/screens'
+import './services/transitions'
 import './services/dialog'
+
 import './utils/utils'
 import './utils/stringUtils'
 import './utils/gfxUtils'
@@ -38,17 +39,17 @@ config:init()
 locales:init()
 noteFs:init()
 
-screenManager:register('home',     HomeScreen())
-screenManager:register('notelist', NoteListScreen())
-screenManager:register('player',   PlayerScreen())
-screenManager:register('settings', SettingsScreen())
-screenManager:register('credits',  CreditsScreen())
+screens:register('home',     HomeScreen())
+screens:register('notelist', NoteListScreen())
+screens:register('player',   PlayerScreen())
+screens:register('settings', SettingsScreen())
+screens:register('credits',  CreditsScreen())
 
-screenManager:setScreen('home', screenManager.BOOTUP)
+screens:setScreen('home', transitions.BOOTUP)
 
 function playdate.update()
-  screenManager:update()
-  dialogManager:update()
+  screens:update()
+  dialog:update()
   utils:doDeferredDraws()
   playdate.timer.updateTimers()
   playdate.frameTimer.updateTimers()

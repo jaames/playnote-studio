@@ -1,5 +1,7 @@
 local gfx <const> = playdate.graphics
 local fontBold <const> = gfx.font.new('./fonts/WhalesharkSans')
+local buttonGfx <const> = gfx.nineSlice.new('./img/button_new', 8, 8, 2, 2)
+local buttonSelectedGfx <const> = gfx.nineSlice.new('./img/button_new_selected', 8, 8, 2, 2)
 
 Button = {}
 class('Button').extends()
@@ -15,6 +17,7 @@ function Button:init(x, y, w, h)
   self.text = nil
   self.textY = nil
   self.icon = nil
+  self.iconW = nil
   self:setText('')
 end
 
@@ -30,7 +33,9 @@ function Button:setText(text)
 end
 
 function Button:setIcon(icon)
+  local iconW, _ = icon:getSize()
   self.icon = icon
+  self.iconW = iconW
 end
 
 function Button:draw()
@@ -43,22 +48,26 @@ function Button:drawAt(x, y)
   local textX = x
   local textW = w
   -- draw background
-  gfx.setColor(gfx.kColorBlack)
   if self.isSelected then
-    gfx.fillRoundRect(x - 3, y - 3, w + 6, h + 6, 4)
-    gfx.setColor(gfx.kColorWhite)
-    gfx.setLineWidth(1)
-    gfx.drawRoundRect(x - 1, y - 1, w + 2, h + 2, 3)
+    buttonSelectedGfx:drawInRect(x - 3, y - 3, w + 6, h + 6)
   else
-    gfx.fillRoundRect(x, y, w, h, 3)
+    buttonGfx:drawInRect(x - 3, y - 3, w + 6, h + 6)
   end
+  -- gfx.setColor(gfx.kColorBlack)
+  -- if self.isSelected then
+  --   gfx.fillRoundRect(x - 3, y - 3, w + 6, h + 6, 4)
+  --   gfx.setColor(gfx.kColorWhite)
+  --   gfx.setLineWidth(1)
+  --   gfx.drawRoundRect(x - 1, y - 1, w + 2, h + 2, 3)
+  -- else
+  --   gfx.fillRoundRect(x, y, w, h, 3)
+  -- end
   -- draw icon if present
   if self.icon then
     local pad = 12
     local gap = 16
-    local iconW, _ = self.icon:getSize()
-    textX = textX + iconW + gap
-    textW = textW - (iconW + gap + pad)
+    textX = textX + self.iconW + gap
+    textW = textW - (self.iconW + gap + pad)
     self.icon:drawAnchored(x + pad, y + (h / 2), 0, 0.5)
   end
   -- draw text if present

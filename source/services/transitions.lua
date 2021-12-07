@@ -1,8 +1,14 @@
+transitions = {}
+
 -- BASE TRANSITION
 
-local function makeTransition(duration, easing, onUpdate)
+local function makeTransition(duration, easing, onBegin, onUpdate)
   return function(a, b, completedCallback)
     local timer = playdate.timer.new(duration, 0, 1, easing)
+
+    if type(onBegin) == 'function' then
+      onBegin()
+    end
 
     timer.updateCallback = function ()
       onUpdate(timer.value, a, b)
@@ -17,7 +23,7 @@ end
 
 -- CROSSFADE TRANSITION
 
-CrossfadeTransition = makeTransition(250, playdate.easingFunctions.linear, function (t, a, b)
+transitions.CROSSFADE = makeTransition(250, playdate.easingFunctions.linear, nil, function (t, a, b)
   if t < 0.5 and a ~= nil then
     a:update()
     gfxUtils:drawWhiteFade(1 - t * 2)
@@ -30,7 +36,7 @@ end)
 
 -- BOOTUP TRANSITION
 
-BootupTransition = makeTransition(320, playdate.easingFunctions.linear, function (t, a, b)
+transitions.BOOTUP = makeTransition(320, playdate.easingFunctions.linear, nil, function (t, a, b)
   if b ~= nil then
     b:update()
     gfxUtils:drawWhiteFade(t)

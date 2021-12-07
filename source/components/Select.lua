@@ -137,7 +137,7 @@ function Select:drawMenu()
   -- draw select menu ui over everything
   utils:deferDraw(function ()
     local oX, oY = gfx.getDrawOffset()
-    gfxUtils:drawWhiteFade(self.bgFade)
+    gfxUtils:drawBlackFade(self.bgFade)
     gfx.setDrawOffset(0, self.menuOpenShift)
     -- draw selection bg
     local menuX = MENU_X
@@ -195,7 +195,7 @@ function Select:openMenu()
         keyTimer:remove()
         keyTimer = nil
       end
-      keyTimer = playdate.timer.keyRepeatTimerWithDelay(200, 90, function ()
+      keyTimer = playdate.timer.keyRepeatTimerWithDelay(350, 50, function ()
         self:selectPrev()
       end)
     end,
@@ -210,7 +210,7 @@ function Select:openMenu()
         keyTimer:remove()
         keyTimer = nil
       end
-      keyTimer = playdate.timer.keyRepeatTimerWithDelay(200, 90, function ()
+      keyTimer = playdate.timer.keyRepeatTimerWithDelay(350, 50, function ()
         self:selectNext()
       end)
     end,

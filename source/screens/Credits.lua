@@ -17,7 +17,7 @@ function CreditsScreen:init()
   self.creditsTexture = nil
   self.inputHandlers = {
     BButtonDown = function()
-      screenManager:setScreen('settings', screenManager.CROSSFADE)
+      screens:setScreen('settings', transitions.CROSSFADE)
     end,
     cranked = function(change, acceleratedChange)
       self.autoScroll = false

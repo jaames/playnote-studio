@@ -67,27 +67,10 @@ function PlayerScreen:init()
       self:togglePlay()
     end,
     BButtonDown = function()
-      screenManager:setScreen('notelist', screenManager.CROSSFADE)
+      screens:setScreen('notelist', transitions.CROSSFADE)
     end
   }
   self.timeline = Timeline((PLAYDATE_W / 2) - 82, PLAYDATE_H - 26, 164, 20)
-end
-
-function PlayerScreen:transitionEnter(t)
-  if t >= 0.5 then
-    gfxUtils:drawBgGrid()
-    self.currentFrame = 1
-    self:update()
-    gfxUtils:drawWhiteFade((t - 0.5) * 2)
-  end
-end
-
-function PlayerScreen:transitionLeave(t)
-  if t < 0.5 then
-    gfxUtils:drawBgGrid()
-    self:update()
-    gfxUtils:drawWhiteFade(1 - t * 2)
-  end
 end
 
 function PlayerScreen:beforeEnter()
@@ -156,8 +139,8 @@ function PlayerScreen:play()
   if not self.isPlaying then
     self.isPlaying = true
     self:transitionUiControls(false)
+    playdate.setAutoLockDisabled(true)
     playdate.display.setRefreshRate(self.ppm.fps)
-    -- playdate.display.setRefreshRate(50)
   end
 end
 
@@ -170,6 +153,7 @@ function PlayerScreen:pause()
     end
     self.isPlaying = false
     self:transitionUiControls(true)
+    playdate.setAutoLockDisabled(false)
     playdate.display.setRefreshRate(30)
     playdate.getCrankTicks(24)
   end

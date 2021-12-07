@@ -12,11 +12,7 @@ function locales:init()
 end
 
 function locales:getAvailableLanguages()
-  local t = {}
-  for _, loc in ipairs(LANGS) do
-    t[loc['key']] = loc['name']
-  end
-  return t
+  return LANGS
 end
 
 function locales:loadStringFile(languageKey)
@@ -28,7 +24,12 @@ function locales:loadStringFile(languageKey)
   return {}
 end
 
+function locales:getLanguage()
+  return self.currLocale
+end
+
 function locales:setLanguage(languageKey)
+  config.lang = languageKey
   self.currLocale = languageKey
   self.currStrings = locales:loadStringFile(languageKey)
   if languageKey ~= 'en' and self.fallbackStrings == nil then
@@ -36,6 +37,7 @@ function locales:setLanguage(languageKey)
   end
 end
 
+-- Get a translation string by its key
 function locales:getText(stringKey)
   local currStrings = self.currStrings
   local fallbackStrings = self.fallbackStrings
@@ -49,15 +51,27 @@ function locales:getText(stringKey)
   return stringKey
 end
 
-function locales:replaceKeysInText(text)
-  return string.gsub(text, '%%([%w_]+)%%', self.currStrings)
-end
-
+-- Get a translation string by its key, and use it as a formating string with the given arguments
 function locales:getTextFormatted(key, ...)
   local str = self:getText(key)
   return string.format(str, ...)
 end
 
--- function locales:getFormattedTimestamp(key, date)
---   local str = self:getText(key)
--- end
+-- Get a translation string by its key, and use it as a formating string for a date
+-- date format should match the playdate.getTime()
+function locales:getFormattedTimestamp(key, date)
+  local year, month, day, weekday, hour, minute, second = table.unpack(date)
+  local str = self:getText(key)
+  str = string.gsub(str, '$YEAR', year)
+  str = string.gsub(str, '$MONTH', month)
+  str = string.gsub(str, '$DAY', day)
+  str = string.gsub(str, '$HOUR', hour)
+  str = string.gsub(str, '$MINUTE', minute)
+  str = string.gsub(str, '$SECOND', second)
+  return str
+end
+
+-- Replace any string keys in a peice of text that are wrapped in percent signs (e.g. `%APP_TITLE%`)
+function locales:replaceKeysInText(text)
+  return string.gsub(text, '%%([%w_]+)%%', self.currStrings)
+end

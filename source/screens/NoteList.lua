@@ -52,7 +52,7 @@ function NoteListScreen:init()
       self:setSelected(self.selectedRow + 1, self.selectedCol)
     end,
     BButtonDown = function()
-      screenManager:setScreen('home', screenManager.CROSSFADE)
+      screens:setScreen('home', transitions.CROSSFADE)
     end,
     AButtonDown = function()
       -- the file dropdown is selected
@@ -62,7 +62,7 @@ function NoteListScreen:init()
         local i = self.selectedRow * 4 + self.selectedCol + 1
         local path = self.currFilepaths[i]
         noteFs:setCurrentNote(path)
-        screenManager:setScreen('player', screenManager.CROSSFADE)
+        screens:setScreen('player', transitions.CROSSFADE)
       end
     end,
   }
@@ -207,8 +207,8 @@ function NoteListScreen:drawGrid(xOffset, bitmaps)
           gfx.setColor(gfx.kColorWhite)
           gfx.fillRect(x - 4, y - 4, w + 8, h + 8)
           gfx.setColor(gfx.kColorBlack)
-          gfx.setLineWidth(3)
-          gfx.drawRoundRect(x - 5, y - 5, w + 10, h + 10, 5)
+          gfx.setLineWidth(2)
+          gfx.drawRoundRect(x - 3, y - 3, w + 6, h + 6, 4)
         else
           -- shadow
           gfx.setLineWidth(1)
