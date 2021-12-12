@@ -18,9 +18,9 @@ VPATH += extension
 SRC = \
 	extension/main.c \
 	ppmlib/ppmlib.c \
+	ppmlib/audio.c \
 	ppmlib/video.c \
 	ppmlib/ppm.c
-# src/ppm_audio.c
 
 # List all user directories here
 UINCDIR = extension ppmlib

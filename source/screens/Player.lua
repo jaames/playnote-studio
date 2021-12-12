@@ -137,10 +137,11 @@ end
 function PlayerScreen:play()
   if self.isPlayTransitionActive then return end
   if not self.isPlaying then
+    self.ppm:playAudio()
     self.isPlaying = true
     self:transitionUiControls(false)
     playdate.setAutoLockDisabled(true)
-    playdate.display.setRefreshRate(self.ppm.fps)
+    -- playdate.display.setRefreshRate(self.ppm.fps)
   end
 end
 
@@ -151,6 +152,7 @@ function PlayerScreen:pause()
       self.keyTimer:remove()
       self.keyTimer = nil
     end
+    self.ppm:stopAudio()
     self.isPlaying = false
     self:transitionUiControls(true)
     playdate.setAutoLockDisabled(false)

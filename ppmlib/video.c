@@ -87,7 +87,7 @@ void ppmVideoDecodeFrame(ppm_ctx_t* ctx, u16 frame)
 
 		switch (layerLines[layer][line])
 		{
-			case 2: /* Fill entire line with colour, then decompress. */
+			case 2: /* Fill entire line with colour, then decompress as type 1. */
 				setChunks(&layerBuffer[offset], 0x01010101, SCREEN_WIDTH);
 			case 1: /* Decompress line. */
 				lineFlags = __builtin_bswap32(*(u32 *)data);
@@ -136,6 +136,7 @@ void ppmVideoDecodeFrame(ppm_ctx_t* ctx, u16 frame)
 
 	/* Faster branch for if the frame isn't translated, XOR multiple pixels at once,
 	   interestingly doing u64 XORs seems to be slightly faster than u32, even though the playdate is 32-bit?
+		 It's still a bit of a bottleneck though, maybe someone could make this faster with some assembly magic
 	 */
 	if (!hdr.isKeyFrame && moveByY == 0 && moveByX == 0)
 	{
@@ -159,53 +160,24 @@ void ppmVideoDecodeFrame(ppm_ctx_t* ctx, u16 frame)
 		u8* layerB = ctx->layers[1];
 		u8* prevLayerA = ctx->prevLayers[0];
 		u8* prevLayerB = ctx->prevLayers[1];
+		int startX = MAX(moveByX, 0);
+		int startY = MAX(moveByY, 0);
+		int endX = MIN(SCREEN_WIDTH + moveByX, SCREEN_WIDTH);
+		int endY = MIN(SCREEN_HEIGHT + moveByY, SCREEN_HEIGHT);
+		int shift = PIXEL(moveByX, moveByY);
 		int src = 0;
 		int dst = 0;
-		for (u16 y = 0; y < SCREEN_HEIGHT; y++)
+		for (u16 y = startY; y < endY; y++)
 		{
-			/* Vertical bounds check. */
-			if (y - moveByY < 0) continue;
-			if (y - moveByY >= SCREEN_HEIGHT) break;
-
-			for (u16 x = 0; x < SCREEN_WIDTH; x++)
+			for (u16 x = startX; x < endX; x++)
 			{
-				/* Horizontal bounds check. */
-				if (x - moveByX < 0) continue;
-				if (x - moveByX >= SCREEN_WIDTH) break;
 				dst = PIXEL(x, y);
-				src = dst - PIXEL(moveByX, moveByY);
+				src = dst - shift;
 				layerA[dst] ^= prevLayerA[src];
 				layerB[dst] ^= prevLayerB[src];
 			}
 		}
 	}
-	// TODO: replace above with faster code once issues with brainslice test note are resolved
-	// else if (!hdr.isKeyFrame)
-	// {
-	// 	u8* layerA = ctx->layers[0];
-	// 	u8* layerB = ctx->layers[1];
-	// 	u8* prevLayerA = ctx->prevLayers[0];
-	// 	u8* prevLayerB = ctx->prevLayers[1];
-	// 	u16 src = 0;
-	// 	// translation offset is constant
-	// 	u16 offs = PIXEL(moveByX, moveByY);
-	// 	// pre calc x range, so we don't need to do it for each pixel
-	// 	u16 xMin = MAX(moveByX, 0);
-	// 	// u16 xMax = MIN(SCREEN_WIDTH - moveByX, SCREEN_WIDTH);
-
-	// 	for (u16 y = MAX(moveByY, 0); y < SCREEN_HEIGHT; y++)
-	// 	{
-	// 		if (y - moveByY >= SCREEN_HEIGHT) break;
-	// 		src = PIXEL(xMin, y);
-	// 		for (u16 x = xMin; x < SCREEN_WIDTH; x++)
-	// 		{
-	// 			if (x - moveByX >= SCREEN_WIDTH) break;
-	// 			layerA[src] ^= prevLayerA[src - offs];
-	// 			layerB[src] ^= prevLayerB[src - offs];
-	// 			src++;
-	// 		}
-	// 	}
-	// }
 }
 
 int ppmVideoRenderFrame(ppm_ctx_t* ctx, u32* out, u16 frame)

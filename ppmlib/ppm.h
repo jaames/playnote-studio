@@ -84,6 +84,14 @@ typedef struct ppm_sound_header_t
 	u8  pad[14];
 } ppm_sound_header_t;
 
+#pragma pack(pop)
+
+typedef struct tmb_ctx_t
+{
+	ppm_header_t hdr;
+	u8 thumbnail[THUMBNAIL_LENGTH];
+} tmb_ctx_t;
+
 typedef struct ppm_ctx_t
 {
 	ppm_header_t           hdr;
@@ -102,15 +110,11 @@ typedef struct ppm_ctx_t
 	u8  paperColour;
 	float frameRate;
 	float bgmFrameRate;
+	// added for Playdate audio playback
+	s16* masterAudio;
+	AudioSample* masterAudioSample;
+	SamplePlayer* audioPlayer;
 } ppm_ctx_t;
-
-typedef struct tmb_ctx_t
-{
-	ppm_header_t hdr;
-	u8 thumbnail[THUMBNAIL_LENGTH];
-} tmb_ctx_t;
-
-#pragma pack(pop)
 
 int  ppmInit(ppm_ctx_t* ctx, u8* ppm, int len);
 // void ppmGetThumbnail(ppm_ctx_t* ctx, u32* out);
