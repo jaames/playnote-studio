@@ -99,12 +99,14 @@ function noteFs:setCurrentNote(notePath)
 end
 
 function noteFs:getPage(pageIndex)
-  local page = table.create(0, notesPerPage)
+  local page = table.create(notesPerPage, 0)
+  local i = 1
   local startIndex = ((pageIndex - 1) * notesPerPage) + 1 -- thanks lua, great programming language
   local endIndex = math.min(startIndex + notesPerPage - 1, numNotes)
-  for i = startIndex, endIndex do
-    local path = noteList[i]
-    page[path] = TmbParser.new(path)
+  for j = startIndex, endIndex do
+    local path = noteList[j]
+    page[i] = TmbParser.new(path)
+    i = i + 1
   end
   return page
 end

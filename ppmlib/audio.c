@@ -60,7 +60,7 @@ u32 ppmAudioNumSamples(ppm_ctx_t* ctx)
 	return ctx->hdr.numFrames * (u32)round(SAMPLE_RATE / ctx->frameRate) * 4;
 }
 
-void ppmAudioRender(ppm_ctx_t* ctx, s16* out)
+void ppmAudioRender(ppm_ctx_t* ctx, s16* out, int maxSize)
 {
 	u32 samplesPerFrame, bgmSampleRate;
 	u32 trackLengths[4];
@@ -106,12 +106,17 @@ void ppmAudioRender(ppm_ctx_t* ctx, s16* out)
 	/* Render all sound effects. */
 	for (u16 frame = 0; frame < ctx->hdr.numFrames; frame++)
 	{
+		int soundOffset = samplesPerFrame * frame * 4;
+		// don't allow sound effects to be written after maxSize
+		if (soundOffset >= maxSize)
+			break;
+
 		for (u8 ch = 0; ch < SE_CHANNELS; ch++)
 		{
 			if ((ctx->audioFrames[frame] >> ch) & 1)
 			{
 				ppmAudioProcess(se[ch],
-					out + samplesPerFrame * frame * 4,
+					out + soundOffset,
 					min(samplesPerFrame * (ctx->hdr.numFrames - frame) * 4,
 					    (trackLengths[ch + 1] / sizeof(s16)) * 4),
 					SAMPLE_RATE, 1);

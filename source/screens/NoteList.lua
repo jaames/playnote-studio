@@ -14,13 +14,12 @@ function NoteListScreen:init()
   NoteListScreen.super.init(self)
 
   self.currPage = 1
-  self.currFilepaths = table.create(noteFs.notesPerPage, 0)
-  self.currThumbBitmaps = table.create(noteFs.notesPerPage, 0)
+  self.currThumbs = table.create(noteFs.notesPerPage, 0)
+  self.prevThumbs = table.create(noteFs.notesPerPage, 0)
   self.notesOnCurrPage = 0
 
   self.hasPrevPage = false
   self.hasNoNotes = false
-  self.prevThumbBitmaps = table.create(noteFs.notesPerPage, 0)
 
   self.transitionDir = 1
   self.isTransitionActive = false
@@ -60,8 +59,8 @@ function NoteListScreen:init()
         self.folderSelect:openMenu()
       else
         local i = self.selectedRow * 4 + self.selectedCol + 1
-        local path = self.currFilepaths[i]
-        noteFs:setCurrentNote(path)
+        local tmb = self.currThumbs[i]
+        noteFs:setCurrentNote(tmb.path)
         screens:setScreen('player', transitions.CROSSFADE)
       end
     end,
@@ -118,8 +117,10 @@ function NoteListScreen:setCurrentFolder(folder)
     self:setCurrentPage(1)
   else
     self.hasNoNotes = true
-    self.currThumbBitmaps = {}
-    self.currFilepaths = {}
+    utils:clearArray(self.currThumbs)
+    utils:clearArray(self.prevThumbs)
+    self.currThumbs = table.create(noteFs.notesPerPage, 0)
+    self.prevThumbs = table.create(noteFs.notesPerPage, 0)
     self.notesOnCurrPage = 0
     self.currPage = 0
     self:setSelected(FOLDERSELECT_ROW, 0) -- only the folder select button can be active
@@ -133,29 +134,14 @@ function NoteListScreen:setCurrentPage(pageIndex)
   end
   -- get paths and thumbnails for the requested page
   local page = noteFs:getPage(pageIndex)
-  -- cleanup all old bitmaps
-  for i = 1, #self.prevThumbBitmaps, 1 do
-    self.prevThumbBitmaps[i] = nil
-  end
+  -- cleanup all old thumbnails
+  utils:clearArray(self.prevThumbs)
   -- copy curr page bitmaps, to draw them for the transition
-  for i = 1, #self.currThumbBitmaps, 1 do
-    self.prevThumbBitmaps[i] = self.currThumbBitmaps[i]
-  end
+  self.prevThumbs = self.currThumbs
   -- generate bitmaps for new page
-  local j = 1
-  for path in pairs(page) do
-    local tmb = page[path]
-    self.currThumbBitmaps[j] = tmb:toBitmap()
-    self.currFilepaths[j] = path
-    tmb = nil
-    j = j + 1
-  end
+  self.currThumbs = page
   -- notes on page used for nagivation
-  self.notesOnCurrPage = j - 1
-  -- remove any unused bitmap slots for the new page, if there wasn't enough to fill the page
-  for k = j, #self.currThumbBitmaps, 1 do
-    self.currThumbBitmaps[k] = nil
-  end
+  self.notesOnCurrPage = #page
   -- transition time!
   if self.hasPrevPage then
     local transitionTimer = playdate.timer.new(TRANSITION_DUR, 0, PLAYDATE_W, playdate.easingFunctions.inQuad)
@@ -172,10 +158,10 @@ function NoteListScreen:setCurrentPage(pageIndex)
       self.xOffset = PLAYDATE_W
       self.isTransitionActive = false
       -- wipe old bitmaps
-      for i = 1, #self.prevThumbBitmaps, 1 do
-        self.prevThumbBitmaps[i] = nil
-      end
-      self.prevThumbBitmaps = table.create(noteFs.notesPerPage, 0)
+      -- for i = 1, #self.prevThumbBitmaps, 1 do
+      --   self.prevThumbBitmaps[i] = nil
+      -- end
+      -- self.prevThumbBitmaps = table.create(noteFs.notesPerPage, 0)
       -- update selection
       if self.transitionDir == -1 then
         self:setSelected(self.selectedRow, 3)
@@ -188,7 +174,7 @@ function NoteListScreen:setCurrentPage(pageIndex)
   self.hasPrevPage = true
 end
 
-function NoteListScreen:drawGrid(xOffset, bitmaps)
+function NoteListScreen:drawGrid(xOffset, thumbs)
   local w <const> = 64
   local h <const> = 48
   local gap <const> = 16
@@ -201,7 +187,7 @@ function NoteListScreen:drawGrid(xOffset, bitmaps)
     for col = 0, nCols - 1, 1 do
       local x = xOffset + baseX + (col * w + gap * col)
       local y = baseY + (row * h + gap * row)
-      if bitmaps[i] ~= nil then
+      if thumbs[i] ~= nil then
         if self.selectedRow == row and self.selectedCol == col then
           -- selection outline
           gfx.setColor(gfx.kColorWhite)
@@ -221,7 +207,7 @@ function NoteListScreen:drawGrid(xOffset, bitmaps)
           gfx.drawRect(x - 1, y - 1, w + 2, h + 2)
         end
         -- thumbnail
-        bitmaps[i]:draw(x, y)
+        thumbs[i].bitmap:draw(x, y)
       end
       i = i + 1
     end
@@ -248,14 +234,14 @@ function NoteListScreen:update()
   gfx.drawText(pageString, PLAYDATE_W - 52, PLAYDATE_H - 16)
   -- grid: right transition
   if self.isTransitionActive and self.transitionDir == 1 then
-    self:drawGrid(-self.xOffset, self.prevThumbBitmaps)
-    self:drawGrid(PLAYDATE_W - self.xOffset, self.currThumbBitmaps)
+    self:drawGrid(-self.xOffset, self.prevThumbs)
+    self:drawGrid(PLAYDATE_W - self.xOffset, self.currThumbs)
   -- grid: left transition 
   elseif self.isTransitionActive and self.transitionDir == -1 then
-    self:drawGrid(self.xOffset, self.prevThumbBitmaps)
-    self:drawGrid(-PLAYDATE_W + self.xOffset, self.currThumbBitmaps)
+    self:drawGrid(self.xOffset, self.prevThumbs)
+    self:drawGrid(-PLAYDATE_W + self.xOffset, self.currThumbs)
   -- grid: rest state
   else
-    self:drawGrid(0, self.currThumbBitmaps)
+    self:drawGrid(0, self.currThumbs)
   end
 end

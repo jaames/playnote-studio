@@ -1,8 +1,11 @@
+#include <string.h>
+
 #include "pd_api.h"
 
 #include "platform.h"
 #include "types.h"
 #include "tmb.h"
+#include "tmblib.h"
 #include "dither.h"
 
 static const lua_reg libTmb[];
@@ -18,50 +21,18 @@ void registerTmblib()
 	}
 }
 
-static tmb_ctx_t* getTmbCtx(int n)
+static char* pd_strdup(const char* str)
 {
-  return pd->lua->getArgObject(n, "TmbParser", NULL);
+  size_t len = strlen(str);
+  char* s = pd_malloc(len + 1);
+  memcpy(s, str, len);
+  s[len] = '\0';
+  return s;
 }
 
-static int tmb_new(lua_State* L)
+LCDBitmap* tmbGetPdBitmap(tmblib_ctx* ctx)
 {
-	const char* filePath = pd->lua->getArgString(1);
-
-	int fsize = 0x06A0;
-	u8* tmb = pd_malloc(fsize);
-
-	SDFile* f = pd->file->open(filePath, kFileRead | kFileReadData);
-	pd->file->read(f, tmb, fsize);
-	pd->file->close(f);
-
-	tmb_ctx_t* ctx = pd_malloc(sizeof(tmb_ctx_t));
-	int err = tmbInit(ctx, tmb, fsize);
-	pd_free(tmb);
-
-	if (err != -1)
-	{
-		pd_error("tmbInit error: %d", err);
-		pd->lua->pushNil();
-		return 1;
-	}
-
-	pd->lua->pushObject(ctx, "TmbParser", 0);
-	return 1;
-}
-
-// called when lua garbage-collects a class instance
-static int tmb_gc(lua_State* L)
-{
-	tmb_ctx_t* ctx = getTmbCtx(1);
-	pd_free(ctx);
-	// pd_log("tmb free");
-  return 0;
-}
-
-static int tmb_toBitmap(lua_State* L)
-{
-	tmb_ctx_t* ctx = getTmbCtx(1);
-	u8* pixels = pd_malloc(THUMBNAIL_WIDTH*  THUMBNAIL_HEIGHT);
+	u8* pixels = pd_malloc(THUMBNAIL_WIDTH * THUMBNAIL_HEIGHT);
 
 	int width = 0;
 	int height = 0;
@@ -72,7 +43,7 @@ static int tmb_toBitmap(lua_State* L)
 	LCDBitmap* bitmap = pd->graphics->newBitmap(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, kColorBlack);
 	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &hasMask, (u8**)&bitmapData);
 
-	tmbGetThumbnail(ctx, pixels);
+	tmbGetThumbnail(ctx->tmb, pixels);
 
 	u32 chunk = 0;
 	u8 patternOffset = 32;
@@ -118,14 +89,78 @@ static int tmb_toBitmap(lua_State* L)
 	}
 
 	pd_free(pixels);
-	pd->lua->pushBitmap(bitmap);
+	return bitmap;
+}
+
+static tmblib_ctx* getTmbCtx(int n)
+{
+  return pd->lua->getArgObject(n, "TmbParser", NULL);
+}
+
+static int tmb_new(lua_State* L)
+{
+	const char* filePath = pd->lua->getArgString(1);
+
+	int fsize = 0x06A0;
+	u8* tmb = pd_malloc(fsize);
+
+	SDFile* f = pd->file->open(filePath, kFileRead | kFileReadData);
+	pd->file->read(f, tmb, fsize);
+	pd->file->close(f);
+
+	tmblib_ctx* ctx = pd_malloc(sizeof(tmblib_ctx));
+	ctx->tmb = pd_malloc(sizeof(tmb_ctx_t));
+	int err = tmbInit(ctx->tmb, tmb, fsize);
+	pd_free(tmb);
+
+	if (err != -1)
+	{
+		pd_error("tmbInit error: %d", err);
+		pd->lua->pushNil();
+		return 1;
+	}
+
+	ctx->ppmPath = pd_strdup(filePath);
+	ctx->bitmap = tmbGetPdBitmap(ctx);
+
+	pd->lua->pushObject(ctx, "TmbParser", 0);
 	return 1;
+}
+
+// called when lua garbage-collects a class instance
+static int tmb_gc(lua_State* L)
+{
+	tmblib_ctx* ctx = getTmbCtx(1);
+	pd_free(ctx->tmb);
+	pd_free(ctx->ppmPath);
+	pd->graphics->freeBitmap(ctx->bitmap);
+	pd_log("tmb free at 0x%08x", ctx);
+	pd_free(ctx);
+  return 0;
+}
+
+static int tmb_index(lua_State* L)
+{
+	if (pd->lua->indexMetatable() == 1)
+		return 1;
+	
+	tmblib_ctx* ctx = getTmbCtx(1);
+	const char* key = pd->lua->getArgString(2);
+
+	if (strcmp(key, "path") == 0)
+		pd->lua->pushString(ctx->ppmPath);
+	else if (strcmp(key, "bitmap") == 0)
+		pd->lua->pushBitmap(ctx->bitmap);
+	else
+		pd->lua->pushNil();
+
+  return 1;
 }
 
 static const lua_reg libTmb[] =
 {
 	{ "new",                 tmb_new },
 	{ "__gc",                tmb_gc },
-	{ "toBitmap",        		 tmb_toBitmap },
+	{ "__index",             tmb_index },
 	{ NULL,                  NULL }
 };

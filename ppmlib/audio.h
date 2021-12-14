@@ -6,8 +6,8 @@
 #include <math.h>
 #include <string.h>
 
-#define SAMPLE_RATE        8192
-#define DS_SAMPLE_RATE     32768
+#define SAMPLE_RATE    8192
+#define DS_SAMPLE_RATE 32768
 
 #define CLAMP(n, l, h) \
 	if (n < l) n = l;  \
@@ -35,4 +35,4 @@ static s32 predictor;
 static s8  stepIndex;
 
 u32 ppmAudioNumSamples(ppm_ctx_t* ctx);
-void ppmAudioRender(ppm_ctx_t* ctx, s16* out);
+void ppmAudioRender(ppm_ctx_t* ctx, s16* out, int maxSize);

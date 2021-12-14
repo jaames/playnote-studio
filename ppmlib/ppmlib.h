@@ -3,8 +3,9 @@
 #include "pd_api.h"
 #include "ppm.h"
 
-// TODO
-#define AUDIO_SIZE_LIMIT = 12 * 1024 * 1024;
+// allow up to 12 MB of memory to be used for audio
+// (we have the space to spare!)
+#define AUDIO_SIZE_LIMIT (12 * 1024 * 1024)
 
 typedef struct ppmlib_ctx
 {

@@ -62,10 +62,10 @@ static int ppm_new(lua_State* L)
 	if (ppmSnd->bgmLength > 0 || ppmSnd->seLength[0] > 0 || ppmSnd->seLength[1] > 0 || ppmSnd->seLength[2] > 0)
 	{
 		// render master audio track
-		int audioTrackSize = ppmAudioNumSamples(ctx->ppm) * sizeof(u16);
+		int audioTrackSize = min(ppmAudioNumSamples(ctx->ppm) * sizeof(u16), AUDIO_SIZE_LIMIT);
 		ctx->masterAudio = pd_malloc(audioTrackSize);
 		memset(ctx->masterAudio, 0, audioTrackSize);
-		ppmAudioRender(ctx->ppm, ctx->masterAudio);
+		ppmAudioRender(ctx->ppm, ctx->masterAudio, AUDIO_SIZE_LIMIT);
 		// create playdate audio sample and player from master audio track
 		ctx->masterAudioSample = pd->sound->sample->newSampleFromData((u8*)ctx->masterAudio, kSound16bitMono, DS_SAMPLE_RATE, audioTrackSize);
 		ctx->audioPlayer = pd->sound->sampleplayer->newPlayer();
@@ -81,15 +81,15 @@ static int ppm_gc(lua_State* L)
 {
 	ppmlib_ctx* ctx = getPpmCtx(1);
 	ppmDone(ctx->ppm);
+	pd_free(ctx->ppm);
 	if (ctx->masterAudio != NULL)
 	{
-		// i added audio stuff onto the ppm ctx, so it needs to be freed too
 		pd->sound->sampleplayer->stop(ctx->audioPlayer);
 		pd->sound->sampleplayer->freePlayer(ctx->audioPlayer);
 		pd->sound->sample->freeSample(ctx->masterAudioSample);
 		pd_free(ctx->masterAudio);
 	}
-	pd_free(ctx->ppm);
+	pd_log("ppm free at 0x%08x", ctx);
 	pd_free(ctx);
   return 0;
 }
@@ -239,8 +239,8 @@ static int ppm_playAudio(lua_State* L)
 	ppmlib_ctx* ctx = getPpmCtx(1);
 	if (ctx->masterAudio != NULL)
 	{
-		// pd->sound->sampleplayer->setOffset(ctx->audioPlayer, X// TODO);
 		pd->sound->sampleplayer->play(ctx->audioPlayer, 1, 1.0);
+		// pd->sound->sampleplayer->setOffset(ctx->audioPlayer, X// TODO);
 	}
   return 0;
 }
