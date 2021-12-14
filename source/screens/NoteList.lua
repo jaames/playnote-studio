@@ -14,10 +14,9 @@ function NoteListScreen:init()
   NoteListScreen.super.init(self)
 
   self.currPage = 1
+  self.notesOnCurrPage = 0
   self.currThumbs = table.create(noteFs.notesPerPage, 0)
   self.prevThumbs = table.create(noteFs.notesPerPage, 0)
-  self.notesOnCurrPage = 0
-
   self.hasPrevPage = false
   self.hasNoNotes = false
 
@@ -50,9 +49,6 @@ function NoteListScreen:init()
     downButtonDown = function()
       self:setSelected(self.selectedRow + 1, self.selectedCol)
     end,
-    BButtonDown = function()
-      screens:setScreen('home', transitions.CROSSFADE)
-    end,
     AButtonDown = function()
       -- the file dropdown is selected
       if self.selectedRow == FOLDERSELECT_ROW then
@@ -61,7 +57,7 @@ function NoteListScreen:init()
         local i = self.selectedRow * 4 + self.selectedCol + 1
         local tmb = self.currThumbs[i]
         noteFs:setCurrentNote(tmb.path)
-        screens:setScreen('player', transitions.CROSSFADE)
+        screens:push('player', transitions.CROSSFADE)
       end
     end,
   }
@@ -76,7 +72,6 @@ function NoteListScreen:beforeEnter()
   function folderSelect:onClose (value, index)
     s.setCurrentFolder(s, value)
   end
-  print(noteFs.folderList)
   for _, folderItem in ipairs(noteFs.folderList) do
     folderSelect:addOption(folderItem.path, folderItem.name)
   end
@@ -87,6 +82,8 @@ end
 
 function NoteListScreen:afterLeave()
   NoteListScreen.super.afterLeave(self)
+  utils:clearArray(self.prevThumbs)
+  utils:clearArray(self.currThumbs)
   self.hasPrevPage = false -- prevent initial transition when returning to this page
   if self.transitionTimer then
     self.transitionTimer:remove()
@@ -134,13 +131,9 @@ function NoteListScreen:setCurrentPage(pageIndex)
   end
   -- get paths and thumbnails for the requested page
   local page = noteFs:getPage(pageIndex)
-  -- cleanup all old thumbnails
-  utils:clearArray(self.prevThumbs)
-  -- copy curr page bitmaps, to draw them for the transition
+  -- prepare previous and current thumbnail pages for the page transition
   self.prevThumbs = self.currThumbs
-  -- generate bitmaps for new page
   self.currThumbs = page
-  -- notes on page used for nagivation
   self.notesOnCurrPage = #page
   -- transition time!
   if self.hasPrevPage then
@@ -157,11 +150,8 @@ function NoteListScreen:setCurrentPage(pageIndex)
     transitionTimer.timerEndedCallback = function ()
       self.xOffset = PLAYDATE_W
       self.isTransitionActive = false
-      -- wipe old bitmaps
-      -- for i = 1, #self.prevThumbBitmaps, 1 do
-      --   self.prevThumbBitmaps[i] = nil
-      -- end
-      -- self.prevThumbBitmaps = table.create(noteFs.notesPerPage, 0)
+      -- cleanup all old thumbnails
+      utils:clearArray(self.prevThumbs)
       -- update selection
       if self.transitionDir == -1 then
         self:setSelected(self.selectedRow, 3)
@@ -188,7 +178,7 @@ function NoteListScreen:drawGrid(xOffset, thumbs)
       local x = xOffset + baseX + (col * w + gap * col)
       local y = baseY + (row * h + gap * row)
       if thumbs[i] ~= nil then
-        if self.selectedRow == row and self.selectedCol == col then
+        if self.isTransitionActive == false and self.selectedRow == row and self.selectedCol == col then
           -- selection outline
           gfx.setColor(gfx.kColorWhite)
           gfx.fillRect(x - 4, y - 4, w + 8, h + 8)
@@ -234,11 +224,11 @@ function NoteListScreen:update()
   gfx.drawText(pageString, PLAYDATE_W - 52, PLAYDATE_H - 16)
   -- grid: right transition
   if self.isTransitionActive and self.transitionDir == 1 then
-    self:drawGrid(-self.xOffset, self.prevThumbs)
+    self:drawGrid(-self.xOffset,             self.prevThumbs)
     self:drawGrid(PLAYDATE_W - self.xOffset, self.currThumbs)
   -- grid: left transition 
   elseif self.isTransitionActive and self.transitionDir == -1 then
-    self:drawGrid(self.xOffset, self.prevThumbs)
+    self:drawGrid(self.xOffset,               self.prevThumbs)
     self:drawGrid(-PLAYDATE_W + self.xOffset, self.currThumbs)
   -- grid: rest state
   else

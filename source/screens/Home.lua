@@ -36,9 +36,9 @@ function HomeScreen:init()
     end,
     AButtonDown = function()
       if self.viewButton.isSelected then
-        screens:setScreen('notelist', transitions.CROSSFADE)
+        screens:push('notelist', transitions.CROSSFADE)
       elseif self.settingsButton.isSelected then
-        screens:setScreen('settings', transitions.CROSSFADE)
+        screens:push('settings', transitions.CROSSFADE)
       end
     end
   }

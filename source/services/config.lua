@@ -14,6 +14,12 @@ local DEFAULT_CONFIG <const> = {
     [gfx.font.kLanguageJapanese] = 'jp'
   })[playdate.getSystemLanguage()],
   enableSoundEffects = true,
+  -- dithering settings, per layer (top, bottom)
+  dithering = {
+    -- settings per layer colour (black, red, blue)
+    {1, 1, 1},
+    {3, 3, 3}
+  },
 }
 
 function saveConfigFile(config)

@@ -17,9 +17,6 @@ function SettingsScreen:init()
       local item = self.items[row]
       item:onClick(item)
     end,
-    BButtonDown = function()
-      screens:setScreen('home', transitions.CROSSFADE)
-    end,
     cranked = function(change, acceleratedChange)
       local x, y = self.uiView:getScrollPosition()
       self.uiView:setScrollPosition(x, y - change, false)
@@ -76,7 +73,27 @@ function SettingsScreen:beforeEnter()
         item.button.isSelected = false
       end,
       onClick = function (item)
-        screens:setScreen('credits', transitions.CROSSFADE)
+        screens:push('credits', transitions.CROSSFADE)
+      end
+    },
+    -- DITHERING BUTTON
+    {
+      init = function(item)
+        local button = Button(0, 0, 336, 48)
+        button:setText(locales:getText('SETTINGS_DITHERING'))
+        item.button = button
+      end,
+      draw = function(item, x, y)
+        item.button:drawAt(x, y)
+      end,
+      select = function (item)
+        item.button.isSelected = true
+      end,
+      deselect = function (item)
+        item.button.isSelected = false
+      end,
+      onClick = function (item)
+        screens:push('dithering', transitions.CROSSFADE)
       end
     },
     -- SOUND EFFECTS ON/OFF

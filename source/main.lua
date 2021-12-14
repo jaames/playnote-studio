@@ -25,12 +25,14 @@ import './components/Select'
 import './components/FolderSelect'
 import './components/Clock'
 import './components/Timeline'
+import './components/DitherSwatch'
 
 import './screens/Screenbase'
 import './screens/Home'
 import './screens/NoteList'
 import './screens/Player'
 import './screens/Settings'
+import './screens/Dithering'
 import './screens/Credits'
 
 playdate.display.setRefreshRate(30)
@@ -39,13 +41,14 @@ config:init()
 locales:init()
 noteFs:init()
 
-screens:register('home',     HomeScreen())
-screens:register('notelist', NoteListScreen())
-screens:register('player',   PlayerScreen())
-screens:register('settings', SettingsScreen())
-screens:register('credits',  CreditsScreen())
+screens:register('home',      HomeScreen())
+screens:register('notelist',  NoteListScreen())
+screens:register('player',    PlayerScreen())
+screens:register('settings',  SettingsScreen())
+screens:register('dithering', DitheringScreen())
+screens:register('credits',   CreditsScreen())
 
-screens:setScreen('home', transitions.BOOTUP)
+screens:push('home', transitions.BOOTUP, transitions.CROSSFADE)
 
 function playdate.update()
   screens:update()

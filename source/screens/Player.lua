@@ -65,9 +65,6 @@ function PlayerScreen:init()
     end,
     AButtonDown = function()
       self:togglePlay()
-    end,
-    BButtonDown = function()
-      screens:setScreen('notelist', transitions.CROSSFADE)
     end
   }
   self.timeline = Timeline((PLAYDATE_W / 2) - 82, PLAYDATE_H - 26, 164, 20)

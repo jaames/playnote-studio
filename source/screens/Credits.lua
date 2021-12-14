@@ -16,9 +16,6 @@ function CreditsScreen:init()
   self.scrollY = 0
   self.creditsTexture = nil
   self.inputHandlers = {
-    BButtonDown = function()
-      screens:setScreen('settings', transitions.CROSSFADE)
-    end,
     cranked = function(change, acceleratedChange)
       self.autoScroll = false
       self.scrollY = utils:clampScroll(self.scrollY + change, SCROLL_START, self.creditsHeight)

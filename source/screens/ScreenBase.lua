@@ -11,7 +11,13 @@ function ScreenBase:beforeEnter()
 end
 
 function ScreenBase:afterEnter()
-  playdate.inputHandlers.push(self.inputHandlers, true)
+  local inputHandlers = self.inputHandlers
+  if inputHandlers.BButtonDown == nil then
+    inputHandlers.BButtonDown = function ()
+      screens:goBack()
+    end
+  end
+  playdate.inputHandlers.push(inputHandlers, true)
 end
 
 function ScreenBase:beforeLeave()

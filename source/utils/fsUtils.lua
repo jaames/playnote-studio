@@ -1,6 +1,9 @@
 fsUtils = {}
 
 local INTERNAL_FOLDERS <const> = {
+  -- Playdate data
+  'Screenshots/',
+  -- internal contents
   'data/',
   'fonts/',
   'img/',
