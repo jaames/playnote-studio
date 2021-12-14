@@ -11,7 +11,6 @@
 #include "dither.h"
 
 static const lua_reg libPpm[];
-static const lua_reg libTmb[];
 
 void registerPpmlib()
 {
@@ -22,15 +21,9 @@ void registerPpmlib()
 		pd_error("%s:%i: registering PPM lib failed, %s", __FILE__, __LINE__, err);
 		return;
 	}
-
-	if (!pd->lua->registerClass("TmbParser", libTmb, NULL, 0, &err))
-	{
-		pd_error("%s:%i: registering TMB lib failed, %s", __FILE__, __LINE__, err);
-		return;
-	}
 }
 
-static ppm_ctx_t* getPpmCtx(int n) 
+static ppmlib_ctx* getPpmCtx(int n) 
 {
 	return pd->lua->getArgObject(n, "PpmParser", NULL);
 }
@@ -49,8 +42,9 @@ static int ppm_new(lua_State* L)
 	pd->file->read(f, ppm, fsize);
 	pd->file->close(f);
 
-	ppm_ctx_t* ctx = pd_malloc(sizeof(ppm_ctx_t));
-	int err = ppmInit(ctx, ppm, fsize);
+	ppmlib_ctx* ctx = pd_malloc(sizeof(ppmlib_ctx));
+	ctx->ppm = pd_malloc(sizeof(ppm_ctx_t));
+	int err = ppmInit(ctx->ppm, ppm, fsize);
 	pd_free(ppm);
 
 	if (err != -1)
@@ -60,15 +54,24 @@ static int ppm_new(lua_State* L)
 		return 1;
 	}
 
-	// render master audio track
-	int audioTrackSize = ppmAudioNumSamples(ctx) * sizeof(u16);
-	ctx->masterAudio = pd_malloc(audioTrackSize);
-	ppmAudioRender(ctx, ctx->masterAudio);
-	// create playdate audio sample and player from master audio track
-	ctx->masterAudioSample = pd->sound->sample->newSampleFromData((u8*)ctx->masterAudio, kSound16bitMono, DS_SAMPLE_RATE, audioTrackSize);
-	ctx->audioPlayer = pd->sound->sampleplayer->newPlayer();
-	pd->sound->sampleplayer->setSample(ctx->audioPlayer, ctx->masterAudioSample);
+	ctx->layerPattern[0] = ditherMaskNone;
+	ctx->layerPattern[1] = ditherMaskNone;
 
+	ctx->masterAudio = NULL;
+	ppm_sound_header_t* ppmSnd = &ctx->ppm->sndHdr;
+	if (ppmSnd->bgmLength > 0 || ppmSnd->seLength[0] > 0 || ppmSnd->seLength[1] > 0 || ppmSnd->seLength[2] > 0)
+	{
+		// render master audio track
+		int audioTrackSize = ppmAudioNumSamples(ctx->ppm) * sizeof(u16);
+		ctx->masterAudio = pd_malloc(audioTrackSize);
+		memset(ctx->masterAudio, 0, audioTrackSize);
+		ppmAudioRender(ctx->ppm, ctx->masterAudio);
+		// create playdate audio sample and player from master audio track
+		ctx->masterAudioSample = pd->sound->sample->newSampleFromData((u8*)ctx->masterAudio, kSound16bitMono, DS_SAMPLE_RATE, audioTrackSize);
+		ctx->audioPlayer = pd->sound->sampleplayer->newPlayer();
+		pd->sound->sampleplayer->setSample(ctx->audioPlayer, ctx->masterAudioSample);
+	}
+	
 	pd->lua->pushObject(ctx, "PpmParser", 0);
 	return 1;
 }
@@ -76,14 +79,17 @@ static int ppm_new(lua_State* L)
 // called when lua garbage-collects a class instance
 static int ppm_gc(lua_State* L)
 {
-	ppm_ctx_t* ctx = getPpmCtx(1);
-	ppmDone(ctx);
-	// i added audio stuff onto the ppm ctx, so it needs to be freed too
-	pd->sound->sampleplayer->stop(ctx->audioPlayer);
-	pd->sound->sampleplayer->freePlayer(ctx->audioPlayer);
-	pd->sound->sample->freeSample(ctx->masterAudioSample);
-	pd_free(ctx->masterAudio);
-	// free the ppm ctx itself once done
+	ppmlib_ctx* ctx = getPpmCtx(1);
+	ppmDone(ctx->ppm);
+	if (ctx->masterAudio != NULL)
+	{
+		// i added audio stuff onto the ppm ctx, so it needs to be freed too
+		pd->sound->sampleplayer->stop(ctx->audioPlayer);
+		pd->sound->sampleplayer->freePlayer(ctx->audioPlayer);
+		pd->sound->sample->freeSample(ctx->masterAudioSample);
+		pd_free(ctx->masterAudio);
+	}
+	pd_free(ctx->ppm);
 	pd_free(ctx);
   return 0;
 }
@@ -93,15 +99,15 @@ static int ppm_index(lua_State* L)
 	if (pd->lua->indexMetatable() == 1)
 		return 1;
 	
-	ppm_ctx_t* ctx = getPpmCtx(1);
+	ppmlib_ctx* ctx = getPpmCtx(1);
 	const char* key = pd->lua->getArgString(2);
 
 	if (strcmp(key, "frameRate") == 0 || strcmp(key, "fps") == 0)
-		pd->lua->pushFloat(ctx->frameRate);
+		pd->lua->pushFloat(ctx->ppm->frameRate);
 	else if (strcmp(key, "numFrames") == 0)
-		pd->lua->pushInt(ctx->hdr.numFrames);
+		pd->lua->pushInt(ctx->ppm->hdr.numFrames);
 	else if (strcmp(key, "loop") == 0)
-		pd->lua->pushBool(ctx->hdr.numFrames);
+		pd->lua->pushBool(ctx->ppm->animHdr.flags.loop);
 	// else if (strcmp(key, "isLocked") == 0)
 	// 	pd->lua->pushInt(ctx->hdr.isLocked);
 	// else if (strcmp(key, "currentEditor") == 0)
@@ -117,16 +123,16 @@ static int ppm_index(lua_State* L)
 // example for reading fields from the ppm ctx
 static int ppm_getMagic(lua_State* L)
 {
-	ppm_ctx_t* ctx = getPpmCtx(1);
-	pd->lua->pushBytes(ctx->hdr.magic, sizeof(ctx->hdr.magic));
+	ppmlib_ctx* ctx = getPpmCtx(1);
+	pd->lua->pushBytes(ctx->ppm->hdr.magic, sizeof(ctx->ppm->hdr.magic));
   return 1;
 }
 
 // get the flipnote framerate (in frames per second) as a float
 static int ppm_getFps(lua_State* L)
 {
-	ppm_ctx_t* ctx = getPpmCtx(1);
-	float rate = ctx->frameRate;
+	ppmlib_ctx* ctx = getPpmCtx(1);
+	float rate = ctx->ppm->frameRate;
 	pd->lua->pushFloat(rate);
   return 1;
 }
@@ -134,8 +140,8 @@ static int ppm_getFps(lua_State* L)
 // get the number of flipnote frames
 static int ppm_getNumFrames(lua_State* L)
 {
-	ppm_ctx_t* ctx = getPpmCtx(1);
-	pd->lua->pushInt(ctx->hdr.numFrames);
+	ppmlib_ctx* ctx = getPpmCtx(1);
+	pd->lua->pushInt(ctx->ppm->hdr.numFrames);
   return 1;
 }
 
@@ -143,16 +149,39 @@ static int ppm_getNumFrames(lua_State* L)
 // frame index begins at 1 - lua-style
 static int ppm_decodeFrame(lua_State* L)
 {
-	ppm_ctx_t* ctx = getPpmCtx(1);
+	ppmlib_ctx* ctx = getPpmCtx(1);
 	int frame = pd->lua->getArgInt(2) - 1;
-	ppmVideoDecodeFrame(ctx, (u16)frame);
+	ppmVideoDecodeFrame(ctx->ppm, (u16)frame);
   return 0;
+}
+
+// set a layer's dither pattern from a list of presets
+static int ppm_setLayerDither(lua_State* L)
+{
+	ppmlib_ctx* ctx = getPpmCtx(1);
+	int layerIndex = pd->lua->getArgInt(2) - 1; // starts at 1 in lua
+	int pattern = pd->lua->getArgInt(3);
+	switch (pattern)
+	{
+		case 1:
+			ctx->layerPattern[layerIndex] = ditherMaskPolka;
+			break;
+		case 2:
+			ctx->layerPattern[layerIndex] = ditherMaskChecker;
+			break;
+		case 3:
+			ctx->layerPattern[layerIndex] = ditherMaskInvPolka;
+			break;
+		default:
+			ctx->layerPattern[layerIndex] = ditherMaskNone;
+	}
+	return 0;
 }
 
 // draw a given frame into the framebuffer
 static int ppm_drawFrame(lua_State* L)
 {
-	ppm_ctx_t* ctx = getPpmCtx(1);
+	ppmlib_ctx* ctx = getPpmCtx(1);
 	int frameIndex = pd->lua->getArgInt(2) - 1; // starts at 1 in lua
 	int updateLines = pd->lua->getArgBool(3);
 	void* frameBuffer = pd->graphics->getFrame();
@@ -162,12 +191,12 @@ static int ppm_drawFrame(lua_State* L)
 	// stride = 52
 	frameBuffer = (u32*)(frameBuffer + 16 * 52 + 9);
 	// 
-	ppmVideoDecodeFrame(ctx, (u16)frameIndex);
-	u8* layerA = ctx->layers[0];
-	u8* layerB = ctx->layers[1];
+	ppmVideoDecodeFrame(ctx->ppm, (u16)frameIndex);
 
-	const u32* layerAPattern = ditherMaskNone;
-	const u32* layerBPattern = ditherMaskChecker;
+	u8* layerA = ctx->ppm->layers[0];
+	u8* layerB = ctx->ppm->layers[1];
+	const u32* layerAPattern = ctx->layerPattern[0];
+	const u32* layerBPattern = ctx->layerPattern[1];
 	u8 patternOffset = 32;
 
 	u32 chunk = 0;
@@ -191,7 +220,7 @@ static int ppm_drawFrame(lua_State* L)
 					chunk &= layerBPattern[patternOffset + shift];
 			}
 			// invert chunk if paper is black
-			if (ctx->paperColour == 0)
+			if (ctx->ppm->paperColour == 0)
 				chunk = ~chunk;
 			*(u32*)frameBuffer = chunk;
 			frameBuffer += 4;
@@ -207,18 +236,22 @@ static int ppm_drawFrame(lua_State* L)
 
 static int ppm_playAudio(lua_State* L)
 {
-	ppm_ctx_t* ctx = getPpmCtx(1);
-	// ppd->sound->sampleplayer->setOffset(ctx->audioPlayer, X// TODO);
-	pd->sound->sampleplayer->play(ctx->audioPlayer, 1, 1.0);
-
+	ppmlib_ctx* ctx = getPpmCtx(1);
+	if (ctx->masterAudio != NULL)
+	{
+		// pd->sound->sampleplayer->setOffset(ctx->audioPlayer, X// TODO);
+		pd->sound->sampleplayer->play(ctx->audioPlayer, 1, 1.0);
+	}
   return 0;
 }
 
 static int ppm_stopAudio(lua_State* L)
 {
-	ppm_ctx_t* ctx = getPpmCtx(1);
-	pd->sound->sampleplayer->stop(ctx->audioPlayer);
-
+	ppmlib_ctx* ctx = getPpmCtx(1);
+	if (ctx->masterAudio != NULL)
+	{
+		pd->sound->sampleplayer->stop(ctx->audioPlayer);
+	}
   return 0;
 }
 
@@ -289,120 +322,11 @@ static const lua_reg libPpm[] =
 	{ "getMagic",            ppm_getMagic },
 	{ "getNumFrames",        ppm_getNumFrames },
 	{ "getFps",              ppm_getFps },
+	{ "setLayerDither",      ppm_setLayerDither },
 	{ "decodeFrame",         ppm_decodeFrame },
 	{ "drawFrame",           ppm_drawFrame },
 	{ "playAudio",           ppm_playAudio },
 	{ "stopAudio",           ppm_stopAudio },
 	// { "decodeFrameToBitmap", ppm_decodeFrameToBitmap },
-	{ NULL,                  NULL }
-};
-
-static tmb_ctx_t* getTmbCtx(int n) { return pd->lua->getArgObject(n, "TmbParser", NULL); }
-
-static int tmb_new(lua_State* L)
-{
-	const char* filePath = pd->lua->getArgString(1);
-
-	int fsize = 0x06A0;
-	u8* tmb = pd_malloc(fsize);
-
-	SDFile* f = pd->file->open(filePath, kFileRead | kFileReadData);
-	pd->file->read(f, tmb, fsize);
-	pd->file->close(f);
-
-	tmb_ctx_t* ctx = pd_malloc(sizeof(tmb_ctx_t));
-	int err = tmbInit(ctx, tmb, fsize);
-	pd_free(tmb);
-
-	if (err != -1)
-	{
-		pd_error("tmbInit error: %d", err);
-		pd->lua->pushNil();
-		return 1;
-	}
-
-	pd->lua->pushObject(ctx, "TmbParser", 0);
-	return 1;
-}
-
-// called when lua garbage-collects a class instance
-static int tmb_gc(lua_State* L)
-{
-	tmb_ctx_t* ctx = getTmbCtx(1);
-	pd_free(ctx);
-	// pd_log("tmb free");
-  return 0;
-}
-
-static int tmb_toBitmap(lua_State* L)
-{
-	tmb_ctx_t* ctx = getTmbCtx(1);
-	u8* pixels = pd_malloc(THUMBNAIL_WIDTH*  THUMBNAIL_HEIGHT);
-
-	int width = 0;
-	int height = 0;
-	int rowBytes = 0;
-	int hasMask = 0;
-	u32* bitmapData;
-	
-	LCDBitmap* bitmap = pd->graphics->newBitmap(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, kColorBlack);
-	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &hasMask, (u8**)&bitmapData);
-
-	tmbGetThumbnail(ctx, pixels);
-
-	u32 chunk = 0;
-	u8 patternOffset = 32;
-	u16 src = 0;
-	u16 dst = 0;
-	for (u8 y = 0; y < THUMBNAIL_HEIGHT; y++)
-	{
-		// each pattern is 32 * 2 pixels, or 2 lines of 32 pixels
-		// for every line in the image, we want to flip between the two pattern lines
-		patternOffset = patternOffset == 32 ? 0 : 32;
-		// pack 32 pixels horizontally
-		for (u8 x = 0; x < THUMBNAIL_WIDTH; x += 32)
-		{
-			// all pixels start out white
-			chunk = 0xFFFFFFFF;
-			for (u8 shift = 0; shift < 32; shift++)
-			{
-				// convert the thumbnail image (which uses paleted color) to 1 bit
-				// patterns are used to mask specific pixels and produce dithering
-				switch (ppmThumbnailPaletteGray[pixels[src++]])
-				{
-					// black
-					case 0: 
-						chunk &= ditherMaskNone[patternOffset + shift];
-						break;
-					// dark gray (polka pattern, inverted)
-					case 1:
-						chunk &= ditherMaskInvPolka[patternOffset + shift];
-						break;
-					// mid gray (checkerboard pattern)
-					case 2:
-						chunk &= ditherMaskChecker[patternOffset + shift];
-						break;
-					// light gray (polka pattern)
-					case 3:
-						chunk &= ditherMaskPolka[patternOffset + shift];
-						break;
-					// 4 = white, do nothing
-				}
-			}
-			bitmapData[dst++] = chunk;
-		}
-	}
-
-	pd_free(pixels);
-	pd->lua->pushBitmap(bitmap);
-	return 1;
-}
-
-static const lua_reg libTmb[] =
-{
-	{ "new",                 tmb_new },
-	{ "__gc",                tmb_gc },
-	// { "__index",             ppm_index },
-	{ "toBitmap",        		 tmb_toBitmap },
 	{ NULL,                  NULL }
 };

@@ -68,11 +68,21 @@ typedef struct ppm_header_t
 	u16  pad;
 } ppm_header_t;
 
+typedef struct ppm_animation_header_flags_t
+{
+	u8               : 1;
+	u8 loop          : 1;
+	u8               : 3;
+	u8 layer1Visible : 1;
+	u8 layer2Visible : 1;
+	u16              : 9;
+} ppm_animation_header_flags_t;
+
 typedef struct ppm_animation_header_t
 {
 	u16 tableLength;
-	u16 pad;
-	u32 flags;
+	u32 pad;
+	ppm_animation_header_flags_t flags;
 } ppm_animation_header_t;
 
 typedef struct ppm_sound_header_t
@@ -83,14 +93,6 @@ typedef struct ppm_sound_header_t
 	u8  recordedSpeed;
 	u8  pad[14];
 } ppm_sound_header_t;
-
-#pragma pack(pop)
-
-typedef struct tmb_ctx_t
-{
-	ppm_header_t hdr;
-	u8 thumbnail[THUMBNAIL_LENGTH];
-} tmb_ctx_t;
 
 typedef struct ppm_ctx_t
 {
@@ -110,16 +112,10 @@ typedef struct ppm_ctx_t
 	u8  paperColour;
 	float frameRate;
 	float bgmFrameRate;
-	// added for Playdate audio playback
-	s16* masterAudio;
-	AudioSample* masterAudioSample;
-	SamplePlayer* audioPlayer;
 } ppm_ctx_t;
 
+#pragma pack(pop)
+
 int  ppmInit(ppm_ctx_t* ctx, u8* ppm, int len);
-// void ppmGetThumbnail(ppm_ctx_t* ctx, u32* out);
 void ppmDone(ppm_ctx_t* ctx);
-int  tmbInit(tmb_ctx_t* ctx, u8* ppm, int len);
-void tmbGetThumbnail(tmb_ctx_t* ctx, u8* out);
-void tmbDone(tmb_ctx_t* ctx);
 char* fsidFromStr(u8 fsid[8]);

@@ -98,6 +98,7 @@ end
 
 function PlayerScreen:loadPpm()
   self.ppm = PpmParser.new(noteFs.currentNote)
+  self.ppm:setLayerDither(2, 2)
   self.numFrames = self.ppm.numFrames
   self.currentFrame = 1
   self.loop = true -- TODO: take from ppm
