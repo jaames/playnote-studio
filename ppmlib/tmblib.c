@@ -134,7 +134,7 @@ static int tmb_gc(lua_State* L)
 	pd_free(ctx->tmb);
 	pd_free(ctx->ppmPath);
 	pd->graphics->freeBitmap(ctx->bitmap);
-	pd_log("tmb free at 0x%08x", ctx);
+	// pd_log("tmb free at 0x%08x", ctx);
 	pd_free(ctx);
   return 0;
 }

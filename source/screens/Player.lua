@@ -94,11 +94,16 @@ function PlayerScreen:afterLeave()
 end
 
 function PlayerScreen:loadPpm()
-  self.ppm = PpmParser.new(noteFs.currentNote)
-  self.ppm:setLayerDither(2, 2)
-  self.numFrames = self.ppm.numFrames
+  local ppm = PpmParser.new(noteFs.currentNote)
+  for layer = 1,2 do
+    for colour = 1,3 do
+      ppm:setLayerDither(layer, colour, config.dithering[layer][colour])
+    end
+  end
+  self.numFrames = ppm.numFrames
+  self.loop = ppm.loop
+  self.ppm = ppm
   self.currentFrame = 1
-  self.loop = true -- TODO: take from ppm
   local animTimer = playdate.timer.new(1000, 1, 32)
   animTimer.repeats = true
   animTimer.discardOnCompletion = false

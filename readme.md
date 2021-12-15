@@ -1,17 +1,22 @@
 ## TODO
 
 - Update button graphics
+- Redo logo, try boiling lines
+- Frog mascot?
 - Add ok/cancel/confirm buttons back to dialogs
 - Icons for all settings buttons, and folder button
 - Remember last folder opened
 - Locale support for Flipnote pack titles
-- Take loop flag from Flipnote
 - Player play/pause with timer
-- Customizable dithering per note
-- Player audio
+- Audio play/pause
+- Make dithering settings screen pretty
+- Dither settings per note
 - Flipnote details screen
 - Get audio design in
 - Get translators in
+- pdxinfo
+- Optimize C parser to keep the image 1-bit all the way through
+- Create a PPM test suite to verify against
 - Instructions for loading PPMs in settings? or on the "no flipnotes in folder" view?
 - Cleanup final build - remove all .pdz files aside from main.pdz, minify json, etc
 - Website

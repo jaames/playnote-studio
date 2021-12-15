@@ -54,8 +54,12 @@ static int ppm_new(lua_State* L)
 		return 1;
 	}
 
-	ctx->layerPattern[0] = ditherMaskNone;
-	ctx->layerPattern[1] = ditherMaskNone;
+	ctx->layerPattern[0][0] = ditherMaskNone;
+	ctx->layerPattern[0][1] = ditherMaskNone;
+	ctx->layerPattern[0][2] = ditherMaskNone;
+	ctx->layerPattern[1][0] = ditherMaskNone;
+	ctx->layerPattern[1][1] = ditherMaskNone;
+	ctx->layerPattern[1][2] = ditherMaskNone;
 
 	ctx->masterAudio = NULL;
 	ppm_sound_header_t* ppmSnd = &ctx->ppm->sndHdr;
@@ -89,7 +93,7 @@ static int ppm_gc(lua_State* L)
 		pd->sound->sample->freeSample(ctx->masterAudioSample);
 		pd_free(ctx->masterAudio);
 	}
-	pd_log("ppm free at 0x%08x", ctx);
+	// pd_log("ppm free at 0x%08x", ctx);
 	pd_free(ctx);
   return 0;
 }
@@ -120,31 +124,6 @@ static int ppm_index(lua_State* L)
   return 1;
 }
 
-// example for reading fields from the ppm ctx
-static int ppm_getMagic(lua_State* L)
-{
-	ppmlib_ctx* ctx = getPpmCtx(1);
-	pd->lua->pushBytes(ctx->ppm->hdr.magic, sizeof(ctx->ppm->hdr.magic));
-  return 1;
-}
-
-// get the flipnote framerate (in frames per second) as a float
-static int ppm_getFps(lua_State* L)
-{
-	ppmlib_ctx* ctx = getPpmCtx(1);
-	float rate = ctx->ppm->frameRate;
-	pd->lua->pushFloat(rate);
-  return 1;
-}
-
-// get the number of flipnote frames
-static int ppm_getNumFrames(lua_State* L)
-{
-	ppmlib_ctx* ctx = getPpmCtx(1);
-	pd->lua->pushInt(ctx->ppm->hdr.numFrames);
-  return 1;
-}
-
 // decode a frame at a given index
 // frame index begins at 1 - lua-style
 static int ppm_decodeFrame(lua_State* L)
@@ -160,20 +139,23 @@ static int ppm_setLayerDither(lua_State* L)
 {
 	ppmlib_ctx* ctx = getPpmCtx(1);
 	int layerIndex = pd->lua->getArgInt(2) - 1; // starts at 1 in lua
-	int pattern = pd->lua->getArgInt(3);
+	int colour = pd->lua->getArgInt(3) - 1; // starts at 1 in lua
+	int pattern = pd->lua->getArgInt(4) - 1; // starts at 1 in lua
+
 	switch (pattern)
 	{
+		// 0 = ditherMaskNone
 		case 1:
-			ctx->layerPattern[layerIndex] = ditherMaskPolka;
+			ctx->layerPattern[layerIndex][colour] = ditherMaskInvPolka;
 			break;
 		case 2:
-			ctx->layerPattern[layerIndex] = ditherMaskChecker;
+			ctx->layerPattern[layerIndex][colour] = ditherMaskChecker;
 			break;
 		case 3:
-			ctx->layerPattern[layerIndex] = ditherMaskInvPolka;
+			ctx->layerPattern[layerIndex][colour] = ditherMaskPolka;
 			break;
 		default:
-			ctx->layerPattern[layerIndex] = ditherMaskNone;
+			ctx->layerPattern[layerIndex][colour] = ditherMaskNone;
 	}
 	return 0;
 }
@@ -195,8 +177,8 @@ static int ppm_drawFrame(lua_State* L)
 
 	u8* layerA = ctx->ppm->layers[0];
 	u8* layerB = ctx->ppm->layers[1];
-	const u32* layerAPattern = ctx->layerPattern[0];
-	const u32* layerBPattern = ctx->layerPattern[1];
+	const u32* layerAPattern = ctx->layerPattern[0][ctx->ppm->layerColours[0] - 1];
+	const u32* layerBPattern = ctx->layerPattern[1][ctx->ppm->layerColours[1] - 1];
 	u8 patternOffset = 32;
 
 	u32 chunk = 0;
@@ -319,9 +301,6 @@ static const lua_reg libPpm[] =
 	{ "new",                 ppm_new },
 	{ "__gc",                ppm_gc },
 	{ "__index",             ppm_index },
-	{ "getMagic",            ppm_getMagic },
-	{ "getNumFrames",        ppm_getNumFrames },
-	{ "getFps",              ppm_getFps },
 	{ "setLayerDither",      ppm_setLayerDither },
 	{ "decodeFrame",         ppm_decodeFrame },
 	{ "drawFrame",           ppm_drawFrame },
