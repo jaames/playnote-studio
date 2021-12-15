@@ -1,5 +1,8 @@
 {
-  "folderTitle": "Playnote Picks",
+  "folderTitle": {
+    "en": "Playnote Picks",
+    "jp": "Playnote Picks JP"
+  },
   "credits": [
     {
       "id": "keke",

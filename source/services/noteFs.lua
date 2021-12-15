@@ -56,10 +56,24 @@ end
 
 function noteFs:getFolderName(folderPath)
   local meta = self:getFolderMeta(folderPath)
-  if meta ~= nil and meta.folderTitle	~= nil then
-    return stringUtils:escape(meta.folderTitle)
+  if meta ~= nil then
+    local folderTitle = meta.folderTitle
+    if type(folderTitle) == 'string' then
+      return stringUtils:escape(folderTitle)
+    elseif type(folderTitle) == 'table' and folderTitle[config.lang] ~= nil then
+      return stringUtils:escape(folderTitle[config.lang])
+    elseif type(folderTitle) == 'table' and folderTitle['en'] ~= nil then
+      return stringUtils:escape(folderTitle['en'])
+    end
   end
   return stringUtils:escape(fsUtils:fixFolderName(folderPath))
+end
+
+-- update folder names after location size
+function noteFs:updateFolderNames()
+  for _, folder in ipairs(self.folderList) do
+    folder.name = self:getFolderName(folder.path)
+  end
 end
 
 function noteFs:getArtistCredits()

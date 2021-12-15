@@ -134,6 +134,7 @@ function SettingsScreen:beforeEnter()
         select:setValue(locales:getLanguage())
         function select:onClose(value)
           locales:setLanguage(value)
+          noteFs:updateFolderNames() -- update folder name list
           -- todo: wait until select menu is closed, keep selection state, reload w transition
           scr:reload()
         end
