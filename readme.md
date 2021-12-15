@@ -3,11 +3,11 @@
 - Update button graphics
 - Redo logo, try boiling lines
 - Frog mascot?
-- Icons for all settings buttons, and folder button
 - Player play/pause with timer
 - Audio play/pause
 - Make dithering settings screen pretty
 - Dither settings per note
+- Add DSi username chars to font
 - Flipnote details screen
 - Get audio design in
 - Get translators in

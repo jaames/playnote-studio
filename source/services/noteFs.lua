@@ -69,7 +69,7 @@ function noteFs:getFolderName(folderPath)
   return stringUtils:escape(fsUtils:fixFolderName(folderPath))
 end
 
--- update folder names after location size
+-- update folder names after locale has been changed
 function noteFs:updateFolderNames()
   for _, folder in ipairs(self.folderList) do
     folder.name = self:getFolderName(folder.path)

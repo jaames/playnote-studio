@@ -16,7 +16,7 @@ function HomeScreen:init()
   self.viewButton:setIcon(viewButtonGfx)
   self.viewButton.isSelected = true
 
-  self.settingsButton = Button(PLAYDATE_W - 120, 8, 112, 24)
+  self.settingsButton = Button(PLAYDATE_W - 140, 8, 132, 24)
   self.settingsButton:setIcon(settingsButtonGfx)
 
   self.clock = Clock(8, 8, 152, 24)

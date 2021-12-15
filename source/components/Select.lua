@@ -120,7 +120,7 @@ function Select:drawAt(x, y)
 
   local currValueLabel = self.optionShortLabels[self.activeOptionIndex]
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  gfx.drawTextInRect(currValueLabel, x, y + self.textY, self.w - 8, self.h, nil, '...', kTextAlignment.right)
+  gfx.drawTextInRect(currValueLabel, x, y + self.textY, self.w - 16, self.h, nil, '...', kTextAlignment.right)
   gfx.setImageDrawMode(0)
 
   if self.isOpen then

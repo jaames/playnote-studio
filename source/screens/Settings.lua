@@ -1,5 +1,14 @@
 local gfx <const> = playdate.graphics
 
+local ITEM_WIDTH <const> = 312
+
+local aboutGfx <const> = gfx.image.new('./img/about')
+local creditsGfx <const> = gfx.image.new('./img/credits')
+local ditherGfx <const> = gfx.image.new('./img/dither')
+local soundFxGfx <const> = gfx.image.new('./img/sound')
+local langGfx <const> = gfx.image.new('./img/lang')
+local resetGfx <const> = gfx.image.new('./img/reset')
+
 SettingsScreen = {}
 class('SettingsScreen').extends(ScreenBase)
 
@@ -33,8 +42,9 @@ function SettingsScreen:beforeEnter()
     -- ABOUT BUTTON
     {
       init = function(item)
-        local button = Button(0, 0, 336, 48)
+        local button = Button(0, 0, ITEM_WIDTH, 48)
         button:setText(locales:getText('SETTINGS_ABOUT'))
+        button:setIcon(aboutGfx)
         item.button = button
       end,
       draw = function(item, x, y)
@@ -59,8 +69,9 @@ function SettingsScreen:beforeEnter()
     -- CREDITS BUTTON
     {
       init = function(item)
-        local button = Button(0, 0, 336, 48)
+        local button = Button(0, 0, ITEM_WIDTH, 48)
         button:setText(locales:getText('SETTINGS_CREDITS'))
+        button:setIcon(creditsGfx)
         item.button = button
       end,
       draw = function(item, x, y)
@@ -79,8 +90,9 @@ function SettingsScreen:beforeEnter()
     -- DITHERING BUTTON
     {
       init = function(item)
-        local button = Button(0, 0, 336, 48)
+        local button = Button(0, 0, ITEM_WIDTH, 48)
         button:setText(locales:getText('SETTINGS_DITHERING'))
+        button:setIcon(ditherGfx)
         item.button = button
       end,
       draw = function(item, x, y)
@@ -99,8 +111,9 @@ function SettingsScreen:beforeEnter()
     -- SOUND EFFECTS ON/OFF
     {
       init = function(item)
-        local select = Select(0, 0, 336, 48)
+        local select = Select(0, 0, ITEM_WIDTH, 48)
         select:setText(locales:getText('SETTINGS_SOUND'))
+        select:setIcon(soundFxGfx)
         select:addOption(true,  locales:getText('SETTINGS_SOUND_ON'),  locales:getText('SETTINGS_ON'))
         select:addOption(false, locales:getText('SETTINGS_SOUND_OFF'), locales:getText('SETTINGS_OFF'))
         select:setValue(config.enableSoundEffects)
@@ -125,9 +138,10 @@ function SettingsScreen:beforeEnter()
     -- LANGUAGE SELECT
     {
       init = function(item)
-        local select = Select(0, 0, 336, 48)
+        local select = Select(0, 0, ITEM_WIDTH, 48)
         local langs = locales:getAvailableLanguages()
         select:setText(locales:getText('SETTINGS_LANGUAGE'))
+        select:setIcon(langGfx)
         for i, lang in ipairs(langs) do
           select:addOption(lang.key, lang.name, string.upper(lang.key))
         end
@@ -156,8 +170,9 @@ function SettingsScreen:beforeEnter()
     -- RESET SETTINGS
     {
       init = function(item)
-        local button = Button(0, 0, 336, 48)
+        local button = Button(0, 0, ITEM_WIDTH, 48)
         button:setText(locales:getText('SETTINGS_RESET'))
+        button:setIcon(resetGfx)
         item.button = button
       end,
       draw = function(item, x, y)
@@ -183,7 +198,7 @@ function SettingsScreen:beforeEnter()
     item.init(item)
   end
   -- set up settings ui view
-  local uiView <const> = playdate.ui.gridview.new(336, 48)
+  local uiView <const> = playdate.ui.gridview.new(ITEM_WIDTH, 48)
   uiView:setNumberOfRows(#items)
   uiView:setContentInset(28, 28, 12, 12)
   uiView:setCellPadding(4, 4, 4, 4)

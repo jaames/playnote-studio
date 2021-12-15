@@ -104,7 +104,7 @@ Austin Burk
 _github.com/sudofox_
 
 
-_%CREDITS_LEGAL%_
+%CREDITS_LEGAL%
 
 
 
