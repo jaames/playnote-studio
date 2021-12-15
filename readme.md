@@ -5,7 +5,6 @@
 - Frog mascot?
 - Add ok/cancel/confirm buttons back to dialogs
 - Icons for all settings buttons, and folder button
-- Remember last folder opened
 - Player play/pause with timer
 - Audio play/pause
 - Make dithering settings screen pretty

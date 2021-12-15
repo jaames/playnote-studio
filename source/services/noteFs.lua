@@ -42,7 +42,7 @@ function noteFs:init()
   self.folderList = folderList
   -- set samplememo as initial folder
   assert(fs.isdir('samplememo'), 'Sample Flipnote folder is missing?')
-  self:setDirectory('samplememo/')
+  self:setDirectory(config.lastFolder)
   self:getArtistCredits()
 end
 
@@ -95,6 +95,7 @@ end
 
 function noteFs:setDirectory(folderPath)
   assert(table.indexOfElement(self.folderPaths, folderPath) ~= nil, 'Folder does not exist')
+  config.lastFolder = folderPath
   self.currentFolder = folderPath
   noteList = {}
   local list = fs.listFiles(folderPath)
