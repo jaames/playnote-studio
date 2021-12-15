@@ -45,8 +45,8 @@ end
 function Button:drawAt(x, y)
   local w = self.w
   local h = self.h
-  local textX = x
-  local textW = w
+  local textX = x + 6
+  local textW = w - 12
   -- draw background
   if self.isSelected then
     buttonSelectedGfx:drawInRect(x - 3, y - 3, w + 6, h + 6)
@@ -75,7 +75,7 @@ function Button:drawAt(x, y)
     gfx.setFont(fontBold)
     gfx.setFontTracking(2)
     gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-    gfx.drawTextInRect(self.text, textX, y + self.textY, textW, h, nil, nil, kTextAlignment.center)
+    gfx.drawTextInRect(self.text, textX, y + self.textY, textW, h, nil, '...', kTextAlignment.center)
     gfx.setImageDrawMode(0)
   end
 end

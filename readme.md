@@ -3,7 +3,6 @@
 - Update button graphics
 - Redo logo, try boiling lines
 - Frog mascot?
-- Add ok/cancel/confirm buttons back to dialogs
 - Icons for all settings buttons, and folder button
 - Player play/pause with timer
 - Audio play/pause

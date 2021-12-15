@@ -14,6 +14,10 @@ local fontFamily = {
 local buttonAIcon = gfx.image.new('./img/button_a')
 local buttonBIcon = gfx.image.new('./img/button_b')
 
+local okButton = nil
+local cancelButton = nil
+local confirmButton = nil
+
 local y = PLAYDATE_H
 local bgFade = 0
 local currentText = nil
@@ -47,6 +51,15 @@ local inputHandlers = {
 
 dialog.handleClose = function () end
 
+function dialog:init()
+  okButton = Button(PLAYDATE_W / 2 - 60, 0, 120, 32)
+  okButton:setIcon(buttonAIcon)
+  confirmButton = Button(PLAYDATE_W / 2 + 4, 0, 130, 32)
+  confirmButton:setIcon(buttonAIcon)
+  cancelButton = Button(PLAYDATE_W / 2 - 134, 0, 130, 32)
+  cancelButton:setIcon(buttonBIcon)
+end
+
 function dialog:alert(text)
   dialog:show(text, 'alert')
 end
@@ -62,6 +75,10 @@ function dialog:show(text, type)
   currentText = text
   _, currentTextHeight = gfx.getTextSizeForMaxWidth(text, PLAYDATE_W - 64, nil, font)
   dialog.isVisible = true
+  -- setup buttons
+  okButton:setText(locales:getText('DIALOG_OK'))
+  cancelButton:setText(locales:getText('DIALOG_CANCEL'))
+  confirmButton:setText(locales:getText('DIALOG_CONFIRM'))
   -- disable input
   playdate.inputHandlers.push({}, true)
   -- setup transition
@@ -126,12 +143,15 @@ function dialog:update()
     gfx.setFontFamily(fontFamily)
     gfx.drawTextInRect(currentText, 32, textY, PLAYDATE_W - 64, PLAYDATE_H - 64, nil, nil, kTextAlignment.center)
     -- buttons
-    -- if currentType == 'alert' then
-    --   gfxUtils:drawButtonWithTextAndIcon('OK',      buttonAIcon, PLAYDATE_W / 2 - 60,  buttonY, 120, 32, false)
-    -- elseif currentType == 'confirm' then
-    --   gfxUtils:drawButtonWithTextAndIcon('Cancel',  buttonBIcon, PLAYDATE_W / 2 - 124, buttonY, 120, 32, false)
-    --   gfxUtils:drawButtonWithTextAndIcon('Confirm', buttonAIcon, PLAYDATE_W / 2 + 4,   buttonY, 120, 32, false)
-    -- end
+    if currentType == 'alert' then
+      okButton.y = buttonY
+      okButton:draw()
+    elseif currentType == 'confirm' then
+      cancelButton.y = buttonY
+      cancelButton:draw()
+      confirmButton.y = buttonY
+      confirmButton:draw()
+    end
 
     gfx.setDrawOffset(offsetX, offsetY)
   end

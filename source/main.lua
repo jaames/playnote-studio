@@ -40,6 +40,7 @@ playdate.display.setRefreshRate(30)
 config:init()
 locales:init()
 noteFs:init()
+dialog:init()
 
 screens:register('home',      HomeScreen())
 screens:register('notelist',  NoteListScreen())

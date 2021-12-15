@@ -120,7 +120,7 @@ function Select:drawAt(x, y)
 
   local currValueLabel = self.optionShortLabels[self.activeOptionIndex]
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  gfx.drawTextInRect(currValueLabel, x, y + self.textY, self.w - 8, self.h, nil, nil, kTextAlignment.right)
+  gfx.drawTextInRect(currValueLabel, x, y + self.textY, self.w - 8, self.h, nil, '...', kTextAlignment.right)
   gfx.setImageDrawMode(0)
 
   if self.isOpen then
@@ -149,7 +149,7 @@ function Select:drawMenu()
     for i = 1,self.numOptions do
       gfx.fillRoundRect(menuX, menuY, OPTION_WIDTH, OPTION_HEIGHT, OPTION_HEIGHT / 2)
       gfx.setFont(font)
-      gfx.drawTextInRect(self.optionLabels[i], menuX, menuY + 10, OPTION_WIDTH, OPTION_HEIGHT, nil, nil, kTextAlignment.center)
+      gfx.drawTextInRect(self.optionLabels[i], menuX + 8, menuY + 11, OPTION_WIDTH - 16, 24, nil, '...', kTextAlignment.center)
       menuY = menuY + OPTION_HEIGHT + OPTION_GAP
     end
     -- draw selection border

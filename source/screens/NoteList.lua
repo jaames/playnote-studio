@@ -69,15 +69,19 @@ function NoteListScreen:beforeEnter()
   -- setup folder select dropdown
   local folderSelect = FolderSelect(-4, -4, 220, 36)
   local s = self
-  function folderSelect:onClose (value, index)
+  function folderSelect:onClose(value, index)
     s.setCurrentFolder(s, value)
   end
   for _, folderItem in ipairs(noteFs.folderList) do
     folderSelect:addOption(folderItem.path, folderItem.name)
   end
   folderSelect:setValue(noteFs.currentFolder)
-
   self.folderSelect = folderSelect
+  -- if there's no notes to display, force the folder button to be selected
+  if self.notesOnCurrPage == 0 then
+    self.hasNoNotes = true
+    self:setSelected(FOLDERSELECT_ROW, self.selectedCol)
+  end
 end
 
 function NoteListScreen:afterLeave()
