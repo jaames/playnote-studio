@@ -2,7 +2,8 @@ local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 local gfx <const> = playdate.graphics
 
-local logoGfx <const> = gfx.image.new('./img/logo')
+local logo <const> = gfx.animation.loop.new(1000 / 4, gfx.imagetable.new('./img/logo_anim'))
+
 local viewButtonGfx <const> = gfx.image.new('./img/view')
 local settingsButtonGfx <const> = gfx.image.new('./img/settings')
 
@@ -40,7 +41,7 @@ function HomeScreen:init()
       elseif self.settingsButton.isSelected then
         screens:push('settings', transitions.CROSSFADE)
       end
-    end
+    end,
   }
 end
 
@@ -55,7 +56,7 @@ function HomeScreen:update()
   -- draw background
   gfxUtils:drawBgGrid()
   -- main logo
-  logoGfx:draw(52, 52)
+  logo:draw(52, 52)
   -- clock
   self.clock:draw()
   -- buttons

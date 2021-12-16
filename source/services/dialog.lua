@@ -19,7 +19,7 @@ local cancelButton = nil
 local confirmButton = nil
 
 local y = PLAYDATE_H
-local bgFade = 0
+local bgFade = 0.5
 local currentText = nil
 local currentType = nil
 local currentTextHeight = 0

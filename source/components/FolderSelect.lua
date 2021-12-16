@@ -21,5 +21,3 @@ end
 function FolderSelect:onChange(value, index)
   self:setText(self.optionLabels[index])
 end
-
-

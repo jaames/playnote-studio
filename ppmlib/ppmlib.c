@@ -146,13 +146,13 @@ static int ppm_setLayerDither(lua_State* L)
 	{
 		// 0 = ditherMaskNone
 		case 1:
-			ctx->layerPattern[layerIndex][colour] = ditherMaskInvPolka;
+			ctx->layerPattern[layerIndex][colour] = ditherMaskPolka;
 			break;
 		case 2:
 			ctx->layerPattern[layerIndex][colour] = ditherMaskChecker;
 			break;
 		case 3:
-			ctx->layerPattern[layerIndex][colour] = ditherMaskPolka;
+			ctx->layerPattern[layerIndex][colour] = ditherMaskInvPolka;
 			break;
 		default:
 			ctx->layerPattern[layerIndex][colour] = ditherMaskNone;

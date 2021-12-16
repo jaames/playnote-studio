@@ -26,7 +26,7 @@ function Select:init(x, y, w, h)
   self.optionValues = {} -- values for each option
   self.activeOptionIndex = 0
   self.activeOptionValue = nil
-  self.bgFade  = 0.5
+  self.bgFade = 0.5
   self.menuScroll = 0
   self.menuHeight = 0
   self.menuOpenShift = 0
