@@ -1,7 +1,6 @@
 ## TODO
 
 - Update button graphics
-- Redo logo, try boiling lines
 - Frog mascot?
 - Player play/pause with timer
 - Audio play/pause

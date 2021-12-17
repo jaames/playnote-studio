@@ -52,7 +52,6 @@ function HomeScreen:beforeEnter()
 end
 
 function HomeScreen:update()
-  gfx.setDrawOffset(0, 0)
   -- draw background
   gfxUtils:drawBgGrid()
   -- main logo

@@ -10,6 +10,10 @@ local isTransitionActive = false
 local screenHistory = {}
 local transitionHistory = {}
 
+local isShakeActive = false
+local moveX = 0
+local moveY = 0
+
 function screens:register(id, screenInst)
   SCREENS[id] = screenInst
   screenInst.id = id
@@ -31,7 +35,7 @@ function screens:goBack()
     local lastTransition = transitionHistory[#transitionHistory]
     self:setScreen(lastSreen.id, lastTransition)
   else
-    -- can't go back
+    self:shakeX()
   end
 end
 
@@ -52,8 +56,27 @@ function screens:setScreen(id, transitionFn)
   end)
 end
 
+function screens:shakeX()
+  isShakeActive = true
+  moveX = 0
+  moveY = 0
+  local timer = playdate.timer.new(200, 0, 1)
+  timer.updateCallback = function ()
+    moveX = math.random(-6, 6)
+  end
+  timer.timerEndedCallback = function ()
+    moveX = 0
+    utils:nextTick(function ()
+      isShakeActive = false
+    end)
+  end
+end
+
 function screens:update()
   if not isTransitionActive then
+    if isShakeActive then
+      playdate.graphics.setDrawOffset(moveX, moveY)
+    end
     activeScreen:update()
   end
 end
