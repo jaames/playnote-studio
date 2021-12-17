@@ -149,7 +149,7 @@ function Select:drawMenu()
     for i = 1,self.numOptions do
       gfx.fillRoundRect(menuX, menuY, OPTION_WIDTH, OPTION_HEIGHT, OPTION_HEIGHT / 2)
       gfx.setFont(font)
-      gfx.drawTextInRect(self.optionLabels[i], menuX + 8, menuY + 11, OPTION_WIDTH - 16, 24, nil, '...', kTextAlignment.center)
+      gfx.drawTextInRect(self.optionLabels[i], menuX + 8, menuY + 10, OPTION_WIDTH - 16, 24, nil, '...', kTextAlignment.center)
       menuY = menuY + OPTION_HEIGHT + OPTION_GAP
     end
     -- draw selection border

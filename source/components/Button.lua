@@ -29,7 +29,7 @@ function Button:setText(text)
   local _, textH = gfx.getTextSize(text)
   local textY = (h / 2) - (textH / 2)
   self.text = text
-  self.textY = textY + 1
+  self.textY = textY
 end
 
 function Button:setIcon(icon)
