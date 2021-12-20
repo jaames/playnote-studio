@@ -56,13 +56,27 @@ function screens:setScreen(id, transitionFn)
   end)
 end
 
+function screens:reloadCurrent(transitionFn)
+  isTransitionActive = true
+
+  activeScreen:afterLeave()
+  activeScreen:beforeEnter()
+
+  transitionFn(activeScreen, activeScreen, function()
+    isTransitionActive = false
+  end)
+end
+
 function screens:shakeX()
+  if isShakeActive then return end
+
+  local timer = playdate.timer.new(200, 0, 1)
   isShakeActive = true
   moveX = 0
   moveY = 0
-  local timer = playdate.timer.new(200, 0, 1)
-  timer.updateCallback = function ()
-    moveX = math.random(-6, 6)
+
+  timer.updateCallback = function (t)
+    moveX = (playdate.graphics.perlin(t.value, 0, 0, 0) - 0.5) * 40
   end
   timer.timerEndedCallback = function ()
     moveX = 0

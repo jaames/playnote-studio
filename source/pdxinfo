@@ -1,6 +1,7 @@
-name=Playnote
+name=Playnote Studio
 author=James Daniel
 description=Flipnote Studio animation player for the Playdate
 bundleID=com.jaames.playnote
 version=1.0
 buildNumber=1
+imagePath=gfx/launcher

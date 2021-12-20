@@ -15,13 +15,13 @@ local DEFAULT_CONFIG <const> = {
     [gfx.font.kLanguageEnglish] = 'en',
     [gfx.font.kLanguageJapanese] = 'jp'
   })[playdate.getSystemLanguage()],
+  enableSoundEffects = true,
   -- dithering settings, per layer (top, bottom)
   dithering = {
     -- dither patterns per layer colour (black, red, blue)
     {1, 3, 4},
     {1, 3, 4}
   },
-  enableSoundEffects = true,
 
   -- state tracking
   lastFolder = 'samplememo/',

@@ -1,8 +1,4 @@
 local gfx <const> = playdate.graphics
-local tinyFont <const> = gfx.getSystemFont(gfx.font.kVariantNormal)
-local normalFont <const> = gfx.font.new('./fonts/WhalesharkSans')
-local boldFont <const> = gfx.font.new('./fonts/Asheville-Rounded-24-px')
-
 local SCROLL_START <const> = 200
 local SCROLL_AUTO_STEP <const> = -1
 
@@ -28,7 +24,7 @@ function CreditsScreen:getArtistCredits()
   local credits = noteFs:getArtistCredits()
   for _, artist in pairs(credits) do
     text = text .. stringUtils:escape(artist.name) .. '\n'
-    for _, link in ipairs(artist.links) do
+    for _, link in pairs(artist.links) do
       text = text .. '_' .. stringUtils:escape(link) .. '_\n'
     end
     text = text .. '\n'
@@ -52,9 +48,9 @@ function CreditsScreen:beforeEnter()
   CreditsScreen.super.beforeEnter(self)
   self.scrollY = SCROLL_START
   gfx.setFontFamily({
-    [gfx.font.kVariantNormal] = normalFont,
-    [gfx.font.kVariantBold] = boldFont,
-    [gfx.font.kVariantItalic] = tinyFont
+    [gfx.font.kVariantNormal] = MAIN_FONT,
+    [gfx.font.kVariantBold] = gfx.font.new('./fonts/Asheville-Rounded-24-px'),
+    [gfx.font.kVariantItalic] = gfx.getSystemFont(gfx.font.kVariantNormal)
   })
   local text = self:getCreditsText()
   local _, height = gfx.getTextSize(text)
@@ -65,6 +61,12 @@ function CreditsScreen:beforeEnter()
   gfx.drawTextInRect(text, rect, nil, nil, kTextAlignment.center)
   gfx.setImageDrawMode(0)
   gfx.popContext()
+  gfx.setFontFamily({
+    [gfx.font.kVariantNormal] = MAIN_FONT,
+    [gfx.font.kVariantBold] = MAIN_FONT,
+    [gfx.font.kVariantItalic] = MAIN_FONT
+  })
+  text = nil
   self.creditsHeight = height
   self.creditsTexture = cache
 end

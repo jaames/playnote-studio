@@ -1,13 +1,22 @@
 local gfx <const> = playdate.graphics
 
-local ITEM_WIDTH <const> = 312
+local aboutGfx <const> =   gfx.image.new('./gfx/icon_about')
+local creditsGfx <const> = gfx.image.new('./gfx/icon_credits')
+local ditherGfx <const> =  gfx.image.new('./gfx/icon_dither')
+local soundFxGfx <const> = gfx.image.new('./gfx/icon_sound')
+local langGfx <const> =    gfx.image.new('./gfx/icon_lang')
+local resetGfx <const> =   gfx.image.new('./gfx/icon_reset')
 
-local aboutGfx <const> = gfx.image.new('./img/about')
-local creditsGfx <const> = gfx.image.new('./img/credits')
-local ditherGfx <const> = gfx.image.new('./img/dither')
-local soundFxGfx <const> = gfx.image.new('./img/sound')
-local langGfx <const> = gfx.image.new('./img/lang')
-local resetGfx <const> = gfx.image.new('./img/reset')
+local PLAYDATE_W <const> = 400
+local PLAYDATE_H <const> = 240
+local ITEM_GAP <const> = 12
+local ITEM_WIDTH <const> = 300
+local ITEM_HEIGHT <const> = 48
+local MENU_X <const> = (PLAYDATE_W / 2) - (ITEM_WIDTH / 2)
+local MENU_GAP_TOP <const> = 24
+local MENU_GAP_BOTTOM <const> = 24
+local MENU_MID <const> = (PLAYDATE_H / 2) - ITEM_HEIGHT
+local MENU_SCROLL_DUR = 200
 
 SettingsScreen = {}
 class('SettingsScreen').extends(ScreenBase)
@@ -22,21 +31,24 @@ function SettingsScreen:init()
       self:selectNext()
     end,
     AButtonDown = function()
-      local row = self.uiView:getSelectedRow()
-      local item = self.items[row]
+      local item = self.items[self.activeItemIndex]
       item:onClick(item)
     end,
-    cranked = function(change, acceleratedChange)
-      local x, y = self.uiView:getScrollPosition()
-      self.uiView:setScrollPosition(x, y - change, false)
-    end,
+    -- cranked = function(change, acceleratedChange)
+    --   local x, y = self.uiView:getScrollPosition()
+    --   self.uiView:setScrollPosition(x, y - change, false)
+    -- end,
   }
+  self.scrollBar = Scrollbar(PLAYDATE_W - 26, MENU_GAP_TOP, PLAYDATE_H - MENU_GAP_TOP - MENU_GAP_BOTTOM)
+  self.menuScroll = 0
+  self.menuHeight = 0
+  self.menuOpenShift = 0
+  self.menuScrollTransitionActive = false
+  self.activeItemIndex = 1
 end
 
 function SettingsScreen:beforeEnter()
   SettingsScreen.super.beforeEnter(self)
-  self.selectedItem = nil
-  local scr = self
   -- set up setting items
   local items <const> = {
     -- ABOUT BUTTON
@@ -87,6 +99,37 @@ function SettingsScreen:beforeEnter()
         screens:push('credits', transitions.CROSSFADE)
       end
     },
+    -- LANGUAGE SELECT
+    {
+      init = function(item)
+        local select = Select(0, 0, ITEM_WIDTH, 48)
+        local langs = locales:getAvailableLanguages()
+        select:setText(locales:getText('SETTINGS_LANGUAGE'))
+        select:setIcon(langGfx)
+        for _, lang in pairs(langs) do
+          select:addOption(lang.key, lang.name, string.upper(lang.key))
+        end
+        select:setValue(locales:getLanguage())
+        function select:onCloseEnded(value)
+          locales:setLanguage(value)
+          noteFs:updateFolderNames() -- update folder name list
+          screens:reloadCurrent(transitions.NONE)
+        end
+        item.selectButton = select
+      end,
+      draw = function(item, x, y)
+        item.selectButton:drawAt(x, y)
+      end,
+      select = function (item)
+        item.selectButton.isSelected = true
+      end,
+      deselect = function (item)
+        item.selectButton.isSelected = false
+      end,
+      onClick = function (item)
+        item.selectButton:openMenu()
+      end
+    },
     -- DITHERING BUTTON
     {
       init = function(item)
@@ -135,38 +178,6 @@ function SettingsScreen:beforeEnter()
         item.selectButton:openMenu()
       end
     },
-    -- LANGUAGE SELECT
-    {
-      init = function(item)
-        local select = Select(0, 0, ITEM_WIDTH, 48)
-        local langs = locales:getAvailableLanguages()
-        select:setText(locales:getText('SETTINGS_LANGUAGE'))
-        select:setIcon(langGfx)
-        for i, lang in ipairs(langs) do
-          select:addOption(lang.key, lang.name, string.upper(lang.key))
-        end
-        select:setValue(locales:getLanguage())
-        function select:onClose(value)
-          locales:setLanguage(value)
-          noteFs:updateFolderNames() -- update folder name list
-          -- todo: wait until select menu is closed, keep selection state, reload w transition
-          scr:reload()
-        end
-        item.selectButton = select
-      end,
-      draw = function(item, x, y)
-        item.selectButton:drawAt(x, y)
-      end,
-      select = function (item)
-        item.selectButton.isSelected = true
-      end,
-      deselect = function (item)
-        item.selectButton.isSelected = false
-      end,
-      onClick = function (item)
-        item.selectButton:openMenu()
-      end
-    },
     -- RESET SETTINGS
     {
       init = function(item)
@@ -185,11 +196,43 @@ function SettingsScreen:beforeEnter()
         item.button.isSelected = false
       end,
       onClick = function (item)
-        dialog.handleClose = function ()
-          config:reset()
-          SettingsScreen:reload()
-        end
-        dialog:confirm(locales:getText('SETTINGS_RESET_CONFIRM'))
+        dialog:sequence({
+          {type = 'confirm', message = locales:getText('SETTINGS_RESET_CONFIRM')},
+          {type = 'confirm', message = 'Are you sure?', callback = function ()
+            config:reset()
+            locales:setLanguage(config.lang)
+            screens:reloadCurrent(transitions.NONE)
+          end},
+          {type = 'alert', message = 'Settings have been cleared.'}
+        })
+      end
+    },
+    -- DELETE SAMPLES
+    {
+      init = function(item)
+        local button = Button(0, 0, ITEM_WIDTH, 48)
+        button:setText('Delete Sample Notes')
+        button:setIcon(resetGfx)
+        item.button = button
+      end,
+      draw = function(item, x, y)
+        item.button:drawAt(x, y)
+      end,
+      select = function (item)
+        item.button.isSelected = true
+      end,
+      deselect = function (item)
+        item.button.isSelected = false
+      end,
+      onClick = function (item)
+        dialog:sequence({
+          {type = 'confirm', message = 'This will delete all of the sample Flipnotes from your Playdate\'s storage to save space.'},
+          {type = 'confirm', message = 'Are you sure?', callback = function ()
+            -- TODO
+            print('delete notes here')
+          end},
+          {type = 'alert', message = 'Sample Flipnotes have been deleted'}
+        })
       end
     }
   }
@@ -197,45 +240,12 @@ function SettingsScreen:beforeEnter()
   for _, item in pairs(items) do
     item.init(item)
   end
-  -- set up settings ui view
-  local uiView <const> = playdate.ui.gridview.new(ITEM_WIDTH, 48)
-  uiView:setNumberOfRows(#items)
-  uiView:setContentInset(28, 28, 12, 12)
-  uiView:setCellPadding(4, 4, 4, 4)
-  
+
+  self.menuHeight = #items * (ITEM_GAP + ITEM_HEIGHT) + MENU_GAP_TOP + MENU_GAP_BOTTOM
+  self.numItems = #items
   self.items = items
-  self.uiView = uiView
-  self:_updateSelectedItem(1)
-
-  function uiView:drawCell(section, row, column, selected, x, y, width, height)
-    local item <const> = items[row]
-    playdate.graphics.setClipRect(0, 0, 400, 240)
-    item.draw(item, x, y)
-  end
-end
-
-function SettingsScreen:selectNext()
-  self.uiView:selectNextRow(false, true)
-  local i = self.uiView:getSelectedRow()
-  self:_updateSelectedItem(i)
-end
-
-function SettingsScreen:selectPrev()
-  self.uiView:selectPreviousRow(false, true)
-  local i = self.uiView:getSelectedRow()
-  self:_updateSelectedItem(i)
-end
-
-function SettingsScreen:_updateSelectedItem(i)
-  local curr = self.selectedItem
-  if curr ~= nil then
-    curr.deselect(curr)
-  end
-  local next = self.items[i]
-  if next ~= nil then
-    next.select(next)
-    self.selectedItem = next
-  end
+  self.scrollMax = self.menuHeight - PLAYDATE_H - ITEM_GAP
+  self:scrollToItemByIndex(self.activeItemIndex)
 end
 
 function SettingsScreen:afterLeave()
@@ -244,11 +254,66 @@ function SettingsScreen:afterLeave()
   config:save()
   -- free ui items
   self.items = nil
-  self.uiView = nil
+end
+
+function SettingsScreen:scrollToItemByIndex(index, animate)
+  -- don't update if menu is transitioning to another item
+  if self.menuScrollTransitionActive then return end
+  -- ignore out of bounds option indecies
+  if index > self.numItems or index < 1 then
+    -- TODO: play 'not allowed' sound effect here
+    index = utils:clamp(index, 1, self.numItems)
+  end
+  -- deselect last item
+  local lastItem = self.items[self.activeItemIndex]
+  lastItem.deselect(lastItem)
+  -- figure out how far to scroll for the selected option
+  local currScroll = self.menuScroll
+  local nextItemY = (index - 1) * (ITEM_HEIGHT + ITEM_GAP)
+  local nextScroll = utils:clamp(nextItemY - MENU_MID, 0, self.scrollMax)
+  -- scroll with animation
+  if animate == true then
+    self.menuScrollTransitionActive = true
+    local timer = playdate.timer.new(MENU_SCROLL_DUR, currScroll, nextScroll, playdate.easingFunctions.outCubic)
+    timer.updateCallback = function ()
+      self:setScroll(timer.value)
+    end
+    timer.timerEndedCallback = function ()
+      self:setScroll(nextScroll)
+      self.menuScrollTransitionActive = false
+    end
+  -- or not
+  else
+    self:setScroll(nextScroll)
+  end
+  -- update state
+  self.activeItemIndex = index
+  self.activeItem = self.items[index]
+  -- update selected item
+  local currItem = self.activeItem
+  currItem.select(currItem)
+end
+
+function SettingsScreen:setScroll(pos)
+  self.menuScroll = pos
+  self.scrollBar.progress = pos / self.scrollMax
+end
+
+function SettingsScreen:selectNext()
+  self:scrollToItemByIndex(self.activeItemIndex + 1, true)
+end
+
+function SettingsScreen:selectPrev()
+  self:scrollToItemByIndex(self.activeItemIndex - 1, true)
 end
 
 function SettingsScreen:update()
   gfx.setDrawOffset(0, 0)
-  gfxUtils:drawBgGridWithOffset(0)
-  self.uiView:drawInRect(0, 0, 400, 240)
+  gfxUtils:drawBgGridWithOffset(self.menuScroll)
+  self.scrollBar:draw()
+  local y = 0 - self.menuScroll + MENU_GAP_TOP
+  for _, item in pairs(self.items) do
+    item.draw(item, MENU_X, y)
+    y = y + ITEM_GAP + ITEM_HEIGHT
+  end
 end

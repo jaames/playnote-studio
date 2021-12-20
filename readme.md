@@ -7,14 +7,14 @@
 - Make dithering settings screen pretty
 - Dither settings per note
 - Add DSi username chars to font
+- Function to delete sample notes
 - Flipnote details screen
 - Get audio design in
 - Get translators in
-- pdxinfo
+- launchSoundPath in pdxinfo
 - Optimize C parser to keep the image 1-bit all the way through
 - Create a PPM test suite to verify against
 - Instructions for loading PPMs in settings? or on the "no flipnotes in folder" view?
-- Cleanup final build - remove all .pdz files aside from main.pdz, minify json, etc
 - Website
 
 ## Playnote Studio
@@ -40,7 +40,8 @@ You will need to have the Playdate SDK, cmake, make, and clang installed.
 For convenience (and because I'm a big dumb-dumb idiot that keeps forgetting things) I made a bash utility script for running various compilation commands in the right sequence:
 
  - **`./build.sh sim`** - Produces a .pdx build that will run in the Playdate Simulator, but won't run on device
- - **`./build.sh device`** - Produces a .pdx build that will run in the Playdate Simulator and will run on device
+ - **`./build.sh dev`** - Produces a .pdx build that will run in the Playdate Simulator and will run on device
+ - **`./build.sh build`** - Produces a .pdx build that will only run on device, and strips junk
  - **`./build.sh lua`** - Produces a .pdx build that will run on device, but skips C compilation for faster Lua development
  - **`./build.sh clean`** - Runs `make clean`
  - **`./build.sh refresh`** - Sometimes the compiler doesn't seem to update the embedded C code when doing a new build, or it will produce an empty pdex.bin. I'm not entirely sure what causes this, but this command should clean up any build files so that things will behave again.

@@ -1,7 +1,6 @@
 import './Button.lua'
 
 local gfx <const> = playdate.graphics
-local font <const> = gfx.font.new('./fonts/WhalesharkSans')
 
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
@@ -39,6 +38,10 @@ end
 
 -- override this to be notified of a menu close
 function Select:onClose(value, index)
+end
+
+-- override this to be notified of a menu close, after the transition
+function Select:onCloseEnded(value, index)
 end
 
 function Select:addOption(value, label, shortLabel)
@@ -148,7 +151,7 @@ function Select:drawMenu()
     gfx.setColor(gfx.kColorWhite)
     for i = 1,self.numOptions do
       gfx.fillRoundRect(menuX, menuY, OPTION_WIDTH, OPTION_HEIGHT, OPTION_HEIGHT / 2)
-      gfx.setFont(font)
+      -- gfx.setFont(font)
       gfx.drawTextInRect(self.optionLabels[i], menuX + 8, menuY + 10, OPTION_WIDTH - 16, 24, nil, '...', kTextAlignment.center)
       menuY = menuY + OPTION_HEIGHT + OPTION_GAP
     end
@@ -241,6 +244,7 @@ function Select:closeMenu()
   timer.timerEndedCallback = function ()
     self.bgFade = 0.5
     self.menuOpenShift = PLAYDATE_H
+    self:onCloseEnded(self.activeOptionValue, self.activeOptionIndex)
     utils:nextTick(function ()
       self.isOpen = false
       self.openTransitionActive = false

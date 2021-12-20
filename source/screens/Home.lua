@@ -2,10 +2,10 @@ local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 local gfx <const> = playdate.graphics
 
-local logo <const> = gfx.animation.loop.new(1000 / 4, gfx.imagetable.new('./img/logo_anim'))
+local logo <const> = gfx.animation.loop.new(1000 / 4, gfx.imagetable.new('./gfx/gfx_logo_anim'))
 
-local viewButtonGfx <const> = gfx.image.new('./img/view')
-local settingsButtonGfx <const> = gfx.image.new('./img/settings')
+local viewButtonGfx <const> = gfx.image.new('./gfx/icon_view')
+local settingsButtonGfx <const> = gfx.image.new('./gfx/icon_settings')
 
 HomeScreen = {}
 class('HomeScreen').extends(ScreenBase)

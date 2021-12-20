@@ -6,7 +6,7 @@ local INTERNAL_FOLDERS <const> = {
   -- internal contents
   'data/',
   'fonts/',
-  'img/',
+  'gfx/',
   'components/',
   'screens/',
   'services/',
@@ -18,12 +18,8 @@ local SEMI_VOICED_SOUND_MARK <const> = 12442
 -- read a text file line by line and return it as a single string
 function fsUtils:readText(path)
   local f = playdate.file.open(path, playdate.file.kFileRead)
-  local text = ''
-  while true do
-    local line = f:readline()
-    if line == nil then break end
-    text = text .. line .. '\n'
-  end
+  local size = playdate.file.getSize(path)
+  local text = f:read(size)
   f:close()
   return text
 end

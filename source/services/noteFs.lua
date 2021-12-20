@@ -23,8 +23,8 @@ function noteFs:init()
   -- filter out files, or folders that are part of the app's internal folder structure
   -- then add the path and resolved name to folderList
   local folderList = {}
-  for _, path in ipairs(fs.listFiles('/')) do
-    if (string.sub(path, -1) == '/') and not fsUtils:isInternalFolder(path) then
+  for _, path in pairs(fs.listFiles('/')) do
+    if fs.isdir(path) and not fsUtils:isInternalFolder(path) then
       table.insert(self.folderPaths, path)
       table.insert(folderList, {
         path = path,
@@ -71,17 +71,17 @@ end
 
 -- update folder names after locale has been changed
 function noteFs:updateFolderNames()
-  for _, folder in ipairs(self.folderList) do
+  for _, folder in pairs(self.folderList) do
     folder.name = self:getFolderName(folder.path)
   end
 end
 
 function noteFs:getArtistCredits()
   local creditList = {}
-  for _, path in ipairs(self.folderPaths) do
+  for _, path in pairs(self.folderPaths) do
     local meta = self:getFolderMeta(path)
     if meta ~= nil and meta.credits	~= nil then
-      for _, item in ipairs(meta.credits) do
+      for _, item in pairs(meta.credits) do
         local id = item.id
         -- artist id should be unique
         if creditList[id] == nil then
@@ -94,12 +94,20 @@ function noteFs:getArtistCredits()
 end
 
 function noteFs:setDirectory(folderPath)
-  assert(table.indexOfElement(self.folderPaths, folderPath) ~= nil, 'Folder does not exist')
+  if folderPath == '/samplememo' and not fs.isdir(folderPath) then
+    fs.mkdir(folderPath)
+    table.insert(self.folderList, { path = folderPath, name = folderPath })
+    noteFs:setDirectory(folderPath)
+    return
+  elseif not fs.isdir(folderPath) then
+    noteFs:setDirectory('/samplememo')
+    return
+  end
   config.lastFolder = folderPath
   self.currentFolder = folderPath
   noteList = {}
   local list = fs.listFiles(folderPath)
-  for _, name in ipairs(list) do
+  for _, name in pairs(list) do
     if string.sub(name, -3) == 'ppm' then
       table.insert(noteList, folderPath .. name)
     end
@@ -128,4 +136,8 @@ end
 
 function noteFs:releasePage(pageTable)
   utils:clearArray(pageTable)
+end
+
+function noteFs:deleteSampleMemo()
+
 end

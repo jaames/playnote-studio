@@ -1,6 +1,6 @@
 local gfx <const> = playdate.graphics
 local font <const> = gfx.font.new('./fonts/UgoNumber_8')
-local clockGfx <const> = gfx.image.new('./img/clock')
+local clockGfx <const> = gfx.image.new('./gfx/icon_clock')
 
 Clock = {}
 class('Clock').extends()
@@ -36,13 +36,12 @@ function Clock:draw()
   local w = self.w
   local h = self.h
   self:tick()
-  gfx.setFont(font)
   gfx.setFontTracking(1)
   gfx.setColor(gfx.kColorWhite)
   gfx.fillRect(x, y, w, h)
-  gfx.drawText(self.dateString, x + 8, y + 7)
+  font:drawText(self.dateString, x + 8, y + 7)
   clockGfx:draw(x + 90, y + 5)
-  gfx.drawText(self.timeString, x + 106, y + 7)
+  font:drawText(self.timeString, x + 106, y + 7)
   gfx.setColor(gfx.kColorBlack)
   gfx.setLineWidth(1)
   gfx.drawRect(x - 1, y - 1, w, h)

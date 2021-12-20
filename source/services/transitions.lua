@@ -21,7 +21,7 @@ local function makeTransition(duration, easing, onBegin, onUpdate)
   end
 end
 
--- CROSSFADE TRANSITION
+transitions.NONE = makeTransition(0, playdate.easingFunctions.linear, nil, function (t, a, b) end)
 
 transitions.CROSSFADE = makeTransition(250, playdate.easingFunctions.linear, nil, function (t, a, b)
   if t < 0.5 and a ~= nil then
@@ -33,8 +33,6 @@ transitions.CROSSFADE = makeTransition(250, playdate.easingFunctions.linear, nil
     gfxUtils:drawWhiteFade((t - 0.5) * 2)
   end
 end)
-
--- BOOTUP TRANSITION
 
 transitions.BOOTUP = makeTransition(320, playdate.easingFunctions.linear, nil, function (t, a, b)
   if b ~= nil then

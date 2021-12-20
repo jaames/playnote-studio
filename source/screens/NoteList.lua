@@ -2,7 +2,6 @@ local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 local FOLDERSELECT_ROW = -1
 local gfx <const> = playdate.graphics
-local baseFont <const> = gfx.font.new('./fonts/WhalesharkSans')
 local pageCounterFont <const> = gfx.font.new('./fonts/UgoNumber_8')
 
 local TRANSITION_DUR <const> = 250
@@ -67,12 +66,13 @@ function NoteListScreen:beforeEnter()
   NoteListScreen.super.beforeEnter(self)
   self:setCurrentPage(self.currPage)
   -- setup folder select dropdown
-  local folderSelect = FolderSelect(-4, -4, 220, 36)
+  local folderSelect = FolderSelect(0, 0, 232, 34)
+  folderSelect.variant = 'folderselect'
   local s = self
   function folderSelect:onClose(value, index)
     s.setCurrentFolder(s, value)
   end
-  for _, folderItem in ipairs(noteFs.folderList) do
+  for _, folderItem in pairs(noteFs.folderList) do
     folderSelect:addOption(folderItem.path, folderItem.name)
   end
   folderSelect:setValue(noteFs.currentFolder)
@@ -88,6 +88,7 @@ function NoteListScreen:afterLeave()
   NoteListScreen.super.afterLeave(self)
   utils:clearArray(self.prevThumbs)
   utils:clearArray(self.currThumbs)
+  self.folderSelect = nil
   self.hasPrevPage = false -- prevent initial transition when returning to this page
   if self.transitionTimer then
     self.transitionTimer:remove()
@@ -175,7 +176,7 @@ function NoteListScreen:drawGrid(xOffset, thumbs)
   local nRows <const> = 3
   local nCols <const> = 4
   local baseX <const> = 48
-  local baseY <const> = 40
+  local baseY <const> = 48
   local i = 1
   for row = 0, nRows - 1, 1 do
     for col = 0, nCols - 1, 1 do
@@ -216,16 +217,16 @@ function NoteListScreen:update()
   -- show 'no notes available'
   if self.hasNoNotes then
     -- TODO: prettier UI
-    gfx.setFont(baseFont)
+    -- gfx.setFont(baseFont)
     gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES'), 0, 80, 400, 40, nil, nil, kTextAlignment.center)
   end
   -- page counter
   local pageString = string.format('%d/%d', self.currPage, noteFs.numPages)
-  gfx.setFont(pageCounterFont)
+  -- gfx.setFont(pageCounterFont)
   gfx.setFontTracking(2)
   gfx.setColor(gfx.kColorWhite)
   gfx.fillRect(PLAYDATE_W - 63, PLAYDATE_H - 23, 64, 24)
-  gfx.drawText(pageString, PLAYDATE_W - 52, PLAYDATE_H - 16)
+  pageCounterFont:drawText(pageString, PLAYDATE_W - 52, PLAYDATE_H - 16)
   -- grid: right transition
   if self.isTransitionActive and self.transitionDir == 1 then
     self:drawGrid(-self.xOffset,             self.prevThumbs)

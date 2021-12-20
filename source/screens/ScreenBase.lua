@@ -27,10 +27,5 @@ end
 function ScreenBase:afterLeave()
 end
 
-function ScreenBase:reload()
-  self:afterLeave()
-  self:beforeEnter()
-end
-
 function ScreenBase:update()
 end

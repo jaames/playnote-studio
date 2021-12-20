@@ -3,6 +3,17 @@ local PLAYDATE_H <const> = 240
 local gfx <const> = playdate.graphics
 local counterFont <const> = gfx.font.new('./fonts/WhalesharkCounter')
 
+local DPAD_DEFAULT <const> = 1
+local DPAD_DOWN <const> = 2
+local DPAD_LEFT <const> = 3
+local DPAD_RIGHT <const> = 4
+local dpadGfx <const> = {
+  [DPAD_DEFAULT] = gfx.image.new('./gfx/gfx_player_dpadhint_default'),
+  [DPAD_LEFT] = gfx.image.new('./gfx/gfx_player_dpadhint_leftpressed'),
+  [DPAD_RIGHT] = gfx.image.new('./gfx/gfx_player_dpadhint_rightpressed'),
+  [DPAD_DOWN] = gfx.image.new('./gfx/gfx_player_dpadhint_downpressed')
+}
+
 PlayerScreen = {}
 class('PlayerScreen').extends(ScreenBase)
 
@@ -23,6 +34,7 @@ function PlayerScreen:init()
   self.playTransitionValue = 0
   -- input stuff
   self.keyTimer = nil
+  self.dpadState = DPAD_DEFAULT
   self.inputHandlers = {
     leftButtonDown = function()
       if self.isPlaying then
@@ -34,6 +46,7 @@ function PlayerScreen:init()
       end
       self.keyTimer = playdate.timer.keyRepeatTimerWithDelay(500, 100, function ()
         self:setCurrentFrame(self.currentFrame - 1)
+        self.dpadState = DPAD_LEFT
       end)
     end,
     leftButtonUp = function()
@@ -41,6 +54,7 @@ function PlayerScreen:init()
         self.keyTimer:remove()
         self.keyTimer = nil
       end
+      self.dpadState = DPAD_DEFAULT
     end,
     rightButtonDown = function()
       if self.isPlaying then
@@ -52,6 +66,7 @@ function PlayerScreen:init()
       end
       self.keyTimer = playdate.timer.keyRepeatTimerWithDelay(500, 100, function ()
         self:setCurrentFrame(self.currentFrame + 1)
+        self.dpadState = DPAD_RIGHT
       end)
     end,
     rightButtonUp = function()
@@ -59,9 +74,15 @@ function PlayerScreen:init()
         self.keyTimer:remove()
         self.keyTimer = nil
       end
+      self.dpadState = DPAD_DEFAULT
     end,
     downButtonDown = function()
       self:togglePlay()
+      self.dpadState = DPAD_DOWN
+    end,
+    downButtonUp = function()
+      self:togglePlay()
+      self.dpadState = DPAD_DEFAULT
     end,
     AButtonDown = function()
       self:togglePlay()
@@ -72,6 +93,7 @@ end
 
 function PlayerScreen:beforeEnter()
   PlayerScreen.super.beforeEnter(self)
+  self.dpadState = DPAD_DEFAULT
   playdate.getCrankTicks(24) -- prevent crank going nuts if it's been moved since this screen was last active
   self:unloadPpm()
   self:loadPpm()
@@ -198,7 +220,7 @@ function PlayerScreen:transitionUiControls(show)
 end
 
 function PlayerScreen:update()
-  playdate.drawFPS(0, 240 -16)
+  -- playdate.drawFPS(8, 16)
   if (not self.isPlaying) then
     local frameChange = playdate.getCrankTicks(24)
     self:setCurrentFrame(self.currentFrame + frameChange)
@@ -223,13 +245,14 @@ function PlayerScreen:update()
     gfx.setColor(gfx.kColorWhite)
     gfx.fillRoundRect(PLAYDATE_W - 104, PLAYDATE_H - 26, 100, 22, 4)
     -- frame counter text
-    gfx.setFont(counterFont)
-    gfx.drawTextAligned(self.currentFrame, PLAYDATE_W - 78, PLAYDATE_H - 24, kTextAlignment.center)
-    gfx.drawTextAligned('/', PLAYDATE_W - 54, PLAYDATE_H - 24, kTextAlignment.center)
-    gfx.drawTextAligned(self.numFrames, PLAYDATE_W - 30, PLAYDATE_H - 24, kTextAlignment.center)
-    -- using transition offset
-    gfx.setDrawOffset(0, self.playTransitionValue * 32)
+    counterFont:drawTextAligned(self.currentFrame, PLAYDATE_W - 78, PLAYDATE_H - 24, kTextAlignment.center)
+    counterFont:drawTextAligned('/', PLAYDATE_W - 54, PLAYDATE_H - 24, kTextAlignment.center)
+    counterFont:drawTextAligned(self.numFrames, PLAYDATE_W - 30, PLAYDATE_H - 24, kTextAlignment.center)
+    -- dpad hint
+    gfx.setDrawOffset(0, self.playTransitionValue * 64)
+    dpadGfx[self.dpadState]:draw(6, PLAYDATE_H - 60)
     -- frame timeline
+    gfx.setDrawOffset(0, self.playTransitionValue * 32)
     self.timeline:draw()
     -- reset offset
     gfx.setDrawOffset(0, 0)

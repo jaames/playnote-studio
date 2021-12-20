@@ -80,8 +80,8 @@ function DitheringScreen:update()
   gfx.setColor(layer == 2 and gfx.kColorWhite or gfx.kColorBlack)
   gfx.fillRoundRect(32 + 32, 128 - 4, 256 + 8, 56, 6)
 
-  for _, row in ipairs(self.swatches) do
-    for _, swatch in ipairs(row) do
+  for _, row in pairs(self.swatches) do
+    for _, swatch in pairs(row) do
       swatch:draw()
     end
   end

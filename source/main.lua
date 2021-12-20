@@ -2,7 +2,6 @@ import 'CoreLibs/math'
 import 'CoreLibs/object'
 import 'CoreLibs/graphics'
 import 'CoreLibs/nineslice'
-import 'CoreLibs/ui'
 import 'CoreLibs/crank'
 import 'CoreLibs/timer'
 import 'CoreLibs/frameTimer'
@@ -26,6 +25,7 @@ import './components/FolderSelect'
 import './components/Clock'
 import './components/Timeline'
 import './components/DitherSwatch'
+import './components/Scrollbar'
 
 import './screens/Screenbase'
 import './screens/Home'
@@ -35,6 +35,8 @@ import './screens/Settings'
 import './screens/Dithering'
 import './screens/Credits'
 
+MAIN_FONT = playdate.graphics.font.new('./fonts/WhalesharkSans')
+playdate.graphics.setFont(MAIN_FONT)
 playdate.display.setRefreshRate(30)
 
 config:init()

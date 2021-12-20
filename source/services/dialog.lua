@@ -5,14 +5,8 @@ local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 local TRANSITION_DUR <const> = 250
 
-local font = gfx.font.new('./fonts/Asheville-Sans-14-Bold')
-local fontFamily = {
-  [gfx.font.kVariantBold]   = gfx.font.new('./fonts/WhalesharkSans'),
-  [gfx.font.kVariantNormal] = gfx.getSystemFont(gfx.font.kVariantNormal)
-}
-
-local buttonAIcon = gfx.image.new('./img/button_a')
-local buttonBIcon = gfx.image.new('./img/button_b')
+local buttonAIcon = gfx.image.new('./gfx/icon_button_a')
+local buttonBIcon = gfx.image.new('./gfx/icon_button_b')
 
 local okButton = nil
 local cancelButton = nil
@@ -30,26 +24,24 @@ local transitionTimer = nil
 local inputHandlers = {
   alert = {
     AButtonDown = function ()
-      dialog.handleClose()
-      dialog:hide()
+      dialog:hide('ok')
     end,
     BButtonDown = function ()
-      dialog.handleClose()
-      dialog:hide()
+      dialog:hide('ok')
     end
   },
   confirm = {
     AButtonDown = function ()
-      dialog.handleClose()
-      dialog:hide()
+      dialog:hide('ok')
     end,
     BButtonDown = function ()
-      dialog:hide()
+      dialog:hide('cancel')
     end
   }
 }
 
-dialog.handleClose = function () end
+dialog.handleClose = function (status) end
+dialog.handleCloseEnd = function (status) end
 
 function dialog:init()
   okButton = Button(PLAYDATE_W / 2 - 60, 0, 120, 32)
@@ -100,8 +92,10 @@ function dialog:show(text, type)
   end
 end
 
-function dialog:hide()
+function dialog:hide(status)
   if not dialog.isVisible or isTransitionActive then return end
+  -- close callback
+  dialog.handleClose(status)
   -- setup transition
   isTransitionActive = true
   transitionTimer = playdate.timer.new(TRANSITION_DUR, 0, 1)
@@ -116,10 +110,37 @@ function dialog:hide()
     bgFade = 0.5
     isTransitionActive = false
     dialog.isVisible = false
+    dialog.handleCloseEnd(status)
     dialog.handleClose = function () end
+    dialog.handleCloseEnd = function () end
     -- restore controls
     playdate.inputHandlers.pop()
   end
+end
+
+function dialog:sequence(seq, fn)
+  local i = 1
+  local function doItem(item)
+    if item == nil then
+      if fn ~= nil then fn() end
+      return
+    end
+    self.handleCloseEnd = function (status)
+      if status == 'ok' then
+        utils:nextTick(function ()
+          i = i + 1
+          if item.callback ~= nil then item.callback() end
+          playdate.timer.performAfterDelay(200, function () doItem(seq[i]) end)
+        end)
+      end
+    end
+    if item.type == 'alert' then
+      self:alert(item.message)
+    elseif item.type == 'confirm' then
+      self:confirm(item.message)
+    end
+  end
+  doItem(seq[i])
 end
 
 function dialog:update()
@@ -140,7 +161,7 @@ function dialog:update()
     gfx.setColor(gfx.kColorBlack)
     gfx.drawRoundRect(28, 28, PLAYDATE_W - 56, PLAYDATE_H - 56, 4)
     -- text
-    gfx.setFontFamily(fontFamily)
+    -- gfx.setFont(font)
     gfx.drawTextInRect(currentText, 32, textY, PLAYDATE_W - 64, PLAYDATE_H - 64, nil, nil, kTextAlignment.center)
     -- buttons
     if currentType == 'alert' then

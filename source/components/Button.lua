@@ -1,7 +1,14 @@
 local gfx <const> = playdate.graphics
-local fontBold <const> = gfx.font.new('./fonts/WhalesharkSans')
-local buttonGfx <const> = gfx.nineSlice.new('./img/button_new', 8, 8, 2, 2)
-local buttonSelectedGfx <const> = gfx.nineSlice.new('./img/button_new_selected', 8, 8, 2, 2)
+
+local buttonGfx = {
+  default =      gfx.nineSlice.new('./gfx/shape_button_default', 8, 8, 2, 2),
+  folderselect = gfx.nineSlice.new('./gfx/shape_button_folderselect', 8, 8, 2, 2)
+}
+
+local buttonSelectedGfx = {
+  default =      gfx.nineSlice.new('./gfx/shape_button_default_selected', 8, 8, 2, 2),
+  folderselect = gfx.nineSlice.new('./gfx/shape_button_folderselect_selected', 8, 8, 2, 2)
+}
 
 Button = {}
 class('Button').extends()
@@ -12,7 +19,7 @@ function Button:init(x, y, w, h)
   self.y = y
   self.w = w
   self.h = h
-  self.isBold = true
+  self.variant = 'default'
   self.isSelected = false
   self.text = nil
   self.textY = nil
@@ -22,7 +29,6 @@ function Button:init(x, y, w, h)
 end
 
 function Button:setText(text)
-  gfx.setFont(fontBold)
   gfx.setFontTracking(2)
   local y = self.y
   local h = self.h
@@ -49,19 +55,10 @@ function Button:drawAt(x, y)
   local textW = w - 12
   -- draw background
   if self.isSelected then
-    buttonSelectedGfx:drawInRect(x - 3, y - 3, w + 6, h + 6)
+    buttonSelectedGfx[self.variant]:drawInRect(x - 3, y - 3, w + 6, h + 6)
   else
-    buttonGfx:drawInRect(x - 3, y - 3, w + 6, h + 6)
+    buttonGfx[self.variant]:drawInRect(x - 3, y - 3, w + 6, h + 6)
   end
-  -- gfx.setColor(gfx.kColorBlack)
-  -- if self.isSelected then
-  --   gfx.fillRoundRect(x - 3, y - 3, w + 6, h + 6, 4)
-  --   gfx.setColor(gfx.kColorWhite)
-  --   gfx.setLineWidth(1)
-  --   gfx.drawRoundRect(x - 1, y - 1, w + 2, h + 2, 3)
-  -- else
-  --   gfx.fillRoundRect(x, y, w, h, 3)
-  -- end
   -- draw icon if present
   if self.icon then
     local pad = 12
