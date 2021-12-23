@@ -1,4 +1,3 @@
-*Playnote Studio*
 
 _Version $VERSION _
 _https://playnote.studio_

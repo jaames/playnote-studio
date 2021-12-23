@@ -2,6 +2,8 @@ local gfx <const> = playdate.graphics
 local SCROLL_START <const> = 200
 local SCROLL_AUTO_STEP <const> = -1
 
+local logoGfx <const> = gfx.image.new('./gfx/gfx_logo_credits')
+
 CreditsScreen = {}
 class('CreditsScreen').extends(ScreenBase)
 
@@ -54,7 +56,7 @@ function CreditsScreen:beforeEnter()
   })
   local text = self:getCreditsText()
   local _, height = gfx.getTextSize(text)
-  local cache = gfx.image.new(400, height, gfx.kColorBlack)
+  local cache = gfx.image.new(400, height, gfx.kColorClear)
   local rect = playdate.geometry.rect.new(10, 0, 400 - 20, height)
   gfx.pushContext(cache)
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
@@ -84,9 +86,9 @@ end
 
 function CreditsScreen:update()
   gfx.setDrawOffset(0, self.scrollY)
-  -- draw background
   gfx.setBackgroundColor(gfx.kColorBlack)
   gfx.clear()
+  logoGfx:drawCentered(200, -30)
   self.creditsTexture:draw(0, 0)
   -- auto scroll
   if self.autoScroll then
