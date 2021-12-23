@@ -41,13 +41,22 @@ end
 function config:init()
   local configFile = readConfigFile()
   -- write default config to file if it doesn't yet exist
-  if configFile == nil then 
+  if configFile == nil then
     configFile = DEFAULT_CONFIG
-    saveConfigFile(configFile)
+  -- fill in any missing keys with default values in case the user mucked around with the config too much
+  else
+    for k in pairs(DEFAULT_CONFIG) do
+      if configFile[k] == nil then
+        configFile[k] = DEFAULT_CONFIG[k]
+      end
+    end
+  end
   -- upgrade config if the version has been updated
-  elseif not configFile.configVersion or configFile.configVersion < CONFIG_VERSION then
+  if configFile.configVersion < CONFIG_VERSION then
     config:upgrade()
   end
+  -- save changes to config file
+  saveConfigFile(configFile)
   -- make config values available on config
   for k in pairs(configFile) do
     config[k] = configFile[k]

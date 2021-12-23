@@ -4,6 +4,8 @@ local FOLDERSELECT_ROW = -1
 local gfx <const> = playdate.graphics
 local pageCounterFont <const> = gfx.font.new('./fonts/UgoNumber_8')
 
+local bgGfx <const> = gfx.image.new('./gfx/gfx_bg_notelist')
+
 local TRANSITION_DUR <const> = 250
 
 NoteListScreen = {}
@@ -212,6 +214,7 @@ end
 function NoteListScreen:update()
   -- page bg
   gfxUtils:drawBgGrid()
+  bgGfx:draw(0, 0)
   -- folder select
   self.folderSelect:draw()
   -- show 'no notes available'

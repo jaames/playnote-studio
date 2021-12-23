@@ -5,6 +5,7 @@ local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 local TRANSITION_DUR <const> = 250
 
+local dialogGfx = gfx.nineSlice.new('./gfx/shape_dialog', 8, 8, 2, 2)
 local buttonAIcon = gfx.image.new('./gfx/icon_button_a')
 local buttonBIcon = gfx.image.new('./gfx/icon_button_b')
 
@@ -18,6 +19,7 @@ local currentText = nil
 local currentType = nil
 local currentTextHeight = 0
 
+local isVisible = false
 local isTransitionActive = false
 local transitionTimer = nil
 
@@ -61,12 +63,12 @@ function dialog:confirm(text)
 end
 
 function dialog:show(text, type)
-  if dialog.isVisible or isTransitionActive then return end
+  if isVisible or isTransitionActive then return end
   -- setup state
   currentType = type or 'alert'
   currentText = text
   _, currentTextHeight = gfx.getTextSizeForMaxWidth(text, PLAYDATE_W - 64, nil, font)
-  dialog.isVisible = true
+  isVisible = true
   -- setup buttons
   okButton:setText(locales:getText('DIALOG_OK'))
   cancelButton:setText(locales:getText('DIALOG_CANCEL'))
@@ -93,7 +95,7 @@ function dialog:show(text, type)
 end
 
 function dialog:hide(status)
-  if not dialog.isVisible or isTransitionActive then return end
+  if not isVisible or isTransitionActive then return end
   -- close callback
   dialog.handleClose(status)
   -- setup transition
@@ -109,7 +111,7 @@ function dialog:hide(status)
     y = PLAYDATE_H
     bgFade = 0.5
     isTransitionActive = false
-    dialog.isVisible = false
+    isVisible = false
     dialog.handleCloseEnd(status)
     dialog.handleClose = function () end
     dialog.handleCloseEnd = function () end
@@ -144,24 +146,17 @@ function dialog:sequence(seq, fn)
 end
 
 function dialog:update()
-  if dialog.isVisible then
+  if isVisible then
     local offsetX, offsetY = gfx.getDrawOffset()
     local textY = PLAYDATE_H / 2 - (currentTextHeight + 28 + 8) / 2
     local buttonY = textY + currentTextHeight + 16
     -- fade over background
     gfxUtils:drawBlackFade(bgFade)
-    -- gfx.setDrawOffset(0, 0)
-    -- gfx.setColor(gfx.kColorBlack)
-    -- gfx.setDitherPattern(1 - bgFade, gfx.image.kDitherTypeBayer8x8)
-    -- panel bg
+    -- transform based on transition progress
     gfx.setDrawOffset(0, y)
-    gfx.fillRect(0, 0, PLAYDATE_W, PLAYDATE_H)
-    gfx.setColor(gfx.kColorWhite)
-    gfx.fillRoundRect(24, 24, PLAYDATE_W - 48, PLAYDATE_H - 48, 8)
-    gfx.setColor(gfx.kColorBlack)
-    gfx.drawRoundRect(28, 28, PLAYDATE_W - 56, PLAYDATE_H - 56, 4)
+    -- panel bg
+    dialogGfx:drawInRect(24, 24, PLAYDATE_W - 48, PLAYDATE_H - 48)
     -- text
-    -- gfx.setFont(font)
     gfx.drawTextInRect(currentText, 32, textY, PLAYDATE_W - 64, PLAYDATE_H - 64, nil, nil, kTextAlignment.center)
     -- buttons
     if currentType == 'alert' then
@@ -173,7 +168,7 @@ function dialog:update()
       confirmButton.y = buttonY
       confirmButton:draw()
     end
-
+    -- reset offset
     gfx.setDrawOffset(offsetX, offsetY)
   end
 end

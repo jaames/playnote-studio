@@ -7,6 +7,8 @@ local soundFxGfx <const> = gfx.image.new('./gfx/icon_sound')
 local langGfx <const> =    gfx.image.new('./gfx/icon_lang')
 local resetGfx <const> =   gfx.image.new('./gfx/icon_reset')
 
+local bgGfx <const> = gfx.image.new('./gfx/gfx_bg_settings')
+
 local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 local ITEM_GAP <const> = 12
@@ -33,22 +35,18 @@ function SettingsScreen:init()
     AButtonDown = function()
       local item = self.items[self.activeItemIndex]
       item:onClick(item)
-    end,
-    -- cranked = function(change, acceleratedChange)
-    --   local x, y = self.uiView:getScrollPosition()
-    --   self.uiView:setScrollPosition(x, y - change, false)
-    -- end,
+    end
   }
   self.scrollBar = Scrollbar(PLAYDATE_W - 26, MENU_GAP_TOP, PLAYDATE_H - MENU_GAP_TOP - MENU_GAP_BOTTOM)
   self.menuScroll = 0
   self.menuHeight = 0
-  self.menuOpenShift = 0
   self.menuScrollTransitionActive = false
   self.activeItemIndex = 1
 end
 
 function SettingsScreen:beforeEnter()
   SettingsScreen.super.beforeEnter(self)
+  local s = self
   -- set up setting items
   local items <const> = {
     -- ABOUT BUTTON
@@ -69,13 +67,13 @@ function SettingsScreen:beforeEnter()
         item.button.isSelected = false
       end,
       onClick = function (item)
-        local aboutText = ''
+        dialog:show(''
           .. '*Playnote Studio*\n'
           .. 'https://playnote.studio\n'
           .. '\n'
           .. locales:getTextFormatted('ABOUT_VERSION', playdate.metadata.version) .. '\n'
           .. locales:getTextFormatted('ABOUT_BUILT_BY', 'James Daniel')
-        dialog:show(aboutText)
+        )
       end
     },
     -- CREDITS BUTTON
@@ -112,7 +110,7 @@ function SettingsScreen:beforeEnter()
         select:setValue(locales:getLanguage())
         function select:onCloseEnded(value)
           locales:setLanguage(value)
-          noteFs:updateFolderNames() -- update folder name list
+          noteFs:updateFolderNames()
           screens:reloadCurrent(transitions.NONE)
         end
         item.selectButton = select
@@ -198,11 +196,14 @@ function SettingsScreen:beforeEnter()
       onClick = function (item)
         dialog:sequence({
           {type = 'confirm', message = locales:getText('SETTINGS_RESET_CONFIRM')},
+          -- TODO: localise
           {type = 'confirm', message = 'Are you sure?', callback = function ()
+            s:scrollToItemByIndex(1, true)
             config:reset()
             locales:setLanguage(config.lang)
             screens:reloadCurrent(transitions.NONE)
           end},
+          -- TODO: localise
           {type = 'alert', message = 'Settings have been cleared.'}
         })
       end
@@ -211,6 +212,7 @@ function SettingsScreen:beforeEnter()
     {
       init = function(item)
         local button = Button(0, 0, ITEM_WIDTH, 48)
+        -- TODO: localise
         button:setText('Delete Sample Notes')
         button:setIcon(resetGfx)
         item.button = button
@@ -226,11 +228,14 @@ function SettingsScreen:beforeEnter()
       end,
       onClick = function (item)
         dialog:sequence({
+          -- TODO: localise
           {type = 'confirm', message = 'This will delete all of the sample Flipnotes from your Playdate\'s storage to save space.'},
+          -- TODO: localise
           {type = 'confirm', message = 'Are you sure?', callback = function ()
             -- TODO
             print('delete notes here')
           end},
+          -- TODO: localise
           {type = 'alert', message = 'Sample Flipnotes have been deleted'}
         })
       end
@@ -254,6 +259,10 @@ function SettingsScreen:afterLeave()
   config:save()
   -- free ui items
   self.items = nil
+  -- reset
+  self.menuScroll = 0
+  self.menuHeight = 0
+  self.menuOpenShift = 0
 end
 
 function SettingsScreen:scrollToItemByIndex(index, animate)
@@ -310,10 +319,23 @@ end
 function SettingsScreen:update()
   gfx.setDrawOffset(0, 0)
   gfxUtils:drawBgGridWithOffset(self.menuScroll)
+  bgGfx:draw(0, 0)
   self.scrollBar:draw()
   local y = 0 - self.menuScroll + MENU_GAP_TOP
   for _, item in pairs(self.items) do
-    item.draw(item, MENU_X, y)
+    if y < -ITEM_HEIGHT then
+      goto nextItem
+    elseif y > PLAYDATE_H then
+      break
+    else
+      item.draw(item, MENU_X, y)
+    end
+    ::nextItem::
     y = y + ITEM_GAP + ITEM_HEIGHT
+  end
+  -- use crank to scroll through items
+  local crankChange = playdate.getCrankTicks(6)
+  if crankChange ~= 0 then
+    self:scrollToItemByIndex(self.activeItemIndex + crankChange, true)
   end
 end

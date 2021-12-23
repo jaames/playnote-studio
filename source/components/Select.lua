@@ -132,11 +132,6 @@ function Select:drawAt(x, y)
 end
 
 function Select:drawMenu()
-  -- use crank to scroll through options
-  local crankChange = playdate.getCrankTicks(6)
-  if crankChange ~= 0 then
-    self:setValueByIndex(self.activeOptionIndex + crankChange, true)
-  end
   -- draw select menu ui over everything
   utils:deferDraw(function ()
     local oX, oY = gfx.getDrawOffset()
@@ -161,6 +156,11 @@ function Select:drawMenu()
     gfx.drawRoundRect(MENU_X - 4, MENU_Y - 4, OPTION_WIDTH + 8, OPTION_HEIGHT + 8, (OPTION_HEIGHT + 8) / 2)
     gfx.setDrawOffset(oX, oY)
   end)
+  -- use crank to scroll through options
+  local crankChange = playdate.getCrankTicks(6)
+  if crankChange ~= 0 then
+    self:setValueByIndex(self.activeOptionIndex + crankChange, true)
+  end
 end
 
 function Select:openMenu()
