@@ -215,38 +215,38 @@ function SettingsScreen:beforeEnter()
       end
     },
     -- DELETE SAMPLES
-    {
-      init = function(item)
-        local button = Button(0, 0, ITEM_WIDTH, 48)
-        -- TODO: localise
-        button:setText('Delete Sample Notes')
-        button:setIcon(resetGfx)
-        item.button = button
-      end,
-      draw = function(item, x, y)
-        item.button:drawAt(x, y)
-      end,
-      select = function (item)
-        item.button:select()
-      end,
-      deselect = function (item)
-        item.button:deselect()
-      end,
-      onClick = function (item)
-        item.button:click()
-        dialog:sequence({
-          -- TODO: localise
-          {type = 'confirm', message = 'This will delete all of the sample Flipnotes from your Playdate\'s storage to save space.'},
-          -- TODO: localise
-          {type = 'confirm', message = 'Are you sure?', callback = function ()
-            -- TODO
-            print('delete notes here')
-          end},
-          -- TODO: localise
-          {type = 'alert', message = 'Sample Flipnotes have been deleted'}
-        })
-      end
-    }
+    -- {
+    --   init = function(item)
+    --     local button = Button(0, 0, ITEM_WIDTH, 48)
+    --     -- TODO: localise
+    --     button:setText('Delete Sample Notes')
+    --     button:setIcon(resetGfx)
+    --     item.button = button
+    --   end,
+    --   draw = function(item, x, y)
+    --     item.button:drawAt(x, y)
+    --   end,
+    --   select = function (item)
+    --     item.button:select()
+    --   end,
+    --   deselect = function (item)
+    --     item.button:deselect()
+    --   end,
+    --   onClick = function (item)
+    --     item.button:click()
+    --     dialog:sequence({
+    --       -- TODO: localise
+    --       {type = 'confirm', message = 'This will delete all of the sample Flipnotes from your Playdate\'s storage to save space.'},
+    --       -- TODO: localise
+    --       {type = 'confirm', message = 'Are you sure?', callback = function ()
+    --         -- TODO
+    --         print('delete notes here')
+    --       end},
+    --       -- TODO: localise
+    --       {type = 'alert', message = 'Sample Flipnotes have been deleted'}
+    --     })
+    --   end
+    -- }
   }
   -- init ui components
   for _, item in pairs(items) do

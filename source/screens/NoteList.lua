@@ -2,7 +2,7 @@ local PLAYDATE_W <const> = 400
 local PLAYDATE_H <const> = 240
 local FOLDERSELECT_ROW = -1
 local gfx <const> = playdate.graphics
-local pageCounterFont <const> = gfx.font.new('./fonts/UgoNumber_8')
+local pageCounterFont <const> = gfx.font.new('./fonts/WhalesharkCounter')
 
 local bgGfx <const> = gfx.image.new('./gfx/gfx_bg_notelist')
 
@@ -55,6 +55,7 @@ function NoteListScreen:init()
       if self.selectedRow == FOLDERSELECT_ROW then
         self.folderSelect:click()
         self.folderSelect:openMenu()
+      -- thumbnail is selected
       else
         local i = self.selectedRow * 4 + self.selectedCol + 1
         local tmb = self.currThumbs[i]
@@ -221,16 +222,15 @@ function NoteListScreen:update()
   -- show 'no notes available'
   if self.hasNoNotes then
     -- TODO: prettier UI
-    -- gfx.setFont(baseFont)
     gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES'), 0, 80, 400, 40, nil, nil, kTextAlignment.center)
+    return
   end
   -- page counter
-  local pageString = string.format('%d/%d', self.currPage, noteFs.numPages)
-  -- gfx.setFont(pageCounterFont)
+  local counterText = string.format('%d/%d', self.currPage, noteFs.numPages)
   gfx.setFontTracking(2)
-  gfx.setColor(gfx.kColorWhite)
-  gfx.fillRect(PLAYDATE_W - 63, PLAYDATE_H - 23, 64, 24)
-  pageCounterFont:drawText(pageString, PLAYDATE_W - 52, PLAYDATE_H - 16)
+  local w = pageCounterFont:getTextWidth(counterText)
+  gfx.fillRoundRect(PLAYDATE_W - w - 28, 4, w + 28, 24, 4)
+  pageCounterFont:drawTextAligned(counterText, PLAYDATE_W - 12, 8, kTextAlignment.right)
   -- grid: right transition
   if self.isTransitionActive and self.transitionDir == 1 then
     self:drawGrid(-self.xOffset,             self.prevThumbs)

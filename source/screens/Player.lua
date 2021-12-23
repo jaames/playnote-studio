@@ -166,7 +166,7 @@ function PlayerScreen:play()
     self.isPlaying = true
     self:transitionUiControls(false)
     playdate.setAutoLockDisabled(true)
-    -- playdate.display.setRefreshRate(self.ppm.fps)
+    playdate.display.setRefreshRate(self.ppm.fps)
   end
 end
 

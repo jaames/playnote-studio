@@ -1,6 +1,5 @@
 ## TODO
 
-- Update button graphics
 - Frog mascot?
 - Player play/pause with timer
 - Audio play/pause
