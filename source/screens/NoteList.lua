@@ -53,6 +53,7 @@ function NoteListScreen:init()
     AButtonDown = function()
       -- the file dropdown is selected
       if self.selectedRow == FOLDERSELECT_ROW then
+        self.folderSelect:click()
         self.folderSelect:openMenu()
       else
         local i = self.selectedRow * 4 + self.selectedCol + 1
@@ -101,7 +102,7 @@ end
 function NoteListScreen:setSelected(row, col)
   local numNotes = self.notesOnCurrPage
   if row == FOLDERSELECT_ROW or numNotes == 0 then
-    self.folderSelect.isSelected = true
+    self.folderSelect:select()
     self.selectedRow = FOLDERSELECT_ROW
   else
     row = math.max(0, math.min(2, row))
@@ -109,7 +110,7 @@ function NoteListScreen:setSelected(row, col)
     local index = math.min((row * 4 + col) + 1, numNotes) - 1
     self.selectedRow = math.floor(index / 4)
     self.selectedCol = index % 4
-    self.folderSelect.isSelected = false
+    self.folderSelect:deselect()
   end
 end
 

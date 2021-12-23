@@ -61,12 +61,13 @@ function SettingsScreen:beforeEnter()
         item.button:drawAt(x, y)
       end,
       select = function (item)
-        item.button.isSelected = true
+        item.button:select()
       end,
       deselect = function (item)
-        item.button.isSelected = false
+        item.button:deselect()
       end,
       onClick = function (item)
+        item.button:click()
         dialog:show(''
           .. '*Playnote Studio*\n'
           .. 'https://playnote.studio\n'
@@ -88,12 +89,13 @@ function SettingsScreen:beforeEnter()
         item.button:drawAt(x, y)
       end,
       select = function (item)
-        item.button.isSelected = true
+        item.button:select()
       end,
       deselect = function (item)
-        item.button.isSelected = false
+        item.button:deselect()
       end,
       onClick = function (item)
+        item.button:click()
         screens:push('credits', transitions.CROSSFADE)
       end
     },
@@ -119,12 +121,13 @@ function SettingsScreen:beforeEnter()
         item.selectButton:drawAt(x, y)
       end,
       select = function (item)
-        item.selectButton.isSelected = true
+        item.selectButton:select()
       end,
       deselect = function (item)
-        item.selectButton.isSelected = false
+        item.selectButton:deselect()
       end,
       onClick = function (item)
+        item.selectButton:click()
         item.selectButton:openMenu()
       end
     },
@@ -140,12 +143,13 @@ function SettingsScreen:beforeEnter()
         item.button:drawAt(x, y)
       end,
       select = function (item)
-        item.button.isSelected = true
+        item.button:select()
       end,
       deselect = function (item)
-        item.button.isSelected = false
+        item.button:deselect()
       end,
       onClick = function (item)
+        item.button:click()
         screens:push('dithering', transitions.CROSSFADE)
       end
     },
@@ -167,12 +171,13 @@ function SettingsScreen:beforeEnter()
         item.selectButton:drawAt(x, y)
       end,
       select = function (item)
-        item.selectButton.isSelected = true
+        item.selectButton:select()
       end,
       deselect = function (item)
-        item.selectButton.isSelected = false
+        item.selectButton:deselect()
       end,
       onClick = function (item)
+        item.selectButton:click()
         item.selectButton:openMenu()
       end
     },
@@ -188,12 +193,13 @@ function SettingsScreen:beforeEnter()
         item.button:drawAt(x, y)
       end,
       select = function (item)
-        item.button.isSelected = true
+        item.button:select()
       end,
       deselect = function (item)
-        item.button.isSelected = false
+        item.button:deselect()
       end,
       onClick = function (item)
+        item.button:click()
         dialog:sequence({
           {type = 'confirm', message = locales:getText('SETTINGS_RESET_CONFIRM')},
           -- TODO: localise
@@ -221,12 +227,13 @@ function SettingsScreen:beforeEnter()
         item.button:drawAt(x, y)
       end,
       select = function (item)
-        item.button.isSelected = true
+        item.button:select()
       end,
       deselect = function (item)
-        item.button.isSelected = false
+        item.button:deselect()
       end,
       onClick = function (item)
+        item.button:click()
         dialog:sequence({
           -- TODO: localise
           {type = 'confirm', message = 'This will delete all of the sample Flipnotes from your Playdate\'s storage to save space.'},
@@ -259,10 +266,6 @@ function SettingsScreen:afterLeave()
   config:save()
   -- free ui items
   self.items = nil
-  -- reset
-  self.menuScroll = 0
-  self.menuHeight = 0
-  self.menuOpenShift = 0
 end
 
 function SettingsScreen:scrollToItemByIndex(index, animate)

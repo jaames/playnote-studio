@@ -1,13 +1,22 @@
 local gfx <const> = playdate.graphics
+local newNineSlice = gfx.nineSlice.new
 
 local buttonGfx = {
-  default =      gfx.nineSlice.new('./gfx/shape_button_default', 8, 8, 2, 2),
-  folderselect = gfx.nineSlice.new('./gfx/shape_button_folderselect', 8, 8, 2, 2)
-}
-
-local buttonSelectedGfx = {
-  default =      gfx.nineSlice.new('./gfx/shape_button_default_selected', 8, 8, 2, 2),
-  folderselect = gfx.nineSlice.new('./gfx/shape_button_folderselect_selected', 8, 8, 2, 2)
+  default = {
+    base =   gfx.nineSlice.new('./gfx/shape_button_default', 8, 8, 2, 2),
+    select = gfx.nineSlice.new('./gfx/shape_button_default_selected', 8, 8, 2, 2),
+    click =  gfx.nineSlice.new('./gfx/shape_button_default_clicked', 8, 8, 2, 2)
+  },
+  folderselect = {
+    base =   gfx.nineSlice.new('./gfx/shape_button_folderselect', 8, 8, 2, 2),
+    select = gfx.nineSlice.new('./gfx/shape_button_folderselect_selected', 8, 8, 2, 2),
+    click =  gfx.nineSlice.new('./gfx/shape_button_folderselect_clicked', 8, 8, 2, 2)
+  },
+  -- settings = {
+  --   base =   gfx.nineSlice.new('./gfx/shape_button_settings', 8, 8, 2, 2),
+  --   select = gfx.nineSlice.new('./gfx/shape_button_settings_selected', 8, 8, 2, 2),
+  --   click =  gfx.nineSlice.new('./gfx/shape_button_settings_clicked', 8, 8, 2, 2)
+  -- },
 }
 
 Button = {}
@@ -20,6 +29,7 @@ function Button:init(x, y, w, h)
   self.w = w
   self.h = h
   self.variant = 'default'
+  self.state = 'base'
   self.isSelected = false
   self.text = nil
   self.textY = nil
@@ -44,6 +54,22 @@ function Button:setIcon(icon)
   self.iconW = iconW
 end
 
+function Button:select()
+  self.state = 'select'
+  self.isSelected = true
+end
+
+function Button:deselect()
+  self.state = 'base'
+  self.isSelected = false
+end
+
+function Button:click()
+  local s = self
+  self.state = 'click'
+  playdate.timer.performAfterDelay(150, function () s.state = 'base' end)
+end
+
 function Button:draw()
   self:drawAt(self.x, self.y)
 end
@@ -54,11 +80,7 @@ function Button:drawAt(x, y)
   local textX = x + 6
   local textW = w - 12
   -- draw background
-  if self.isSelected then
-    buttonSelectedGfx[self.variant]:drawInRect(x - 3, y - 3, w + 6, h + 6)
-  else
-    buttonGfx[self.variant]:drawInRect(x - 3, y - 3, w + 6, h + 6)
-  end
+  buttonGfx[self.variant][self.state]:drawInRect(x - 3, y - 3, w + 6, h + 6)
   -- draw icon if present
   if self.icon then
     local pad = 12

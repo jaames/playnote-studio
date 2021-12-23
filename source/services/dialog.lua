@@ -26,17 +26,21 @@ local transitionTimer = nil
 local inputHandlers = {
   alert = {
     AButtonDown = function ()
+      okButton:click()
       dialog:hide('ok')
     end,
     BButtonDown = function ()
+      okButton:click()
       dialog:hide('ok')
     end
   },
   confirm = {
     AButtonDown = function ()
+      confirmButton:click()
       dialog:hide('ok')
     end,
     BButtonDown = function ()
+      cancelButton:click()
       dialog:hide('cancel')
     end
   }

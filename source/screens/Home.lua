@@ -15,7 +15,7 @@ function HomeScreen:init()
 
   self.viewButton = Button(PLAYDATE_W / 2 - 98, PLAYDATE_H - 52, 196, 34)
   self.viewButton:setIcon(viewButtonGfx)
-  self.viewButton.isSelected = true
+  self.viewButton:select()
 
   self.settingsButton = Button(PLAYDATE_W - 140, 8, 132, 24)
   self.settingsButton:setIcon(settingsButtonGfx)
@@ -25,20 +25,22 @@ function HomeScreen:init()
   self.inputHandlers = {
     upButtonDown = function ()
       if self.viewButton.isSelected then
-        self.viewButton.isSelected = false
-        self.settingsButton.isSelected = true
+        self.viewButton:deselect()
+        self.settingsButton:select()
       end
     end,
     downButtonDown = function ()
       if self.settingsButton.isSelected then
-        self.settingsButton.isSelected = false
-        self.viewButton.isSelected = true
+        self.settingsButton:deselect()
+        self.viewButton:select()
       end
     end,
     AButtonDown = function()
       if self.viewButton.isSelected then
+        self.viewButton:click()
         screens:push('notelist', transitions.CROSSFADE)
       elseif self.settingsButton.isSelected then
+        self.settingsButton:click()
         screens:push('settings', transitions.CROSSFADE)
       end
     end,

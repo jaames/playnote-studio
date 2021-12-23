@@ -248,9 +248,9 @@ function PlayerScreen:update()
     counterFont:drawTextAligned(self.currentFrame, PLAYDATE_W - 78, PLAYDATE_H - 24, kTextAlignment.center)
     counterFont:drawTextAligned('/', PLAYDATE_W - 54, PLAYDATE_H - 24, kTextAlignment.center)
     counterFont:drawTextAligned(self.numFrames, PLAYDATE_W - 30, PLAYDATE_H - 24, kTextAlignment.center)
-    -- dpad hint
-    gfx.setDrawOffset(0, self.playTransitionValue * 64)
-    dpadGfx[self.dpadState]:draw(6, PLAYDATE_H - 60)
+    -- dpad hint (TODO: redraw so it feels less distracting?)
+    -- gfx.setDrawOffset(0, self.playTransitionValue * 64)
+    -- dpadGfx[self.dpadState]:draw(6, PLAYDATE_H - 60)
     -- frame timeline
     gfx.setDrawOffset(0, self.playTransitionValue * 32)
     self.timeline:draw()
