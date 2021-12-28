@@ -6,7 +6,7 @@
 #include "types.h"
 #include "tmb.h"
 #include "tmblib.h"
-#include "dither.h"
+#include "tables.h"
 
 static const lua_reg libTmb[];
 
@@ -32,34 +32,31 @@ static char* pd_strdup(const char* str)
 
 LCDBitmap* tmbGetPdBitmap(tmblib_ctx* ctx)
 {
-	u8* pixels = pd_malloc(THUMBNAIL_WIDTH * THUMBNAIL_HEIGHT);
+	u8* pixels = pd_malloc(PPM_THUMBNAIL_WIDTH * PPM_THUMBNAIL_HEIGHT);
 
 	int width = 0;
 	int height = 0;
 	int rowBytes = 0;
 	int hasMask = 0;
-	u32* bitmapData;
+	u8* bitmapData;
 	
-	LCDBitmap* bitmap = pd->graphics->newBitmap(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, kColorBlack);
-	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &hasMask, (u8**)&bitmapData);
+	LCDBitmap* bitmap = pd->graphics->newBitmap(PPM_THUMBNAIL_WIDTH, PPM_THUMBNAIL_HEIGHT, kColorBlack);
+	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &hasMask, &bitmapData);
 
 	tmbGetThumbnail(ctx->tmb, pixels);
 
-	u32 chunk = 0;
-	u8 patternOffset = 32;
+	u8 chunk = 0;
+	u8 patternOffset = 0;
 	u16 src = 0;
 	u16 dst = 0;
-	for (u8 y = 0; y < THUMBNAIL_HEIGHT; y++)
+	for (u8 y = 0; y < PPM_THUMBNAIL_HEIGHT; y++)
 	{
-		// each pattern is 32 * 2 pixels, or 2 lines of 32 pixels
-		// for every line in the image, we want to flip between the two pattern lines
-		patternOffset = patternOffset == 32 ? 0 : 32;
-		// pack 32 pixels horizontally
-		for (u8 x = 0; x < THUMBNAIL_WIDTH; x += 32)
+		// pack 8 pixels horizontally
+		for (u8 x = 0; x < PPM_THUMBNAIL_WIDTH; x += 8)
 		{
 			// all pixels start out white
-			chunk = 0xFFFFFFFF;
-			for (u8 shift = 0; shift < 32; shift++)
+			chunk = 0xFF;
+			for (u8 shift = 0; shift < 8; shift++)
 			{
 				// convert the thumbnail image (which uses paleted color) to 1 bit
 				// patterns are used to mask specific pixels and produce dithering
@@ -67,25 +64,27 @@ LCDBitmap* tmbGetPdBitmap(tmblib_ctx* ctx)
 				{
 					// black
 					case 0: 
-						chunk &= ditherMaskNone[patternOffset + shift];
+						chunk &= MASK_tmbDitherNone[patternOffset + shift];
 						break;
 					// dark gray (polka pattern, inverted)
 					case 1:
-						chunk &= ditherMaskInvPolka[patternOffset + shift];
+						chunk &= MASK_tmbDitherInvPolka[patternOffset + shift];
 						break;
 					// mid gray (checkerboard pattern)
 					case 2:
-						chunk &= ditherMaskChecker[patternOffset + shift];
+						chunk &= MASK_tmbDitherChecker[patternOffset + shift];
 						break;
 					// light gray (polka pattern)
 					case 3:
-						chunk &= ditherMaskPolka[patternOffset + shift];
+						chunk &= MASK_tmbDitherPolka[patternOffset + shift];
 						break;
 					// 4 = white, do nothing
 				}
 			}
 			bitmapData[dst++] = chunk;
 		}
+		// at the end of every line, switch to the other half of the pattern table
+		patternOffset = patternOffset == 8 ? 0 : 8;
 	}
 
 	pd_free(pixels);

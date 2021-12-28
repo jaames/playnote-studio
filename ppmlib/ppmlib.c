@@ -8,7 +8,7 @@
 #include "ppm.h"
 #include "audio.h"
 #include "video.h"
-#include "dither.h"
+#include "tables.h"
 
 static const lua_reg libPpm[];
 
@@ -54,12 +54,12 @@ static int ppm_new(lua_State* L)
 		return 1;
 	}
 
-	ctx->layerPattern[0][0] = ditherMaskNone;
-	ctx->layerPattern[0][1] = ditherMaskNone;
-	ctx->layerPattern[0][2] = ditherMaskNone;
-	ctx->layerPattern[1][0] = ditherMaskNone;
-	ctx->layerPattern[1][1] = ditherMaskNone;
-	ctx->layerPattern[1][2] = ditherMaskNone;
+	ctx->layerPattern[0][0] = LUT_ppmDitherNone;
+	ctx->layerPattern[0][1] = LUT_ppmDitherNone;
+	ctx->layerPattern[0][2] = LUT_ppmDitherNone;
+	ctx->layerPattern[1][0] = LUT_ppmDitherNone;
+	ctx->layerPattern[1][1] = LUT_ppmDitherNone;
+	ctx->layerPattern[1][2] = LUT_ppmDitherNone;
 
 	ctx->masterAudio = NULL;
 	ppm_sound_header_t* ppmSnd = &ctx->ppm->sndHdr;
@@ -144,18 +144,18 @@ static int ppm_setLayerDither(lua_State* L)
 
 	switch (pattern)
 	{
-		// 0 = ditherMaskNone
+		// 0 = LUT_ppmDitherNone
 		case 1:
-			ctx->layerPattern[layerIndex][colour] = ditherMaskPolka;
+			ctx->layerPattern[layerIndex][colour] = LUT_ppmDitherPolka;
 			break;
 		case 2:
-			ctx->layerPattern[layerIndex][colour] = ditherMaskChecker;
+			ctx->layerPattern[layerIndex][colour] = LUT_ppmDitherChecker;
 			break;
 		case 3:
-			ctx->layerPattern[layerIndex][colour] = ditherMaskInvPolka;
+			ctx->layerPattern[layerIndex][colour] = LUT_ppmDitherInvPolka;
 			break;
 		default:
-			ctx->layerPattern[layerIndex][colour] = ditherMaskNone;
+			ctx->layerPattern[layerIndex][colour] = LUT_ppmDitherNone;
 	}
 	return 0;
 }
@@ -169,7 +169,7 @@ static int ppm_drawFrame(lua_State* L)
 	void* frameBuffer = pd->graphics->getFrame();
 	// initial frame data start position
 	// startY = 16
-	// startX = 72
+	// startX = 72 / 8 bits
 	// stride = 52
 	frameBuffer = (u32*)(frameBuffer + 16 * 52 + 9);
 	// 
@@ -177,41 +177,45 @@ static int ppm_drawFrame(lua_State* L)
 
 	u8* layerA = ctx->ppm->layers[0];
 	u8* layerB = ctx->ppm->layers[1];
-	const u32* layerAPattern = ctx->layerPattern[0][ctx->ppm->layerColours[0] - 1];
-	const u32* layerBPattern = ctx->layerPattern[1][ctx->ppm->layerColours[1] - 1];
-	u8 patternOffset = 32;
-
-	u32 chunk = 0;
+	const u8* layerAPattern = ctx->layerPattern[0][ctx->ppm->layerColours[0] - 1];
+	const u8* layerBPattern = ctx->layerPattern[1][ctx->ppm->layerColours[1] - 1];
+	u16 patternOffset = 0;
 	int src = 0;
 
-	for (u8 y = 0; y < SCREEN_HEIGHT; y++)
+	// code is a bit messy here, but doing a branch inside the loop would hurt performance
+	// invert bits after combining for white paper
+	if (ctx->ppm->paperColour != 0)
 	{
-		// shift pattern between even and odd row
-		patternOffset = patternOffset == 32 ? 0 : 32;
-		// pack 32 pixels into a 4-byte chunk
-		for (u8 c = 0; c < 8; c += 1)
+		for (u8 y = 0; y < PPM_SCREEN_HEIGHT; y++)
 		{
-			// all pixels start out white
-			chunk = 0xFFFFFFFF;
-			for (u8 shift = 0; shift < 32; shift++, src++)
+			for (u8 c = 0; c < PPM_BUFFER_STRIDE; c++)
 			{
-				// flip bit to black if the pixel is > 0
-				if (layerA[src])
-					chunk &= layerAPattern[patternOffset + shift];
-				else if (layerB[src])
-					chunk &= layerBPattern[patternOffset + shift];
+				*(u8*)frameBuffer = ~(layerAPattern[layerA[src] + patternOffset] | layerBPattern[layerB[src] + patternOffset]);
+				src += 1;
+				frameBuffer += 1;
 			}
-			// invert chunk if paper is black
-			if (ctx->ppm->paperColour == 0)
-				chunk = ~chunk;
-			*(u32*)frameBuffer = chunk;
-			frameBuffer += 4;
+			patternOffset = patternOffset == 256 ? 0 : 256;
+			frameBuffer += 20;
 		}
-		frameBuffer += 20;
+	}
+	// retain inverted bits for black paper
+	else
+	{
+		for (u8 y = 0; y < PPM_SCREEN_HEIGHT; y++)
+		{
+			for (u8 c = 0; c < PPM_BUFFER_STRIDE; c++)
+			{
+				*(u8*)frameBuffer = layerAPattern[layerA[src] + patternOffset] | layerBPattern[layerB[src] + patternOffset];
+				src += 1;
+				frameBuffer += 1;
+			}
+			patternOffset = patternOffset == 256 ? 0 : 256;
+			frameBuffer += 20;
+		}
 	}
 
 	if (updateLines)
-		pd->graphics->markUpdatedRows(16, 16 + SCREEN_HEIGHT);
+		pd->graphics->markUpdatedRows(16, 16 + PPM_SCREEN_HEIGHT);
 
 	return 0;
 }
@@ -255,7 +259,7 @@ static int ppm_stopAudio(lua_State* L)
 // 	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &hasMask, &data);
 
 // 	// TODO: better error message
-// 	if (width != SCREEN_WIDTH || height != SCREEN_HEIGHT || hasMask != 1)
+// 	if (width != PPM_SCREEN_WIDTH || height != PPM_SCREEN_HEIGHT || hasMask != 1)
 // 	{
 // 		pd_log("Error with layer bitmap");
 // 		return 0;

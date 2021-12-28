@@ -45,7 +45,7 @@ function screens:setScreen(id, transitionFn)
   local hasPrevScreen = activeScreen ~= nil
   prevScreen = activeScreen
   activeScreen = SCREENS[id]
-  
+
   if hasPrevScreen then prevScreen:beforeLeave() end
   activeScreen:beforeEnter()
 

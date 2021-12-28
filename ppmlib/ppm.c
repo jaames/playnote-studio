@@ -106,16 +106,16 @@ int ppmInit(ppm_ctx_t* ctx, u8* ppm, int len)
 		return 9;
 	}
 
-	for (u8 i = 0; i < SE_CHANNELS; i++)
+	for (u8 i = 0; i < PPM_SE_CHANNELS; i++)
 	{
 		ctx->seData[i] = pd_malloc(ctx->sndHdr.seLength[i]);
 		memcpy(ctx->seData[i], ppm, ctx->sndHdr.seLength[i]);
 	}
 
-	for (u8 i = 0; i < LAYERS; i++)
+	for (u8 i = 0; i < PPM_LAYERS; i++)
 	{
-		ctx->layers[i]     = pd_calloc(SCREEN_SIZE, 1);
-		ctx->prevLayers[i] = pd_calloc(SCREEN_SIZE, 1);
+		ctx->layers[i]     = pd_calloc(PPM_BUFFER_SIZE, 1);
+		ctx->prevLayers[i] = pd_calloc(PPM_BUFFER_SIZE, 1);
 	}
 
 	ctx->prevFrame = -1;
@@ -145,12 +145,12 @@ void ppmDone(ppm_ctx_t* ctx)
 
 	pd_free(ctx->bgmData);
 
-	for (u8 i = 0; i < SE_CHANNELS; i++)
+	for (u8 i = 0; i < PPM_SE_CHANNELS; i++)
 		pd_free(ctx->seData[i]);
 
 	pd_free(ctx->videoData);
 
-	for (u8 i = 0; i < LAYERS; i++)
+	for (u8 i = 0; i < PPM_LAYERS; i++)
 	{
 		pd_free(ctx->layers[i]);
 		pd_free(ctx->prevLayers[i]);

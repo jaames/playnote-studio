@@ -111,7 +111,7 @@ void ppmAudioRender(ppm_ctx_t* ctx, s16* out, int maxSize)
 		if (soundOffset >= maxSize)
 			break;
 
-		for (u8 ch = 0; ch < SE_CHANNELS; ch++)
+		for (u8 ch = 0; ch < PPM_SE_CHANNELS; ch++)
 		{
 			if ((ctx->audioFrames[frame] >> ch) & 1)
 			{

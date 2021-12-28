@@ -112,7 +112,7 @@ function noteFs:setDirectory(folderPath)
       table.insert(noteList, folderPath .. name)
     end
   end
-  numNotes, _ = table.getsize(noteList)
+  numNotes = #noteList
   self.hasNotes = numNotes > 1
   self.numPages = math.ceil(numNotes / notesPerPage)
 end

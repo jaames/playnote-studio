@@ -6,7 +6,7 @@
 typedef struct tmb_ctx_t
 {
 	ppm_header_t hdr;
-	u8 thumbnail[THUMBNAIL_LENGTH];
+	u8 thumbnail[PPM_THUMBNAIL_LENGTH];
 } tmb_ctx_t;
 
 int  tmbInit(tmb_ctx_t* ctx, u8* ppm, int len);

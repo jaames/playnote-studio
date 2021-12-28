@@ -6,18 +6,22 @@
 #define __builtin_bswap32(x) _byteswap_ulong(x)
 #endif
 
-#define THUMBNAIL_WIDTH  64
-#define THUMBNAIL_HEIGHT 48
-#define THUMBNAIL_LENGTH ((THUMBNAIL_WIDTH * THUMBNAIL_HEIGHT) / 2)
+#define PPM_THUMBNAIL_WIDTH  64
+#define PPM_THUMBNAIL_HEIGHT 48
+#define PPM_THUMBNAIL_LENGTH ((PPM_THUMBNAIL_WIDTH * PPM_THUMBNAIL_HEIGHT) / 2)
 
-#define SCREEN_WIDTH  256
-#define SCREEN_HEIGHT 192
-#define SCREEN_SIZE   (SCREEN_WIDTH * SCREEN_HEIGHT)
+#define PPM_SCREEN_WIDTH  256
+#define PPM_SCREEN_HEIGHT 192
+#define PPM_SCREEN_SIZE   (PPM_SCREEN_WIDTH * PPM_SCREEN_HEIGHT)
+// 1-bit image buffer
+#define PPM_BUFFER_STRIDE (PPM_SCREEN_WIDTH / 8)
+#define PPM_BUFFER_SIZE   ((PPM_SCREEN_WIDTH * PPM_SCREEN_HEIGHT) / 8)
 
-#define SE_CHANNELS 3
-#define LAYERS      2
+#define PPM_SE_CHANNELS 3
+#define PPM_LAYERS      2
 
-#define PIXEL(x, y) (((y) * SCREEN_WIDTH) + (x))
+#define PIXEL(x, y) (((y) * PPM_SCREEN_WIDTH) + (x))
+#define BUFFER_OFFSET(c, y) (((y) * PPM_BUFFER_STRIDE) + (c))
 #define ROUND_UP_4(n) (((n) + 3) & ~3)
 
 #define MAKE_RGBA(r, g, b, a) (((a) << 24) | ((b) << 16) | ((g) << 8) | (r)) 
@@ -99,17 +103,17 @@ typedef struct ppm_ctx_t
 	ppm_header_t           hdr;
 	ppm_animation_header_t animHdr;
 	ppm_sound_header_t     sndHdr;
-	u8  thumbnail[THUMBNAIL_LENGTH];
+	u8   thumbnail[PPM_THUMBNAIL_LENGTH];
 	u8*  audioFrames;
 	u32* videoOffsets;
 	u8*  bgmData;
 	u8*  seData[3];
 	u8*  videoData;
-	u8*  layers[LAYERS];
-	u8*  prevLayers[LAYERS];
-	s16 prevFrame;
-	u8  layerColours[LAYERS];
-	u8  paperColour;
+	u8*  layers[PPM_LAYERS];
+	u8*  prevLayers[PPM_LAYERS];
+	s16  prevFrame;
+	u8   layerColours[PPM_LAYERS];
+	u8   paperColour;
 	float frameRate;
 	float bgmFrameRate;
 } ppm_ctx_t;

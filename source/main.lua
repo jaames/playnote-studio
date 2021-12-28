@@ -35,6 +35,8 @@ import './screens/Settings'
 import './screens/Dithering'
 import './screens/Credits'
 
+debug = nil -- disallow debugging
+
 MAIN_FONT = playdate.graphics.font.new('./fonts/WhalesharkSans')
 playdate.graphics.setFont(MAIN_FONT)
 playdate.display.setRefreshRate(30)

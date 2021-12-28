@@ -47,6 +47,8 @@ end
 function SettingsScreen:beforeEnter()
   SettingsScreen.super.beforeEnter(self)
   local s = self
+  -- don't let previous crank changes mess up the scrolling on this page
+  playdate.getCrankTicks(6)
   -- set up setting items
   local items <const> = {
     -- ABOUT BUTTON

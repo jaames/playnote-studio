@@ -10,7 +10,7 @@
 typedef struct ppmlib_ctx
 {
   ppm_ctx_t* ppm;
-  const u32* layerPattern[2][3];
+  const u8* layerPattern[2][3];
 	s16* masterAudio;
 	AudioSample* masterAudioSample;
 	SamplePlayer* audioPlayer;
