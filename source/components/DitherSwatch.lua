@@ -66,7 +66,7 @@ function DitherSwatch:switchPattern()
   
   self.pattern = nextPattern
   self.isTransitionActive = true
-  local transitionTimer = playdate.timer.new(150, 0, self.h, playdate.easingFunctions.outCubic)
+  local transitionTimer = playdate.timer.new(200, 0, self.h, playdate.easingFunctions.outCubic)
 
   transitionTimer.updateCallback = function (timer)
     self:updateBitmap(nextPattern, lastPattern, timer.value)

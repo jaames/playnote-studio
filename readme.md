@@ -1,6 +1,5 @@
 ## TODO
 
-- Frog mascot?
 - Player play/pause with timer
 - Audio play/pause
 - Make dithering settings screen pretty
@@ -11,7 +10,6 @@
 - Get audio design in
 - Get translators in
 - launchSoundPath in pdxinfo
-- Optimize C parser to keep the image 1-bit all the way through
 - Create a PPM test suite to verify against
 - Instructions for loading PPMs in settings? or on the "no flipnotes in folder" view?
 - Website

@@ -10,6 +10,7 @@ import 'CoreLibs/animation'
 import './services/config'
 import './services/locales'
 import './services/noteFs'
+import './services/sounds'
 import './services/screens'
 import './services/transitions'
 import './services/dialog'
@@ -40,6 +41,8 @@ debug = nil -- disallow debugging
 MAIN_FONT = playdate.graphics.font.new('./fonts/WhalesharkSans')
 playdate.graphics.setFont(MAIN_FONT)
 playdate.display.setRefreshRate(30)
+-- TODO: list common sfx
+sounds:prepareSfxGroup('common', {})
 
 config:init()
 locales:init()

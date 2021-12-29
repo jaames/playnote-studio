@@ -67,18 +67,18 @@ function DitheringScreen:update()
   local layer = self.selectedLayer
   gfxUtils:drawBgGrid()
   gfx.setColor(gfx.kColorBlack)
-  gfx.fillRoundRect(32 + 40, 32 - 3, 256 + 6, 24, 6)
+  gfx.fillRoundRect(32 + 36, 32 - 3, 256 + 6, 24, 6)
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
   gfx.drawTextInRect("Black", 32 + 48, 32, 48, 20, nil, "...", kTextAlignment.center)
   gfx.drawTextInRect("Red", 128 + 48, 32, 48, 20, nil, "...", kTextAlignment.center)
   gfx.drawTextInRect("Blue", 224 + 48, 32, 48, 20, nil, "...", kTextAlignment.center)
   gfx.setImageDrawMode(0)
 
-  gfx.setColor(layer == 1 and gfx.kColorWhite or gfx.kColorBlack)
-  gfx.fillRoundRect(32 + 32, 64 - 4, 256 + 8, 56, 6)
+  gfx.setColor(gfx.kColorWhite)
+  gfx.fillRoundRect(32 + 36, 64 - 4, 256 + 8, 56, 6)
 
-  gfx.setColor(layer == 2 and gfx.kColorWhite or gfx.kColorBlack)
-  gfx.fillRoundRect(32 + 32, 128 - 4, 256 + 8, 56, 6)
+  gfx.setColor(gfx.kColorWhite)
+  gfx.fillRoundRect(32 + 36, 128 - 4, 256 + 8, 56, 6)
 
   for _, row in pairs(self.swatches) do
     for _, swatch in pairs(row) do
