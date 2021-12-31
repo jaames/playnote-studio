@@ -1,8 +1,6 @@
 transitions = {}
 
--- BASE TRANSITION
-
-local function makeTransition(duration, easing, onBegin, onUpdate)
+local function newTransition(duration, easing, onBegin, onUpdate)
   return function(a, b, completedCallback)
     local timer = playdate.timer.new(duration, 0, 1, easing)
 
@@ -21,9 +19,9 @@ local function makeTransition(duration, easing, onBegin, onUpdate)
   end
 end
 
-transitions.NONE = makeTransition(0, playdate.easingFunctions.linear, nil, function (t, a, b) end)
+transitions.kTransitionNone = newTransition(0, playdate.easingFunctions.linear, nil, function (t, a, b) end)
 
-transitions.CROSSFADE = makeTransition(250, playdate.easingFunctions.linear, nil, function (t, a, b)
+transitions.kTransitionCrossfade = newTransition(250, playdate.easingFunctions.linear, nil, function (t, a, b)
   if t < 0.5 and a ~= nil then
     a:update()
     gfxUtils:drawWhiteFade(1 - t * 2)
@@ -34,7 +32,7 @@ transitions.CROSSFADE = makeTransition(250, playdate.easingFunctions.linear, nil
   end
 end)
 
-transitions.BOOTUP = makeTransition(320, playdate.easingFunctions.linear, nil, function (t, a, b)
+transitions.kTransitionStartup = newTransition(320, playdate.easingFunctions.linear, nil, function (t, a, b)
   if b ~= nil then
     b:update()
     gfxUtils:drawWhiteFade(t)

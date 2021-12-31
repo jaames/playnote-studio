@@ -6,5 +6,5 @@ function stringUtils:escape(text)
 end
 
 function stringUtils:replaceVars(text, vars)
-  return string.gsub(text, '$([%w_]+)', vars)
+  return string.gsub(text, '${([%w_]+)}', vars)
 end

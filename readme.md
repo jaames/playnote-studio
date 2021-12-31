@@ -18,6 +18,15 @@
 
 Play animations from the DSiWare version of Flipnote Studio on your Playdate!
 
+## Use
+
+If you wish to use parts of this repo in your own project, please be sure to credit the right people:
+
+- *any lua or web code, UI design elements, image assets or the 3d playdate model* - [James Daniel](https://github.com/jaames)
+- *ppmlib code* - [Simon Aarons](https://github.com/simontime) and [James Daniel](https://github.com/jaames)
+- *sound effects or music* - TODO
+- *Flipnote Studio screenshots* - [Austin Burk](https://twitter.com/AustinSudomemo)
+
 ## Special Thanks
 
 - All of the Flipnote artists who kindly granted me permission to include some of their works as sample notes:
@@ -25,7 +34,7 @@ Play animations from the DSiWare version of Flipnote Studio on your Playdate!
   - [MrJohn](flipnot.es/9F990EE00074AC4D)
   - [bokeh f/2 (who cares)](www.instagram.com/gsupnet_)
   - [ペキラ (Pekira)](twitter.com/pekira1227)
-- [Simon](https://github.com/simontime) for kindly letting me use his C PPM library and answering my dumb C questions while I was trying to port it to the Playdate.
+- [Simon](https://github.com/simontime) for kindly letting me use his C PPM library and answering my dumb C questions while I was trying to port it to the Playdate. 
 - [Lauren](https://github.com/thejsa) and [Ezekiel](https://github.com/Stary2001) for additional C tips
 - Rob and Austin from [Sudomemo](https://www.sudomemo.net/) for helping me reach out to various Flipnote artists, and for the cross-promo
 - [Matt](https://github.com/gingerbeardman) for helping me get into to the Playdate Developer Preview

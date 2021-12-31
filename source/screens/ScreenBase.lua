@@ -14,7 +14,7 @@ function ScreenBase:afterEnter()
   local inputHandlers = self.inputHandlers
   if inputHandlers.BButtonDown == nil then
     inputHandlers.BButtonDown = function ()
-      screens:goBack()
+      screens:pop()
     end
   end
   playdate.inputHandlers.push(inputHandlers, true)

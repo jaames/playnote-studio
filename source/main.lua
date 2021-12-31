@@ -6,6 +6,7 @@ import 'CoreLibs/crank'
 import 'CoreLibs/timer'
 import 'CoreLibs/frameTimer'
 import 'CoreLibs/animation'
+-- import 'CoreLibs/qrcode'
 
 import './services/config'
 import './services/locales'
@@ -56,7 +57,7 @@ screens:register('settings',  SettingsScreen())
 screens:register('dithering', DitheringScreen())
 screens:register('credits',   CreditsScreen())
 
-screens:push('home', transitions.BOOTUP, transitions.CROSSFADE)
+screens:push('home', transitions.kTransitionStartup, transitions.kTransitionCrossfade)
 
 function playdate.update()
   screens:update()

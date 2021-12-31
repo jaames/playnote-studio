@@ -14,8 +14,8 @@
   "SETTINGS_RESET": "Reset Settings",
   "SETTINGS_ON": "On",
   "SETTINGS_OFF": "Off",
-  "SETTINGS_SOUND_ON": "Sound Effects On",
-  "SETTINGS_SOUND_OFF": "Sound Effects Off",
+  "SETTINGS_SOUND_ON": "Sound effects on",
+  "SETTINGS_SOUND_OFF": "Sound effects off",
   "SETTINGS_RESET_CONFIRM": "*Settings will be cleared*",
 
   "ABOUT_VERSION": "Version %d",
@@ -38,7 +38,8 @@
 
   "VIEW_FOLDERNAME_PICKS": "Playnote Picks",
   "VIEW_DETAILS": "Flipnote Details",
-  "VIEW_NO_FLIPNOTES": "There's no Flipnotes in this Folder",
+  "VIEW_NO_FLIPNOTES": "There aren't any Flipnotes here",
+  "VIEW_NO_FLIPNOTES_INFO": "To learn how to add Flipnotes, please visit\nplaynote.studio/filehelp",
 
   "DETAILS_AUTHOR": "Author",
   "DETAILS_CREATED": "Created",

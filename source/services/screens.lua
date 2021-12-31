@@ -27,7 +27,7 @@ function screens:push(id, transitionFn, backTransitionFn)
   end
 end
 
-function screens:goBack()
+function screens:pop()
   if not isTransitionActive and #screenHistory > 1 then
     table.remove(screenHistory)
     table.remove(transitionHistory)

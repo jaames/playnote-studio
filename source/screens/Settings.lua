@@ -98,7 +98,7 @@ function SettingsScreen:beforeEnter()
       end,
       onClick = function (item)
         item.button:click()
-        screens:push('credits', transitions.CROSSFADE)
+        screens:push('credits', transitions.kTransitionCrossfade)
       end
     },
     -- LANGUAGE SELECT
@@ -115,7 +115,7 @@ function SettingsScreen:beforeEnter()
         function select:onCloseEnded(value)
           locales:setLanguage(value)
           noteFs:updateFolderNames()
-          screens:reloadCurrent(transitions.NONE)
+          screens:reloadCurrent(transitions.kTransitionNone)
         end
         item.selectButton = select
       end,
@@ -152,7 +152,7 @@ function SettingsScreen:beforeEnter()
       end,
       onClick = function (item)
         item.button:click()
-        screens:push('dithering', transitions.CROSSFADE)
+        screens:push('dithering', transitions.kTransitionCrossfade)
       end
     },
     -- SOUND EFFECTS ON/OFF
@@ -209,7 +209,7 @@ function SettingsScreen:beforeEnter()
             s:scrollToItemByIndex(1, true)
             config:reset()
             locales:setLanguage(config.lang)
-            screens:reloadCurrent(transitions.NONE)
+            screens:reloadCurrent(transitions.kTransitionNone)
           end},
           -- TODO: localise
           {type = 'alert', message = 'Settings have been cleared.'}

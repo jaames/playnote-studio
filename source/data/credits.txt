@@ -1,5 +1,5 @@
 
-_Version $VERSION _
+_Version ${version}_
 _https://playnote.studio_
 
 
@@ -34,6 +34,9 @@ TODO
 Matt Sephton
 _twitter.com/gingerbeardman_
 
+Kaeru Team
+_kaeru.world_
+
 Rob from Sudomemo
 _www.sudomemo.net_
 
@@ -41,13 +44,13 @@ Austin Burk
 _github.com/sudofox_
 _twitter.com/AustinSudomemo_
 
-Kaeru Team
-_kaeru.world_
+NioXoiN
+_twitter.com/NioXoiN_
 
 
 %CREDITS_HEADER_ARTISTS%
 
-$ARTIST_CREDITS
+${artistCredits}
 
 
 %CREDITS_HEADER_RESEARCH%

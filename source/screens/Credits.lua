@@ -40,8 +40,8 @@ function CreditsScreen:getCreditsText()
   -- replace placeholders in credits text
   text = locales:replaceKeysInText(text)
   text = stringUtils:replaceVars(text, {
-    VERSION = playdate.metadata.version,
-    ARTIST_CREDITS = artistCredits
+    version = playdate.metadata.version,
+    artistCredits = artistCredits
   })
   return text
 end

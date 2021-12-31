@@ -38,10 +38,10 @@ function HomeScreen:init()
     AButtonDown = function()
       if self.viewButton.isSelected then
         self.viewButton:click()
-        screens:push('notelist', transitions.CROSSFADE)
+        screens:push('notelist', transitions.kTransitionStartup)
       elseif self.settingsButton.isSelected then
         self.settingsButton:click()
-        screens:push('settings', transitions.CROSSFADE)
+        screens:push('settings', transitions.kTransitionStartup)
       end
     end,
   }

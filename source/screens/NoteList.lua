@@ -5,6 +5,8 @@ local gfx <const> = playdate.graphics
 local pageCounterFont <const> = gfx.font.new('./fonts/WhalesharkCounter')
 
 local bgGfx <const> = gfx.image.new('./gfx/gfx_bg_notelist')
+local helpQrGfx <const> = gfx.image.new('./gfx/qr_filehelp')
+local boxGfx <const> = gfx.nineSlice.new('./gfx/shape_box', 5, 5, 2, 2)
 
 local TRANSITION_DUR <const> = 250
 
@@ -60,7 +62,7 @@ function NoteListScreen:init()
         local i = self.selectedRow * 4 + self.selectedCol + 1
         local tmb = self.currThumbs[i]
         noteFs:setCurrentNote(tmb.path)
-        screens:push('player', transitions.CROSSFADE)
+        screens:push('player', transitions.kTransitionCrossfade)
       end
     end,
   }
@@ -221,8 +223,10 @@ function NoteListScreen:update()
   self.folderSelect:draw()
   -- show 'no notes available'
   if self.hasNoNotes then
-    -- TODO: prettier UI
-    gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES'), 0, 80, 400, 40, nil, nil, kTextAlignment.center)
+    boxGfx:drawInRect(20, 52, 400 - 38, 240 - 72)
+    gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES'), 40, 76, 360, 200, nil, nil)
+    helpQrGfx:draw(400 - 124, 112)
+    gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES_INFO'), 40, 128, 232, 200, nil, nil)
     return
   end
   -- page counter

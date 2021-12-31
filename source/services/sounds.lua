@@ -11,9 +11,6 @@ local currMusic = nil
 
 sounds = {}
 
-function sounds:init()
-end
-
 -- prepare a list of sound effects for use
 -- sound effect data will be loaded if it hasn't already been prepared
 function sounds:prepareSfx(sampleNames)
@@ -44,14 +41,14 @@ end
 -- prepare a list of sound effects, and group them together to they can be released at once later one
 function sounds:prepareSfxGroup(groupId, sampleNames)
   sfxGroups[groupId] = sampleNames
-  self:prepare(sampleNames)
+  self:prepareSfx(sampleNames)
 end
 
 -- release a whole group of sound effects
 function sounds:releaseSfxGroup(groupId)
   local sampleNames = sfxGroups[groupId]
   if sampleNames ~= nil then
-    self:release(sampleNames)
+    self:releaseSfx(sampleNames)
     sfxGroups[groupId] = nil
   end
 end

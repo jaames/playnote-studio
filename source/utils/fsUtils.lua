@@ -1,20 +1,5 @@
 fsUtils = {}
 
-local INTERNAL_FOLDERS <const> = {
-  -- Playdate data
-  'Screenshots/',
-  -- internal contents
-  'data/',
-  'fonts/',
-  'gfx/',
-  'components/',
-  'screens/',
-  'services/',
-  'utils/',
-}
-local VOICED_SOUND_MARK <const> = 12441
-local SEMI_VOICED_SOUND_MARK <const> = 12442
-
 -- read a text file line by line and return it as a single string
 function fsUtils:readText(path)
   local f = playdate.file.open(path, playdate.file.kFileRead)
@@ -24,10 +9,27 @@ function fsUtils:readText(path)
   return text
 end
 
+local INTERNAL_FOLDERS <const> = {
+  -- Playdate data
+  'Screenshots/',
+  -- internal contents
+  'data/',
+  'fonts/',
+  'gfx/',
+  'sounds/',
+  'components/',
+  'screens/',
+  'services/',
+  'utils/',
+}
+
 -- returns true if a given folder is internal
 function fsUtils:isInternalFolder(name)
   return table.indexOfElement(INTERNAL_FOLDERS, name) ~= nil
 end
+
+local VOICED_SOUND_MARK <const> = 12441
+local SEMI_VOICED_SOUND_MARK <const> = 12442
 
 -- fix weird hiragana/katakana encoding in filename lists
 -- this will apparently be fixed in version 1.5.0
