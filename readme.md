@@ -11,7 +11,6 @@
 - Get translators in
 - launchSoundPath in pdxinfo
 - Create a PPM test suite to verify against
-- Instructions for loading PPMs in settings? or on the "no flipnotes in folder" view?
 - Website
 
 ## Playnote Studio

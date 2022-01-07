@@ -1,7 +1,7 @@
 local fs = playdate.file
 local snd = playdate.sound
 
-local SOUND_ROOT <const> = './sounds/'
+local SOUND_ROOT <const> = '/sounds/'
 
 local sfx = {}
 local sfxGroups = {}
@@ -17,7 +17,9 @@ function sounds:prepareSfx(sampleNames)
   for _, sampleName in pairs(sampleNames) do
     if sfx[sampleName] == nil then
       local path = SOUND_ROOT .. sampleName
-      assert(fs.exists(path), 'Missing sfx file ' .. path)
+      local pathWithExt = path .. '.pda'
+      assert(fs.exists(pathWithExt), 'Missing sfx file ' .. pathWithExt)
+      -- print('Loading SFX: ' .. sampleName)
       sfx[sampleName] = snd.sampleplayer.new(path)
       refCounts[sampleName] = 1
     else
@@ -33,6 +35,7 @@ function sounds:releaseSfx(sampleNames)
     refCounts[sampleName] -= 1
     -- free sounds effect once there's nothing else using it
     if refCounts[sampleName] == 0 then
+      -- print('Freeing SFX: ' .. sampleName)
       sfx[sampleName] = nil
     end
   end
@@ -57,6 +60,7 @@ end
 function sounds:playSfx(sampleName)
   if config.enableSoundEffects and sfx[sampleName] ~= nil then
     lastSfx = sampleName
+    -- print('playing ' .. sampleName)
     sfx[sampleName]:play(1)
   end
 end
