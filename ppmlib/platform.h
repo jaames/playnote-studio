@@ -13,6 +13,7 @@ extern PlaydateAPI* pd;
 #ifndef pd_malloc
 #define pd_malloc(s) pd->system->realloc(NULL, (s))
 #endif
+// NOTE: pd_calloc does not initialise mem to 0, need to use memset() afterwards
 #ifndef pd_calloc
 #define pd_calloc(numEls, elSize) pd->system->realloc(NULL, ((numEls) * (elSize)))
 #endif

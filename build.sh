@@ -34,10 +34,14 @@ if [ $CMD == "build" ]; then
   cmake -DCMAKE_TOOLCHAIN_FILE=${SDK}/C_API/buildsupport/arm.cmake ..
   make
   cd ..
+  # tell pdc to compile lua without debug symbols
   pdc -s Source ${PRODUCT}
+  # strip unused .pdz files and macOS C binaries
   find ./${PRODUCT} -name "*.pdz" -type f -depth 2 -delete
   find ./${PRODUCT} -name "*.dylib" -type f -delete
   find ./${PRODUCT} -empty -type d -delete
+  # zip result, skipping pesky DS_Store files
+  zip -vr ./${PRODUCT}.zip ./${PRODUCT}/ -x "*.DS_Store"
 fi
 
 if [ $CMD == "lua" ]; then

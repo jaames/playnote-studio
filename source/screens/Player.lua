@@ -74,6 +74,18 @@ function PlayerScreen:init()
   self.timeline = Timeline((PLAYDATE_W / 2) - 82, PLAYDATE_H - 26, 164, 20)
 end
 
+function PlayerScreen:setupMenuItems(menu)
+  local currNote = noteFs.currentNote
+  local ditherItem = menu:addMenuItem("Dithering", function()
+    local ditherSettings = noteFs:getNoteDitherSettings(currNote)
+    local function updateDither(newSettings)
+      noteFs:saveNoteDitherSettings(currNote, newSettings)
+    end
+    screens:push('dithering', transitions.kTransitionFade, nil, ditherSettings, updateDither)
+  end)
+  return {ditherItem}
+end
+
 function PlayerScreen:beforeEnter()
   PlayerScreen.super.beforeEnter(self)
   sounds:prepareSfxGroup('player', {
@@ -110,9 +122,10 @@ end
 
 function PlayerScreen:loadPpm()
   local ppm = PpmParser.new(noteFs.currentNote)
+  local ditherSetttings = noteFs:getNoteDitherSettings(noteFs.currentNote)
   for layer = 1,2 do
     for colour = 1,3 do
-      ppm:setLayerDither(layer, colour, config.dithering[layer][colour])
+      ppm:setLayerDither(layer, colour, ditherSetttings[layer][colour])
     end
   end
   self.currentFrame = 1

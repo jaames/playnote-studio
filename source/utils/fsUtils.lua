@@ -32,7 +32,6 @@ local VOICED_SOUND_MARK <const> = 12441
 local SEMI_VOICED_SOUND_MARK <const> = 12442
 
 -- fix weird hiragana/katakana encoding in filename lists
--- this will apparently be fixed in version 1.5.0
 function fsUtils:fixFolderName(name)
   local i = 1
   local size = utf8.len(name)

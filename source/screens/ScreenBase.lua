@@ -7,7 +7,7 @@ function ScreenBase:init()
   self.inputHandlers = {}
 end
 
-function ScreenBase:beforeEnter()
+function ScreenBase:beforeEnter(...)
 end
 
 function ScreenBase:afterEnter()
@@ -25,6 +25,10 @@ function ScreenBase:beforeLeave()
 end
 
 function ScreenBase:afterLeave()
+end
+
+function ScreenBase:setupMenuItems(systemMenu)
+  return {}
 end
 
 function ScreenBase:update()

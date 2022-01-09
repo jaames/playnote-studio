@@ -98,7 +98,7 @@ function SettingsScreen:beforeEnter()
       end,
       onClick = function (item)
         item.button:click()
-        screens:push('credits', transitions.kTransitionCrossfade)
+        screens:push('credits', transitions.kTransitionFade)
       end
     },
     -- LANGUAGE SELECT
@@ -152,7 +152,9 @@ function SettingsScreen:beforeEnter()
       end,
       onClick = function (item)
         item.button:click()
-        screens:push('dithering', transitions.kTransitionCrossfade)
+        -- tell dithering screen to use the core dithering config
+        -- (since it call also edit dither values for specific notes)
+        screens:push('dithering', transitions.kTransitionFade, nil, config.dithering)
       end
     },
     -- SOUND EFFECTS ON/OFF

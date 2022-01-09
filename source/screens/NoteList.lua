@@ -62,7 +62,7 @@ function NoteListScreen:init()
         local i = self.selectedRow * 4 + self.selectedCol + 1
         local tmb = self.currThumbs[i]
         noteFs:setCurrentNote(tmb.path)
-        screens:push('player', transitions.kTransitionCrossfade)
+        screens:push('player', transitions.kTransitionFade)
       end
     end,
   }
@@ -225,8 +225,8 @@ function NoteListScreen:update()
   if self.hasNoNotes then
     boxGfx:drawInRect(20, 52, 400 - 38, 240 - 72)
     gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES'), 40, 76, 360, 200, nil, nil)
-    helpQrGfx:draw(400 - 124, 112)
-    gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES_INFO'), 40, 128, 232, 200, nil, nil)
+    helpQrGfx:draw(400 - 134, 102)
+    gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES_INFO'), 40, 116, 232, 200, nil, nil)
     return
   end
   -- page counter

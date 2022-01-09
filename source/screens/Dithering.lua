@@ -1,10 +1,46 @@
 local gfx <const> = playdate.graphics
 
+local PLAYDATE_W <const> = 400
+local PLAYDATE_H <const> = 240
+local COL_ICON <const> = 92
+local COL_BLACK <const> = 136
+local COL_RED <const> = 218
+local COL_BLUE <const> = 300
+
+local ROW_LABELS <const> = 42
+local ROW_LAYER1 <const> = 100
+local ROW_LAYER2 <const> = 164
+
+local RECT_LABELS <const> = playdate.geometry.rect.new(
+  COL_BLACK - 38,
+  ROW_LABELS - 4, 
+  (COL_BLUE - COL_BLACK) + (38 * 2),
+  27
+)
+
+local RECT_LAYER1 <const> = playdate.geometry.rect.new(
+  COL_ICON - 44,
+  ROW_LAYER1 - 28, 
+  (COL_BLUE - COL_ICON) + (44 * 2),
+  56
+)
+
+local RECT_LAYER2 <const> = playdate.geometry.rect.new(
+  COL_ICON - 44,
+  ROW_LAYER2 - 28, 
+  (COL_BLUE - COL_ICON) + (44 * 2),
+  56
+)
+
+local layer1Icon <const> = gfx.image.new('/gfx/icon_layer1')
+local layer2Icon <const> = gfx.image.new('/gfx/icon_layer2')
+
 DitheringScreen = {}
 class('DitheringScreen').extends(ScreenBase)
 
 function DitheringScreen:init()
   DitheringScreen.super.init(self)
+  self.ditherConf = config.dithering
   self.inputHandlers = {
     leftButtonDown = function()
       self:setSelected(self.selectedLayer, self.selectedColour - 1)
@@ -23,31 +59,44 @@ function DitheringScreen:init()
       local colour = self.selectedColour
       local selectedSwatch = self.swatches[layer][colour]
       selectedSwatch:switchPattern()
-      config.dithering[layer][colour] = selectedSwatch.pattern
+      self.ditherConf[layer][colour] = selectedSwatch.pattern
     end,
   }
   self.swatches = {
     {
-      DitherSwatch(32 + 48, 64, 48, 48),
-      DitherSwatch(128 + 48, 64, 48, 48),
-      DitherSwatch(224 + 48, 64, 48, 48),
+      DitherSwatch(COL_BLACK, ROW_LAYER1),
+      DitherSwatch(COL_RED,   ROW_LAYER1),
+      DitherSwatch(COL_BLUE,  ROW_LAYER1),
     },
     {
-      DitherSwatch(32 + 48, 128, 48, 48),
-      DitherSwatch(128 + 48, 128, 48, 48),
-      DitherSwatch(224 + 48, 128, 48, 48),
+      DitherSwatch(COL_BLACK, ROW_LAYER2),
+      DitherSwatch(COL_RED,   ROW_LAYER2),
+      DitherSwatch(COL_BLUE,  ROW_LAYER2),
     }
   }
   self:setSelected(1, 1)
 end
 
-function DitheringScreen:beforeEnter()
+function DitheringScreen:beforeEnter(ditherConf, callback)
   DitheringScreen.super.beforeEnter(self)
+  if not ditherConf then
+    ditherConf = config.dithering
+  end
   for i, row in ipairs(self.swatches) do
     for j, swatch in ipairs(row) do
-      swatch:setPattern(config.dithering[i][j])
+      swatch:setPattern(ditherConf[i][j])
     end
   end
+  self.ditherConf = ditherConf
+  self.callback = callback
+end
+
+function DitheringScreen:beforeLeave()
+  if self.callback then
+    self.callback(self.ditherConf)
+  end
+  self.ditherConf = nil
+  self.callback = nil
 end
 
 function DitheringScreen:setSelected(layer, colour)
@@ -61,24 +110,24 @@ function DitheringScreen:setSelected(layer, colour)
   self.selectedColour = colour
 end
 
--- TODO: make pretty
-
 function DitheringScreen:update()
-  local layer = self.selectedLayer
   gfxUtils:drawBgGrid()
+
   gfx.setColor(gfx.kColorBlack)
-  gfx.fillRoundRect(32 + 36, 32 - 3, 256 + 6, 24, 6)
+  gfx.fillRoundRect(RECT_LABELS, 6)
+
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  gfx.drawTextInRect("Black", 32 + 48, 32, 48, 20, nil, "...", kTextAlignment.center)
-  gfx.drawTextInRect("Red", 128 + 48, 32, 48, 20, nil, "...", kTextAlignment.center)
-  gfx.drawTextInRect("Blue", 224 + 48, 32, 48, 20, nil, "...", kTextAlignment.center)
+  gfx.drawTextAligned("Black", COL_BLACK, ROW_LABELS, kTextAlignment.center)
+  gfx.drawTextAligned("Red",   COL_RED,   ROW_LABELS, kTextAlignment.center)
+  gfx.drawTextAligned("Blue",  COL_BLUE,  ROW_LABELS, kTextAlignment.center)
   gfx.setImageDrawMode(0)
 
   gfx.setColor(gfx.kColorWhite)
-  gfx.fillRoundRect(32 + 36, 64 - 4, 256 + 8, 56, 6)
+  gfx.fillRoundRect(RECT_LAYER1, 8)
+  gfx.fillRoundRect(RECT_LAYER2, 8)
 
-  gfx.setColor(gfx.kColorWhite)
-  gfx.fillRoundRect(32 + 36, 128 - 4, 256 + 8, 56, 6)
+  layer1Icon:drawAnchored(COL_ICON, ROW_LAYER1, 0.80, 0.5)
+  layer2Icon:drawAnchored(COL_ICON, ROW_LAYER2, 0.80, 0.5)
 
   for _, row in pairs(self.swatches) do
     for _, swatch in pairs(row) do

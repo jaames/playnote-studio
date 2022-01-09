@@ -1,9 +1,8 @@
 ## TODO
 
+- Sound effect bug in pekira note
 - Player play/pause with timer
 - Audio play/pause
-- Make dithering settings screen pretty
-- Dither settings per note
 - Add DSi username chars to font
 - Function to delete sample notes
 - Flipnote details screen

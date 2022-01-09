@@ -6,7 +6,6 @@ import 'CoreLibs/crank'
 import 'CoreLibs/timer'
 import 'CoreLibs/frameTimer'
 import 'CoreLibs/animation'
--- import 'CoreLibs/qrcode'
 
 import './services/config'
 import './services/locales'
@@ -57,7 +56,7 @@ screens:register('settings',  SettingsScreen())
 screens:register('dithering', DitheringScreen())
 screens:register('credits',   CreditsScreen())
 
-screens:push('home', transitions.kTransitionStartup, transitions.kTransitionCrossfade)
+screens:push('home', transitions.kTransitionStartup, transitions.kTransitionFade)
 
 function playdate.update()
   screens:update()
@@ -66,3 +65,9 @@ function playdate.update()
   playdate.timer.updateTimers()
   playdate.frameTimer.updateTimers()
 end
+
+-- import 'CoreLibs/qrcode'
+-- playdate.graphics.generateQRCode("https://playnote.studio/filehelp", 120, function (qr)
+--   playdate.simulator.writeToFile(qr, '~/qr.png')
+--   print('qr generated')
+-- end)

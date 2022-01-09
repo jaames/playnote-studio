@@ -21,7 +21,7 @@ end
 
 transitions.kTransitionNone = newTransition(0, playdate.easingFunctions.linear, nil, function (t, a, b) end)
 
-transitions.kTransitionCrossfade = newTransition(250, playdate.easingFunctions.linear, nil, function (t, a, b)
+transitions.kTransitionFade = newTransition(250, playdate.easingFunctions.linear, nil, function (t, a, b)
   if t < 0.5 and a ~= nil then
     a:update()
     gfxUtils:drawWhiteFade(1 - t * 2)

@@ -34,16 +34,13 @@ function noteFs:init()
   end
   -- sort folderList so that ones with custom titles come first
   table.sort(folderList, function (a, b)
-    if string.sub(a.name, -1) ~= '/' then
-      return true
-    end
-    return false
+    return string.sub(a.name, -1) ~= '/'
   end)
   self.folderList = folderList
   -- set samplememo as initial folder
   assert(fs.isdir('samplememo'), 'Sample Flipnote folder is missing?')
   self:setDirectory(config.lastFolder)
-  self:getArtistCredits()
+  -- self:getArtistCredits()
 end
 
 function noteFs:getFolderMeta(folderPath)
@@ -91,6 +88,47 @@ function noteFs:getArtistCredits()
     end
   end
   return creditList
+end
+
+function noteFs:getNoteDitherSettings(filename)
+  local meta = self:getFolderMeta(self.currentFolder)
+  if meta ~= nil and type(meta.notes) == "table" then
+    for _, note in pairs(meta.notes) do
+      if note.filename == filename and type(note.dithering) == "table" then
+        return note.dithering
+      end
+    end
+  end
+  return config.dithering
+end
+
+function noteFs:saveNoteDitherSettings(filename, ditherSettings)
+  local meta = self:getFolderMeta(self.currentFolder)
+  local metaPath = self.currentFolder .. 'playnote.json'
+  local entry = {
+    filename = filename,
+    dithering = ditherSettings
+  }
+  if meta ~= nil then
+    if type(meta.notes) ~= "table" then
+      meta.notes = {entry}
+    else
+      local found = false
+      for _, note in pairs(meta.notes) do
+        if note.filename == filename then
+          note.dithering = ditherSettings
+          found = true
+          break
+        end
+      end
+      if not found then
+        table.insert(meta.notes, entry)
+      end
+    end
+  else
+    meta = {notes = { entry }}
+  end
+  json.encodeToFile(metaPath, false, meta)
 end
 
 function noteFs:setDirectory(folderPath)

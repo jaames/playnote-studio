@@ -10,6 +10,9 @@ local isTransitionActive = false
 local screenHistory = {}
 local transitionHistory = {}
 
+local menu = playdate.getSystemMenu()
+local menuItems = {}
+
 local isShakeActive = false
 local moveX = 0
 local moveY = 0
@@ -19,9 +22,9 @@ function screens:register(id, screenInst)
   screenInst.id = id
 end
 
-function screens:push(id, transitionFn, backTransitionFn)
+function screens:push(id, transitionFn, backTransitionFn, ...)
   if not isTransitionActive then
-    self:setScreen(id, transitionFn)
+    self:setScreen(id, transitionFn, ...)
     table.insert(screenHistory, activeScreen)
     table.insert(transitionHistory, backTransitionFn or transitionFn)
   end
@@ -39,15 +42,24 @@ function screens:pop()
   end
 end
 
-function screens:setScreen(id, transitionFn)
+function screens:setScreen(id, transitionFn, ...)
   isTransitionActive = true
 
   local hasPrevScreen = activeScreen ~= nil
   prevScreen = activeScreen
   activeScreen = SCREENS[id]
 
-  if hasPrevScreen then prevScreen:beforeLeave() end
-  activeScreen:beforeEnter()
+  if hasPrevScreen then
+    prevScreen:beforeLeave()
+    if menuItems then
+      for _, item in pairs(menuItems) do
+        menu:removeMenuItem(item)
+      end
+    end
+  end
+  activeScreen:beforeEnter(...)
+
+  menuItems = activeScreen:setupMenuItems(menu)
 
   transitionFn(prevScreen, activeScreen, function()
     if hasPrevScreen then prevScreen:afterLeave() end

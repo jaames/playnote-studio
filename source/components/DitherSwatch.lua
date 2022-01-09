@@ -14,10 +14,14 @@ local PATTERNS <const> = {
 DitherSwatch = {}
 class('DitherSwatch').extends()
 
-function DitherSwatch:init(x, y, w, h)
+function DitherSwatch:init(x, y)
   DitherSwatch.super.init(self)
-  self.x = x
-  self.y = y
+  -- ~40 seems to be the sweet spot for avoiding graphical glitches with stencils
+  -- https://devforum.play.date/t/graphical-glitch-with-setstencilimage/2097
+  local w = 40
+  local h = 40
+  self.x = x - w / 2
+  self.y = y - h / 2
   self.w = w
   self.h = h
   self.pattern = 3
