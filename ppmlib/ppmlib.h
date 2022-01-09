@@ -10,7 +10,13 @@
 typedef struct ppmlib_ctx
 {
   ppm_ctx_t* ppm;
+	// ppm meta shorthands
+	u16 numFrames;
+	u8 loop;
+	// ppm playback state
+	u16 currentFrame;
   const u8* layerPattern[2][3];
+	// ppm audio render
 	s16* masterAudio;
 	AudioSample* masterAudioSample;
 	SamplePlayer* audioPlayer;

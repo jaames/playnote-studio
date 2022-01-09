@@ -5,6 +5,33 @@ function utils:nextTick(callback)
   playdate.frameTimer.new(1, callback)
 end
 
+-- create a removable button repeater
+function utils:createRepeater(delayAfterInitialFiring, delayAfterSecondFiring, callback)
+  local repeatTimer = nil
+  local isRepeat = false
+
+  local function remove()
+    if repeatTimer ~= nil then
+      repeatTimer:remove()
+      repeatTimer = nil
+    end
+  end
+
+  local function buttonDown()
+    repeatTimer = playdate.timer.keyRepeatTimerWithDelay(delayAfterInitialFiring, delayAfterSecondFiring, function ()
+      callback(isRepeat)
+    end)
+    isRepeat = true
+  end
+
+  local function buttonUp()
+    remove()
+    isRepeat = false
+  end
+  return buttonDown, buttonUp, remove
+end
+
+-- clamp value between lower and upper
 function utils:clamp(val, lower, upper)
   return math.max(lower, math.min(upper, val))
 end

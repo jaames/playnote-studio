@@ -3,16 +3,14 @@ local PLAYDATE_H <const> = 240
 local gfx <const> = playdate.graphics
 local counterFont <const> = gfx.font.new('./fonts/WhalesharkCounter')
 
-local DPAD_DEFAULT <const> = 1
-local DPAD_DOWN <const> = 2
-local DPAD_LEFT <const> = 3
-local DPAD_RIGHT <const> = 4
-local dpadGfx <const> = {
-  [DPAD_DEFAULT] = gfx.image.new('./gfx/gfx_player_dpadhint_default'),
-  [DPAD_LEFT] = gfx.image.new('./gfx/gfx_player_dpadhint_leftpressed'),
-  [DPAD_RIGHT] = gfx.image.new('./gfx/gfx_player_dpadhint_rightpressed'),
-  [DPAD_DOWN] = gfx.image.new('./gfx/gfx_player_dpadhint_downpressed')
-}
+local NOTE_X <const> = 72
+local NOTE_Y <const> = 16
+local NOTE_W <const> = 256
+local NOTE_H <const> = 192
+
+local DELAY_PAGE_FIRST <const> = 500
+local DELAY_PAGE_REPEAT <const> = 100
+local DELAY_PLAY_UI <const> = 200
 
 PlayerScreen = {}
 class('PlayerScreen').extends(ScreenBase)
@@ -27,73 +25,65 @@ function PlayerScreen:init()
   self.isPlaying = false
   self.animTimer = nil -- TODO
   -- player ui transition stuff
-  self.playTransitionDir = 1
   self.isPlayTransitionActive = false
-  self.isPlayUiActive = true
-  self.playTransitionTimer = nil
-  self.playTransitionValue = 0
+  self.isUiVisible = true
+  self.playTransitionVal = 0
+  -- frame transition stuff
+  self.isFrameTransitionActive = false
+  self.frameTransitionStaticBitmap = gfx.image.new(NOTE_W, NOTE_H)
+  self.frameTransitionBitmap = gfx.image.new(NOTE_W, NOTE_H)
+  self.frameTransitionPos = nil
   -- input stuff
-  self.keyTimer = nil
-  self.dpadState = DPAD_DEFAULT
+  local pageNextStart, pageNextEnd, removePageNextTimer = utils:createRepeater(DELAY_PAGE_FIRST, DELAY_PAGE_REPEAT, function (isRepeat)
+    if self.isPlaying then
+      return
+    end
+    self.removePagePrevTimer()
+    if isRepeat then
+      self:jumpToNextFrame()
+    else
+      self:jumpToNextFrameWithTransition()
+    end
+  end)
+  local pagePrevStart, pagePrevEnd, removePagePrevTimer = utils:createRepeater(DELAY_PAGE_FIRST, DELAY_PAGE_REPEAT, function (isRepeat)
+    if self.isPlaying then
+      return
+    end
+    self.removePageNextTimer()
+    if isRepeat then
+      self:jumpToPrevFrame()
+    else
+      self:jumpToPrevFrameWithTransition()
+    end
+  end)
+  self.removePageNextTimer = removePageNextTimer
+  self.removePagePrevTimer = removePagePrevTimer
   self.inputHandlers = {
-    leftButtonDown = function()
-      if self.isPlaying then
-        return
-      end
-      if self.keyTimer then
-        self.keyTimer:remove()
-        self.keyTimer = nil
-      end
-      self.keyTimer = playdate.timer.keyRepeatTimerWithDelay(500, 100, function ()
-        self:setCurrentFrame(self.currentFrame - 1)
-        self.dpadState = DPAD_LEFT
-      end)
-    end,
-    leftButtonUp = function()
-      if self.keyTimer then
-        self.keyTimer:remove()
-        self.keyTimer = nil
-      end
-      self.dpadState = DPAD_DEFAULT
-    end,
-    rightButtonDown = function()
-      if self.isPlaying then
-        return
-      end
-      if self.keyTimer then
-        self.keyTimer:remove()
-        self.keyTimer = nil
-      end
-      self.keyTimer = playdate.timer.keyRepeatTimerWithDelay(500, 100, function ()
-        self:setCurrentFrame(self.currentFrame + 1)
-        self.dpadState = DPAD_RIGHT
-      end)
-    end,
-    rightButtonUp = function()
-      if self.keyTimer then
-        self.keyTimer:remove()
-        self.keyTimer = nil
-      end
-      self.dpadState = DPAD_DEFAULT
-    end,
+    leftButtonDown = pagePrevStart,
+    leftButtonUp = pagePrevEnd,
+    rightButtonDown = pageNextStart,
+    rightButtonUp = pageNextEnd,
     downButtonDown = function()
       self:togglePlay()
-      self.dpadState = DPAD_DOWN
-    end,
-    downButtonUp = function()
-      self:togglePlay()
-      self.dpadState = DPAD_DEFAULT
     end,
     AButtonDown = function()
       self:togglePlay()
     end
   }
+  -- ui components
   self.timeline = Timeline((PLAYDATE_W / 2) - 82, PLAYDATE_H - 26, 164, 20)
 end
 
 function PlayerScreen:beforeEnter()
   PlayerScreen.super.beforeEnter(self)
-  self.dpadState = DPAD_DEFAULT
+  sounds:prepareSfxGroup('player', {
+    'pageNext',
+    'pagePrev',
+    'pageNextFast',
+    'pagePrevFast',
+    'pause',
+    'playMove'
+  })
   playdate.getCrankTicks(24) -- prevent crank going nuts if it's been moved since this screen was last active
   self:unloadPpm()
   self:loadPpm()
@@ -108,10 +98,13 @@ end
 function PlayerScreen:beforeLeave()
   PlayerScreen.super.beforeLeave(self)
   self:pause()
+  self.removePageNextTimer()
+  self.removePagePrevTimer()
 end
 
 function PlayerScreen:afterLeave()
   PlayerScreen.super.afterLeave(self)
+  sounds:releaseSfxGroup('player')
   self:unloadPpm()
 end
 
@@ -122,13 +115,20 @@ function PlayerScreen:loadPpm()
       ppm:setLayerDither(layer, colour, config.dithering[layer][colour])
     end
   end
+  self.currentFrame = 1
   self.numFrames = ppm.numFrames
   self.loop = ppm.loop
   self.ppm = ppm
-  self.currentFrame = 1
-  local animTimer = playdate.timer.new(1000, 1, 32)
-  animTimer.repeats = true
+  local animTimer = playdate.timer.new(ppm.duration * 1000, 0, self.numFrames)
+  animTimer.repeats = self.loop
   animTimer.discardOnCompletion = false
+  animTimer:pause()
+  animTimer.updateCallback = function ()
+    print('anim timer update v: ', math.floor(animTimer.value) + 1, self.currentFrame)
+  end
+  animTimer.timerEndedCallback = function ()
+    print('anim timer end: ', math.floor(animTimer.value) + 1, self.currentFrame)
+  end
   self.animTimer = animTimer
 end
 
@@ -142,26 +142,92 @@ function PlayerScreen:unloadPpm()
 end
 
 function PlayerScreen:setCurrentFrame(i)
-  i = math.floor(i)
-  -- if playback can loop, allow the playback to wrap around
-  if self.loop then  
-    if i > self.numFrames then
-      self.currentFrame = 1
-    elseif i < 1 then
-      self.currentFrame = self.numFrames
-    else
-      self.currentFrame = i
-    end
-  -- else clamp
-  else
-    self.currentFrame = math.max(1, math.min(i, self.numFrames))
+  local ppm = self.ppm
+  ppm:setCurrentFrame(math.floor(i))
+  self.currentFrame = ppm.currentFrame
+  self.timeline.progress = ppm.progress
+end
+
+function PlayerScreen:jumpToPrevFrame()
+  sounds:playSfx('pagePrevFast')
+  self:setCurrentFrame(self.currentFrame - 1)
+end
+
+function PlayerScreen:jumpToPrevFrameWithTransition()
+  if self.isFrameTransitionActive then return end
+  local initPos = NOTE_X
+  local endPos = -NOTE_W
+  local currFrame = self.currentFrame
+  local nextFrame = currFrame == 1 and self.numFrames or currFrame - 1
+
+  self.frameTransitionPos = initPos
+  self.ppm:drawFrameToBitmap(nextFrame, self.frameTransitionStaticBitmap)
+  self.ppm:drawFrameToBitmap(currFrame, self.frameTransitionBitmap)
+ 
+  utils:nextTick(function ()
+    sounds:playSfx('pagePrev')
+    self.isFrameTransitionActive = true
+  end)
+
+  local transitionTimer = playdate.timer.new(250, initPos, endPos, playdate.easingFunctions.inCubic)
+  -- on timer update
+  transitionTimer.updateCallback = function (timer)
+    self.frameTransitionPos = timer.value
   end
-  self.timeline.progress = (self.currentFrame - 1) / (self.numFrames - 1)
+  -- page transition is done
+  transitionTimer.timerEndedCallback = function ()
+    self.frameTransitionPos = endPos
+    self:setCurrentFrame(nextFrame)
+    utils:nextTick(function ()
+      self.isFrameTransitionActive = false
+    end)
+  end
+end
+
+function PlayerScreen:jumpToNextFrame()
+  sounds:playSfx('pageNextFast')
+  self:setCurrentFrame(self.currentFrame + 1)
+end
+
+function PlayerScreen:jumpToNextFrameWithTransition()
+  if self.isFrameTransitionActive then return end
+  local initPos = PLAYDATE_W + NOTE_W
+  local endPos = NOTE_X
+  local currFrame = self.currentFrame
+  local nextFrame = currFrame == self.numFrames and 1 or currFrame + 1
+
+  self.frameTransitionPos = initPos
+  self.ppm:drawFrameToBitmap(currFrame, self.frameTransitionStaticBitmap)
+  self.ppm:drawFrameToBitmap(nextFrame, self.frameTransitionBitmap)
+ 
+  utils:nextTick(function ()
+    sounds:playSfx('pageNext')
+    self.isFrameTransitionActive = true
+  end)
+
+  local transitionTimer = playdate.timer.new(250, initPos, endPos, playdate.easingFunctions.outCubic)
+  -- on timer update
+  transitionTimer.updateCallback = function (timer)
+    self.frameTransitionPos = timer.value
+  end
+  -- page transition is done
+  transitionTimer.timerEndedCallback = function ()
+    self.frameTransitionPos = endPos
+    self:setCurrentFrame(nextFrame)
+    utils:nextTick(function ()
+      self.isFrameTransitionActive = false
+    end)
+  end
 end
 
 function PlayerScreen:play()
   if self.isPlayTransitionActive then return end
   if not self.isPlaying then
+    sounds:playSfx('playMove')
+    -- workaround for timer bug https://devforum.play.date/t/playdate-timer-value-increases-between-calling-pause-and-start/2096
+	  self.animTimer._lastTime = nil
+    self.animTimer:start()
+    -- TODO: reenable
     self.ppm:playAudio()
     self.isPlaying = true
     self:transitionUiControls(false)
@@ -177,7 +243,10 @@ function PlayerScreen:pause()
       self.keyTimer:remove()
       self.keyTimer = nil
     end
+    sounds:playSfx('pause')
+    -- TODO: reenable
     self.ppm:stopAudio()
+    self.animTimer:pause()
     self.isPlaying = false
     self:transitionUiControls(true)
     playdate.setAutoLockDisabled(false)
@@ -197,23 +266,22 @@ end
 function PlayerScreen:transitionUiControls(show)
   local transitionTimer
   if show then
-    transitionTimer = playdate.timer.new(200, 1, 0, playdate.easingFunctions.outBack)
+    transitionTimer = playdate.timer.new(DELAY_PLAY_UI, 1, 0, playdate.easingFunctions.outBack)
   else
-    transitionTimer = playdate.timer.new(200, 0, 1, playdate.easingFunctions.inBack)
+    transitionTimer = playdate.timer.new(DELAY_PLAY_UI, 0, 1, playdate.easingFunctions.inBack)
   end
-  self.isPlayUiActive = true
+  self.isUiVisible = true
   self.isPlayTransitionActive = true
-  self.playTransitionTimer = transitionTimer
-  self.playTransitionValue = show and 1 or 0
+  self.playTransitionVal = show and 1 or 0
   -- on timer update
   transitionTimer.updateCallback = function (timer)
-    self.playTransitionValue = timer.value
+    self.playTransitionVal = timer.value
   end
   -- page transition is done
   transitionTimer.timerEndedCallback = function ()
-    self.playTransitionValue = show and 0 or 1
+    self.playTransitionVal = show and 0 or 1
     utils:nextTick(function ()
-      self.isPlayUiActive = show
+      self.isUiVisible = show
       self.isPlayTransitionActive = false
     end)
   end
@@ -226,21 +294,28 @@ function PlayerScreen:update()
     self:setCurrentFrame(self.currentFrame + frameChange)
   end
   -- this effectively clears the screen
-  -- which is only needed if the ui is moving, everything else is static, so it's faster too not draw the grid
-  if self.isPlayTransitionActive then
+  -- which is only needed if the ui is moving, everything else is static, so it's faster to not always draw the grid
+  if self.isPlayTransitionActive or self.isFrameTransitionActive then
     gfxUtils.drawBgGrid()
   end
-  -- draw border around the frame
-  gfx.setColor(gfx.kColorBlack)
-  gfx.drawRect(72 - 2, 16 - 2, 256 + 4, 192 + 4)
-  gfx.setColor(gfx.kColorWhite)
-  gfx.drawRect(72 - 1, 16 - 1, 256 + 2, 192 + 2)
-  -- draw the frame itself
-  self.ppm:drawFrame(self.currentFrame, false)
-  -- draw player UIx
-  if self.isPlayUiActive then
+  -- 
+  if self.isFrameTransitionActive then
+    gfx.setColor(gfx.kColorBlack)
+    gfx.drawRect(NOTE_X - 2, NOTE_Y - 2, NOTE_W + 4, NOTE_H + 4)
+    gfx.setColor(gfx.kColorWhite)
+    gfx.drawRect(NOTE_X - 1, NOTE_Y - 1, NOTE_W + 2, NOTE_H + 2)
+    self.frameTransitionStaticBitmap:draw(NOTE_X, NOTE_Y)
+    self.frameTransitionBitmap:draw(self.frameTransitionPos, 16)
+  -- draw the current frame
+  -- TODO: only if the frame has changed?
+  else
+    self.ppm:draw(NOTE_X, NOTE_Y)
+  end
+  -- draw player UI
+  if self.isUiVisible then
     -- using transition offset
-    gfx.setDrawOffset(0, self.playTransitionValue * 48)
+    gfx.setDrawOffset(0, self.playTransitionVal * 48)
+    -- TODO: make component
     -- frame counter
     gfx.setColor(gfx.kColorWhite)
     gfx.fillRoundRect(PLAYDATE_W - 104, PLAYDATE_H - 26, 100, 22, 4)
@@ -252,12 +327,12 @@ function PlayerScreen:update()
     -- gfx.setDrawOffset(0, self.playTransitionValue * 64)
     -- dpadGfx[self.dpadState]:draw(6, PLAYDATE_H - 60)
     -- frame timeline
-    gfx.setDrawOffset(0, self.playTransitionValue * 32)
+    gfx.setDrawOffset(0, self.playTransitionVal * 32)
     self.timeline:draw()
     -- reset offset
     gfx.setDrawOffset(0, 0)
   end
-  -- TODO: proper frame tming
+  -- TODO: proper frame timing
   if self.isPlaying then
     self:setCurrentFrame(self.currentFrame + 1)
   end

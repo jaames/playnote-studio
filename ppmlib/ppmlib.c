@@ -54,6 +54,10 @@ static int ppm_new(lua_State* L)
 		return 1;
 	}
 
+	ctx->currentFrame = 0;
+	ctx->numFrames = ctx->ppm->hdr.numFrames;
+	ctx->loop = ctx->ppm->animHdr.flags.loop;
+
 	ctx->layerPattern[0][0] = LUT_ppmDitherNone;
 	ctx->layerPattern[0][1] = LUT_ppmDitherNone;
 	ctx->layerPattern[0][2] = LUT_ppmDitherNone;
@@ -66,7 +70,7 @@ static int ppm_new(lua_State* L)
 	if (ppmSnd->bgmLength > 0 || ppmSnd->seLength[0] > 0 || ppmSnd->seLength[1] > 0 || ppmSnd->seLength[2] > 0)
 	{
 		// render master audio track
-		int audioTrackSize = min(ppmAudioNumSamples(ctx->ppm) * sizeof(u16), AUDIO_SIZE_LIMIT);
+		int audioTrackSize = min(ppmAudioNumSamples(ctx->ppm) * sizeof(s16), AUDIO_SIZE_LIMIT);
 		ctx->masterAudio = pd_malloc(audioTrackSize);
 		memset(ctx->masterAudio, 0, audioTrackSize);
 		ppmAudioRender(ctx->ppm, ctx->masterAudio, AUDIO_SIZE_LIMIT);
@@ -106,12 +110,18 @@ static int ppm_index(lua_State* L)
 	ppmlib_ctx* ctx = getPpmCtx(1);
 	const char* key = pd->lua->getArgString(2);
 
-	if (strcmp(key, "frameRate") == 0 || strcmp(key, "fps") == 0)
+	if (strcmp(key, "currentFrame") == 0)
+		pd->lua->pushInt(ctx->currentFrame + 1); // index startsa at 1 in lua
+	else if (strcmp(key, "progress") == 0)
+		pd->lua->pushFloat((float)ctx->currentFrame / ((float)ctx->numFrames - 1.0));
+	else if (strcmp(key, "frameRate") == 0 || strcmp(key, "fps") == 0)
 		pd->lua->pushFloat(ctx->ppm->frameRate);
 	else if (strcmp(key, "numFrames") == 0)
-		pd->lua->pushInt(ctx->ppm->hdr.numFrames);
+		pd->lua->pushInt(ctx->numFrames);
+	else if (strcmp(key, "duration") == 0)
+		pd->lua->pushFloat((float)ctx->numFrames * (1.0 / (float)ctx->ppm->frameRate));
 	else if (strcmp(key, "loop") == 0)
-		pd->lua->pushBool(ctx->ppm->animHdr.flags.loop);
+		pd->lua->pushBool(ctx->loop);
 	// else if (strcmp(key, "isLocked") == 0)
 	// 	pd->lua->pushInt(ctx->hdr.isLocked);
 	// else if (strcmp(key, "currentEditor") == 0)
@@ -126,13 +136,13 @@ static int ppm_index(lua_State* L)
 
 // decode a frame at a given index
 // frame index begins at 1 - lua-style
-static int ppm_decodeFrame(lua_State* L)
-{
-	ppmlib_ctx* ctx = getPpmCtx(1);
-	int frame = pd->lua->getArgInt(2) - 1;
-	ppmVideoDecodeFrame(ctx->ppm, (u16)frame);
-  return 0;
-}
+// static int ppm_decodeFrame(lua_State* L)
+// {
+// 	ppmlib_ctx* ctx = getPpmCtx(1);
+// 	int frame = pd->lua->getArgInt(2) - 1;
+// 	ppmVideoDecodeFrame(ctx->ppm, (u16)frame);
+//   return 0;
+// }
 
 // set a layer's dither pattern from a list of presets
 static int ppm_setLayerDither(lua_State* L)
@@ -160,20 +170,34 @@ static int ppm_setLayerDither(lua_State* L)
 	return 0;
 }
 
-// draw a given frame into the framebuffer
-static int ppm_drawFrame(lua_State* L)
+static int ppm_setCurrentFrame(lua_State* L)
 {
 	ppmlib_ctx* ctx = getPpmCtx(1);
-	int frameIndex = pd->lua->getArgInt(2) - 1; // starts at 1 in lua
-	int updateLines = pd->lua->getArgBool(3);
-	void* frameBuffer = pd->graphics->getFrame();
-	// initial frame data start position
-	// startY = 16
-	// startX = 72 / 8 bits
-	// stride = 52
-	frameBuffer = (u32*)(frameBuffer + 16 * 52 + 9);
-	// 
-	ppmVideoDecodeFrame(ctx->ppm, (u16)frameIndex);
+	int frame = pd->lua->getArgInt(2) - 1; // starts at 1 in lua
+
+	if (ctx->loop)
+	{
+		if (frame > ctx->numFrames - 1) 
+			ctx->currentFrame = 0;
+		else if (frame < 0)
+			ctx->currentFrame = ctx->numFrames - 1;
+		else
+			ctx->currentFrame = frame;
+	}
+	else
+	{
+		ctx->currentFrame = frame;
+		CLAMP(ctx->currentFrame, 0, ctx->numFrames - 1);
+	}
+
+	return 0;
+}
+
+void ppm_blitFrame(ppmlib_ctx* ctx, u16 frameIndex, void* frameBufferBase, u16 frameX, u16 frameY, u16 frameStride)
+{
+	void* frameBuffer;
+
+	ppmVideoDecodeFrame(ctx->ppm, frameIndex);
 
 	u8* layerA = ctx->ppm->layers[0];
 	u8* layerB = ctx->ppm->layers[1];
@@ -188,6 +212,7 @@ static int ppm_drawFrame(lua_State* L)
 	{
 		for (u8 y = 0; y < PPM_SCREEN_HEIGHT; y++)
 		{
+			frameBuffer = frameBufferBase + (frameY + y) * frameStride + (frameX / 8);
 			for (u8 c = 0; c < PPM_BUFFER_STRIDE; c++)
 			{
 				*(u8*)frameBuffer = ~(layerAPattern[layerA[src] + patternOffset] | layerBPattern[layerB[src] + patternOffset]);
@@ -195,7 +220,6 @@ static int ppm_drawFrame(lua_State* L)
 				frameBuffer += 1;
 			}
 			patternOffset = patternOffset == 256 ? 0 : 256;
-			frameBuffer += 20;
 		}
 	}
 	// retain inverted bits for black paper
@@ -203,6 +227,7 @@ static int ppm_drawFrame(lua_State* L)
 	{
 		for (u8 y = 0; y < PPM_SCREEN_HEIGHT; y++)
 		{
+			frameBuffer = frameBufferBase + (frameY + y) * frameStride + (frameX / 8);
 			for (u8 c = 0; c < PPM_BUFFER_STRIDE; c++)
 			{
 				*(u8*)frameBuffer = layerAPattern[layerA[src] + patternOffset] | layerBPattern[layerB[src] + patternOffset];
@@ -210,12 +235,94 @@ static int ppm_drawFrame(lua_State* L)
 				frameBuffer += 1;
 			}
 			patternOffset = patternOffset == 256 ? 0 : 256;
-			frameBuffer += 20;
 		}
 	}
+}
 
-	if (updateLines)
-		pd->graphics->markUpdatedRows(16, 16 + PPM_SCREEN_HEIGHT);
+void ppm_blitFrameToBitmap(ppmlib_ctx* ctx, u16 frameIndex, LCDBitmap* bitmap, u16 x, u16 y)
+{
+	int width = 0;
+	int height = 0;
+	int stride = 0;
+	int hasMask = 0;
+	u8* bitmapBuffer;
+	
+	pd->graphics->getBitmapData(bitmap, &width, &height, &stride, &hasMask, &bitmapBuffer);
+
+	if (width != PPM_SCREEN_WIDTH || height != PPM_SCREEN_HEIGHT)
+	{
+		pd_log("Error with layer bitmap");
+		return;
+	}
+
+	// bitmap data is comprised of two maps for each channel, one after the other
+	int mapSize = height * stride;
+	void* color = bitmapBuffer; // each bit is 0 for black, 1 for white
+	if (hasMask)
+	{
+		void* alpha = bitmapBuffer + mapSize; // each bit is 0 for transparent, 1 for opaque
+		memset(alpha, 0xFF, mapSize); // fill alpha map - so all pixels are opaque
+	}
+
+	ppm_blitFrame(ctx, frameIndex, color, 0, 0, stride);
+}
+
+// draw the current frame into the frame buffer
+// ppm:draw(x, y)
+static int ppm_draw(lua_State* L)
+{
+	ppmlib_ctx* ctx = getPpmCtx(1);
+	int frameX = pd->lua->getArgInt(2);
+	int frameY = pd->lua->getArgInt(3);
+	void* frameBuffer = pd->graphics->getFrame();
+
+	ppm_blitFrame(ctx, ctx->currentFrame, frameBuffer, frameX, frameY, LCD_ROWSIZE);
+
+	pd->graphics->drawRect(frameX - 2, frameY - 2, PPM_SCREEN_WIDTH + 4, PPM_SCREEN_HEIGHT + 4, kColorBlack);
+	pd->graphics->drawRect(frameX - 1, frameY - 1, PPM_SCREEN_WIDTH + 2, PPM_SCREEN_HEIGHT + 2, kColorWhite);
+
+	return 0;
+}
+
+// draw the current frame into a bitmap
+// ppm:drawToBitmap(bitmap)
+static int ppm_drawToBitmap(lua_State* L)
+{
+	ppmlib_ctx* ctx = getPpmCtx(1);
+	LCDBitmap* bitmap = pd->lua->getBitmap(2);
+
+	ppm_blitFrameToBitmap(ctx, ctx->currentFrame, bitmap, 0, 0);
+
+	return 0;
+}
+
+// draw a given frame index (starts at 1) into the framebuffer
+// ppm:drawFrame(frameIndex, x, y)
+static int ppm_drawFrame(lua_State* L)
+{
+	ppmlib_ctx* ctx = getPpmCtx(1);
+	int frameIndex = pd->lua->getArgInt(2) - 1; // starts at 1 in lua
+	int frameX = pd->lua->getArgInt(3);
+	int frameY = pd->lua->getArgInt(4);
+	void* frameBuffer = pd->graphics->getFrame();
+
+	ppm_blitFrame(ctx, (u16)frameIndex, frameBuffer, frameX, frameY, LCD_ROWSIZE);
+
+	pd->graphics->drawRect(frameX - 2, frameY - 2, PPM_SCREEN_WIDTH + 4, PPM_SCREEN_HEIGHT + 4, kColorBlack);
+	pd->graphics->drawRect(frameX - 1, frameY - 1, PPM_SCREEN_WIDTH + 2, PPM_SCREEN_HEIGHT + 2, kColorWhite);
+
+	return 0;
+}
+
+// draw a given frame index (starts at 1) into a bitmap
+// ppm:drawFrameToBitmap(frameIndex, bitmap)
+static int ppm_drawFrameToBitmap(lua_State* L)
+{
+	ppmlib_ctx* ctx = getPpmCtx(1);
+	int frameIndex = pd->lua->getArgInt(2) - 1; // starts at 1 in lua
+	LCDBitmap* bitmap = pd->lua->getBitmap(3);
+
+	ppm_blitFrameToBitmap(ctx, (u16)frameIndex, bitmap, 0, 0);
 
 	return 0;
 }
@@ -235,70 +342,9 @@ static int ppm_stopAudio(lua_State* L)
 {
 	ppmlib_ctx* ctx = getPpmCtx(1);
 	if (ctx->masterAudio != NULL)
-	{
 		pd->sound->sampleplayer->stop(ctx->audioPlayer);
-	}
   return 0;
 }
-
-// // decode a frame at a given index
-// // frame index begins at 1 - lua-style
-// static int ppm_decodeFrameToBitmap(lua_State* L)
-// {
-// 	ppm_ctx_t* ctx = getPpmCtx(1);
-// 	int frame = pd->lua->getArgInt(2) - 1;
-
-// 	LCDBitmap* bitmap = pd->lua->getBitmap(3);
-
-// 	int width = 0;
-// 	int height = 0;
-// 	int rowBytes = 0;
-// 	int hasMask = 0;
-// 	u8* data;
-	
-// 	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &hasMask, &data);
-
-// 	// TODO: better error message
-// 	if (width != PPM_SCREEN_WIDTH || height != PPM_SCREEN_HEIGHT || hasMask != 1)
-// 	{
-// 		pd_log("Error with layer bitmap");
-// 		return 0;
-// 	}
-
-// 	// bitmap data is comprised of two maps for each channel, one after the other
-// 	int mapSize = (height*  rowBytes);
-// 	u8* color = data; // each bit is 0 for black, 1 for white
-// 	u8* alpha = data + mapSize; // each bit is 0 for transparent, 1 for opaque
-
-// 	// clear color map
-// 	memset(color, 0x00, mapSize);
-// 	// fill alpha map - so all pixels are opaque
-// 	memset(alpha, 0xFF, mapSize);
-
-// 	ppmVideoDecodeFrame(ctx, (u16)frame);
-
-// 	u8* layerA = ctx->layers[0];
-// 	u8* layerB = ctx->layers[1];
-	
-// 	// pack layers into 1-bit pixel map
-// 	int srcOffset = 0;
-// 	u8 chunk = 0;
-// 	int dstOffset = 0;
-// 	while (dstOffset < mapSize)
-// 	{
-// 		chunk = 0xFF; // all bits start out white
-// 		for (int shift = 0; shift < 8; shift++)
-// 		{
-// 			// set a bit to black if it corresponds to a black pixel
-// 			if (layerA[srcOffset] == 1 || layerB[srcOffset] == 1)
-// 				chunk ^= (0x80 >> shift);
-// 			srcOffset++;
-// 		}
-// 		color[dstOffset++] = chunk;
-// 	}
-
-// 	return 0;
-// }
 
 static const lua_reg libPpm[] =
 {
@@ -306,10 +352,12 @@ static const lua_reg libPpm[] =
 	{ "__gc",                ppm_gc },
 	{ "__index",             ppm_index },
 	{ "setLayerDither",      ppm_setLayerDither },
-	{ "decodeFrame",         ppm_decodeFrame },
+	{ "setCurrentFrame",     ppm_setCurrentFrame },
+	{ "draw",                ppm_draw },
+	{ "drawToBitmap",        ppm_drawToBitmap },
 	{ "drawFrame",           ppm_drawFrame },
+	{ "drawFrameToBitmap",   ppm_drawFrameToBitmap },
 	{ "playAudio",           ppm_playAudio },
 	{ "stopAudio",           ppm_stopAudio },
-	// { "decodeFrameToBitmap", ppm_decodeFrameToBitmap },
 	{ NULL,                  NULL }
 };

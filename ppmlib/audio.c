@@ -83,6 +83,10 @@ void ppmAudioRender(ppm_ctx_t* ctx, s16* out, int maxSize)
 	se[0] = pd_malloc(trackLengths[1]);
 	se[1] = pd_malloc(trackLengths[2]);
 	se[2] = pd_malloc(trackLengths[3]);
+	memset(bgm, 0, trackLengths[0]);
+	memset(se[0], 0, trackLengths[1]);
+	memset(se[1], 0, trackLengths[2]);
+	memset(se[2], 0, trackLengths[3]);
 
 	/* Decode all ADPCM buffers into PCM. */
 	ppmAudioDecodeBuffer(ctx->bgmData,   bgm,   ctx->sndHdr.bgmLength);
