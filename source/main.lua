@@ -67,7 +67,7 @@ function playdate.update()
 end
 
 -- import 'CoreLibs/qrcode'
--- playdate.graphics.generateQRCode("https://playnote.studio/filehelp", 120, function (qr)
+-- playdate.graphics.generateQRCode('https://playnote.studio/filehelp', 120, function (qr)
 --   playdate.simulator.writeToFile(qr, '~/qr.png')
 --   print('qr generated')
 -- end)

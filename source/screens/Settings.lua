@@ -114,7 +114,7 @@ function SettingsScreen:beforeEnter()
         select:setValue(locales:getLanguage())
         function select:onCloseEnded(value)
           locales:setLanguage(value)
-          noteFs:updateFolderNames()
+          noteFs:refreshFolderNames()
           screens:reloadCurrent(transitions.kTransitionNone)
         end
         item.selectButton = select

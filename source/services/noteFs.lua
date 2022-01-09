@@ -43,42 +43,85 @@ function noteFs:init()
   -- self:getArtistCredits()
 end
 
-function noteFs:getFolderMeta(folderPath)
+function noteFs:getFolderData(folderPath)
   local jsonPath = folderPath .. 'playnote.json'
   if fs.exists(jsonPath) then
-    return json.decodeFile(jsonPath)
+    local data = json.decodeFile(jsonPath)
+    if type(data) == 'table' then
+      return data
+    end
+  else
+    json.encodeToFile(jsonPath, false, {})
   end
-  return nil
+  return {}
 end
 
 function noteFs:getFolderName(folderPath)
-  local meta = self:getFolderMeta(folderPath)
-  if meta ~= nil then
-    local folderTitle = meta.folderTitle
-    if type(folderTitle) == 'string' then
-      return stringUtils:escape(folderTitle)
-    elseif type(folderTitle) == 'table' and folderTitle[config.lang] ~= nil then
-      return stringUtils:escape(folderTitle[config.lang])
-    elseif type(folderTitle) == 'table' and folderTitle['en'] ~= nil then
-      return stringUtils:escape(folderTitle['en'])
-    end
+  local data = self:getFolderData(folderPath)
+  local folderTitle = data.folderTitle
+  if type(folderTitle) == 'string' then
+    return stringUtils:escape(folderTitle)
+  elseif type(folderTitle) == 'table' and folderTitle[config.lang] ~= nil then
+    return stringUtils:escape(folderTitle[config.lang])
+  elseif type(folderTitle) == 'table' and folderTitle['en'] ~= nil then
+    return stringUtils:escape(folderTitle['en'])
   end
   return stringUtils:escape(fsUtils:fixFolderName(folderPath))
 end
 
 -- update folder names after locale has been changed
-function noteFs:updateFolderNames()
+function noteFs:refreshFolderNames()
   for _, folder in pairs(self.folderList) do
     folder.name = self:getFolderName(folder.path)
   end
 end
 
+function noteFs:getNoteData(folderPath, filename)
+  local data = self:getFolderData(folderPath)
+  if type(data.notes) == 'table' then
+    for _, noteData in pairs(data.notes) do
+      if type(noteData) == 'table' and noteData.filename == filename then
+        return noteData
+      end
+    end
+  end
+  return {}
+end
+
+function noteFs:updateNoteData(folderPath, filename, newData)
+  local data = self:getFolderData(folderPath)
+  -- if there's no notes array, add it
+  if type(data.notes) ~= 'table' then
+    data.notes = {}
+  end
+  -- loop through note list to see if there's already an entry for this note
+  -- if there is, merge newData in with the existing data
+  local wasFound = false
+  for _, noteData in pairs(data.notes) do
+    if type(noteData) == 'table' and noteData.filename == filename then
+      for k, v in pairs(newData) do
+        noteData[k] = v
+      end
+      wasFound = true
+      break
+    end
+  end
+  -- if there's no entry for this note, insert a new one
+  if not wasFound then
+    newData.filename = filename
+    table.insert(data.notes, newData)
+  end
+  -- save changes to file
+  local jsonPath = folderPath .. 'playnote.json'
+  json.encodeToFile(jsonPath, false, data)
+end
+
 function noteFs:getArtistCredits()
   local creditList = {}
   for _, path in pairs(self.folderPaths) do
-    local meta = self:getFolderMeta(path)
-    if meta ~= nil and meta.credits	~= nil then
-      for _, item in pairs(meta.credits) do
+    local data = self:getFolderData(path)
+    if type(data.credits) == 'table' then
+      for _, item in pairs(data.credits) do
         local id = item.id
         -- artist id should be unique
         if creditList[id] == nil then
@@ -91,44 +134,17 @@ function noteFs:getArtistCredits()
 end
 
 function noteFs:getNoteDitherSettings(filename)
-  local meta = self:getFolderMeta(self.currentFolder)
-  if meta ~= nil and type(meta.notes) == "table" then
-    for _, note in pairs(meta.notes) do
-      if note.filename == filename and type(note.dithering) == "table" then
-        return note.dithering
-      end
-    end
+  local data = self:getNoteData(self.currentFolder, filename)
+  if type(data.dithering) == 'table' then
+    return data.dithering
   end
-  return config.dithering
+  return table.deepcopy(config.dithering)
 end
 
-function noteFs:saveNoteDitherSettings(filename, ditherSettings)
-  local meta = self:getFolderMeta(self.currentFolder)
-  local metaPath = self.currentFolder .. 'playnote.json'
-  local entry = {
-    filename = filename,
+function noteFs:updateNoteDitherSettings(filename, ditherSettings)
+  self:updateNoteData(self.currentFolder, filename, {
     dithering = ditherSettings
-  }
-  if meta ~= nil then
-    if type(meta.notes) ~= "table" then
-      meta.notes = {entry}
-    else
-      local found = false
-      for _, note in pairs(meta.notes) do
-        if note.filename == filename then
-          note.dithering = ditherSettings
-          found = true
-          break
-        end
-      end
-      if not found then
-        table.insert(meta.notes, entry)
-      end
-    end
-  else
-    meta = {notes = { entry }}
-  end
-  json.encodeToFile(metaPath, false, meta)
+  })
 end
 
 function noteFs:setDirectory(folderPath)

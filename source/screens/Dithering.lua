@@ -79,9 +79,7 @@ end
 
 function DitheringScreen:beforeEnter(ditherConf, callback)
   DitheringScreen.super.beforeEnter(self)
-  if not ditherConf then
-    ditherConf = config.dithering
-  end
+  assert(ditherConf ~= nil, 'No dither config, uh oh')
   for i, row in ipairs(self.swatches) do
     for j, swatch in ipairs(row) do
       swatch:setPattern(ditherConf[i][j])
@@ -117,9 +115,9 @@ function DitheringScreen:update()
   gfx.fillRoundRect(RECT_LABELS, 6)
 
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  gfx.drawTextAligned("Black", COL_BLACK, ROW_LABELS, kTextAlignment.center)
-  gfx.drawTextAligned("Red",   COL_RED,   ROW_LABELS, kTextAlignment.center)
-  gfx.drawTextAligned("Blue",  COL_BLUE,  ROW_LABELS, kTextAlignment.center)
+  gfx.drawTextAligned('Black', COL_BLACK, ROW_LABELS, kTextAlignment.center)
+  gfx.drawTextAligned('Red',   COL_RED,   ROW_LABELS, kTextAlignment.center)
+  gfx.drawTextAligned('Blue',  COL_BLUE,  ROW_LABELS, kTextAlignment.center)
   gfx.setImageDrawMode(0)
 
   gfx.setColor(gfx.kColorWhite)
