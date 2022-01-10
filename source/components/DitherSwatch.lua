@@ -10,6 +10,11 @@ local PATTERNS <const> = {
   -- polka
   {0xAA, 0x00, 0xAA, 0x00, 0xAA, 0x00, 0xAA, 0x00},
 }
+local SWATCH_SIZE <const> = 40
+-- mask size needs to be multiple of 32 to avoid graphical glitches
+-- https://devforum.play.date/t/graphical-glitch-with-setstencilimage/2097
+local MASK_SIZE <const> = 64
+local MASK_OFFSET <const> = (MASK_SIZE - SWATCH_SIZE) / 2
 
 DitherSwatch = {}
 class('DitherSwatch').extends()
@@ -17,9 +22,8 @@ class('DitherSwatch').extends()
 function DitherSwatch:init(x, y)
   DitherSwatch.super.init(self)
   -- ~40 seems to be the sweet spot for avoiding graphical glitches with stencils
-  -- https://devforum.play.date/t/graphical-glitch-with-setstencilimage/2097
-  local w = 40
-  local h = 40
+  local w = SWATCH_SIZE
+  local h = SWATCH_SIZE
   self.x = x - w / 2
   self.y = y - h / 2
   self.w = w
@@ -27,11 +31,11 @@ function DitherSwatch:init(x, y)
   self.pattern = 3
   self.isSelected = false
   self.isTransitionActive = false
-  self.bitmap = gfx.image.new(w, h, gfx.kColorClear)
-  self.mask = gfx.image.new(w, h, gfx.kColorBlack)
+  self.bitmap = gfx.image.new(MASK_SIZE, MASK_SIZE, gfx.kColorClear)
+  self.mask = gfx.image.new(MASK_SIZE, MASK_SIZE, gfx.kColorBlack)
   gfx.pushContext(self.mask)
   gfx.setColor(gfx.kColorWhite)
-  gfx.fillCircleInRect(0, 0, w, h)
+  gfx.fillCircleInRect(MASK_OFFSET, MASK_OFFSET, w, h)
   gfx.popContext()
 end
 
@@ -49,7 +53,7 @@ function DitherSwatch:draw()
     gfx.setColor(gfx.kColorBlack)
     gfx.fillCircleInRect(-2, -2, w + 4, h + 4)
   end
-  self.bitmap:draw(0, 0)
+  self.bitmap:draw(-MASK_OFFSET, -MASK_OFFSET)
   gfx.setColor(gfx.kColorWhite)
   gfx.setLineWidth(2)
   gfx.drawCircleInRect(1, 1, w - 2, h - 2)
@@ -89,12 +93,12 @@ function DitherSwatch:updateBitmap(newPattern, lastPattern, y)
   gfx.setStencilImage(self.mask)
   if lastPattern == nil then
     gfx.setPattern(PATTERNS[newPattern])
-    gfx.fillCircleInRect(0, 0, w, h)
+    gfx.fillCircleInRect(MASK_OFFSET, MASK_OFFSET, w, h)
   else
     gfx.setPattern(PATTERNS[lastPattern])
-    gfx.fillCircleInRect(0, 0, w, h)
+    gfx.fillCircleInRect(MASK_OFFSET, MASK_OFFSET, w, h)
     gfx.setPattern(PATTERNS[newPattern])
-    gfx.fillCircleInRect(0, h-y, w, h)
+    gfx.fillCircleInRect(MASK_OFFSET, MASK_OFFSET + h-y, w, h)
   end
   gfx.popContext()
 end
