@@ -115,9 +115,9 @@ function DitheringScreen:update()
   gfx.fillRoundRect(RECT_LABELS, 6)
 
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  gfx.drawTextAligned('Black', COL_BLACK, ROW_LABELS, kTextAlignment.center)
-  gfx.drawTextAligned('Red',   COL_RED,   ROW_LABELS, kTextAlignment.center)
-  gfx.drawTextAligned('Blue',  COL_BLUE,  ROW_LABELS, kTextAlignment.center)
+  gfx.drawTextAligned(locales:getText('DITHER_COLOUR_BLACK'), COL_BLACK, ROW_LABELS, kTextAlignment.center)
+  gfx.drawTextAligned(locales:getText('DITHER_COLOUR_RED'),   COL_RED,   ROW_LABELS, kTextAlignment.center)
+  gfx.drawTextAligned(locales:getText('DITHER_COLOUR_BLUE'),  COL_BLUE,  ROW_LABELS, kTextAlignment.center)
   gfx.setImageDrawMode(0)
 
   gfx.setColor(gfx.kColorWhite)

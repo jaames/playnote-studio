@@ -43,18 +43,18 @@ function DetailsScreen:renderNoteDetails(ppmPath)
   local authorName, links = noteFs:getNoteCredits(ppmPath)
   -- details items
   local rows = {
-    {'Author', authorName or stringUtils:fromWideChars(tmb.currentAuthor)},
-    {'Author ID', stringUtils:hexFromBytes(tmb.currentAuthorId, true)},
-    {'Links', links},
+    {locales:getText('DETAILS_AUTHOR'), authorName or stringUtils:fromWideChars(tmb.currentAuthor)},
+    {locales:getText('DETAILS_AUTHOR_ID'), stringUtils:hexFromBytes(tmb.currentAuthorId, true)},
+    {locales:getText('DETAILS_LINKS'), links},
     '-',
-    {'Last edited', stringUtils:formatTimestamp(tmb.timestamp, '${DAY}/${MONTH}/${YEAR}')},
-    {'Frame count', tostring(tmb.numFrames + 1)},
+    {locales:getText('DETAILS_LAST_EDIT'), locales:getFormattedTimestamp('DETAILS_DATE_FORMAT', playdate.timeFromEpoch(tmb.timestamp, 0)) },
+    {locales:getText('DETAILS_FRAME_COUNT'), tostring(tmb.numFrames + 1)},
     '-',
-    {'File size', fsUtils:formatFileSize(tmb.ppmSize)},
-    {'File path', stringUtils:escape(tmb.path)},
+    {locales:getText('DETAILS_FILE_SIZE'), fsUtils:formatFileSize(tmb.ppmSize)},
+    {locales:getText('DETAILS_FILE_PATH'), stringUtils:escape(tmb.path)},
     '-',
-    {'Previous author', stringUtils:fromWideChars(tmb.previousAuthor)},
-    {'Original author', stringUtils:fromWideChars(tmb.originalAuthor)},
+    {locales:getText('DETAILS_PREV_AUTHOR'), stringUtils:fromWideChars(tmb.previousAuthor)},
+    {locales:getText('DETAILS_ORIG_AUTHOR'), stringUtils:fromWideChars(tmb.originalAuthor)},
   }
   -- initial run to measure text height
   local detailsHeight = DETAILS_Y

@@ -205,16 +205,13 @@ function SettingsScreen:beforeEnter()
       onClick = function (item)
         item.button:click()
         dialog:sequence({
-          {type = 'confirm', message = locales:getText('SETTINGS_RESET_CONFIRM')},
-          -- TODO: localise
-          {type = 'confirm', message = 'Are you sure?', callback = function ()
+          {type = 'confirm', message = locales:getText('SETTINGS_RESET_CONFIRM'), callback = function ()
             s:scrollToItemByIndex(1, true)
             config:reset()
             locales:setLanguage(config.lang)
             screens:reloadCurrent(transitions.kTransitionNone)
           end},
-          -- TODO: localise
-          {type = 'alert', message = 'Settings have been cleared.'}
+          {type = 'alert', message = locales:getText('SETTINGS_RESET_DONE')}
         })
       end
     },

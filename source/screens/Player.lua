@@ -76,10 +76,10 @@ end
 
 function PlayerScreen:setupMenuItems(menu)
   local currNote = noteFs.currentNote
-  local detailsItem = menu:addMenuItem('Details', function()
+  local detailsItem = menu:addMenuItem(locales:getText('PLAY_MENU_DETAILS'), function()
     screens:push('details', transitions.kTransitionFade, nil, currNote)
   end)
-  local ditherItem = menu:addMenuItem('Dithering', function()
+  local ditherItem = menu:addMenuItem(locales:getText('PLAY_MENU_DITHERING'), function()
     local ditherSettings = noteFs:getNoteDitherSettings(currNote)
     local function updateDither(newSettings)
       noteFs:updateNoteDitherSettings(currNote, newSettings)

@@ -1,4 +1,7 @@
 local gfx <const> = playdate.graphics
+
+local PLAYDATE_W <const> = 400
+local PLAYDATE_H <const> = 240
 local SCROLL_START <const> = 200
 local SCROLL_AUTO_STEP <const> = -1
 
@@ -56,8 +59,8 @@ function CreditsScreen:beforeEnter()
   })
   local text = self:getCreditsText()
   local _, height = gfx.getTextSize(text)
-  local cache = gfx.image.new(400, height, gfx.kColorClear)
-  local rect = playdate.geometry.rect.new(10, 0, 400 - 20, height)
+  local cache = gfx.image.new(PLAYDATE_W, height, gfx.kColorClear)
+  local rect = playdate.geometry.rect.new(10, 0, PLAYDATE_W - 20, height)
   gfx.pushContext(cache)
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
   gfx.drawTextInRect(text, rect, nil, nil, kTextAlignment.center)

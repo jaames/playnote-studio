@@ -22,7 +22,7 @@ function Clock:tick()
   local currTime = playdate.getCurrentTimeMilliseconds()
   if (currTime - self.lastTickTime > 1000) then
     local time = playdate.getTime()
-    local dateFormat = '${DAY}/${MONTH}/${YEAR}'
+    local dateFormat = locales:getText('CLOCK_DATE_FORMAT')
     local timeFormat = self.blinkOn and '${HOUR}:${MINUTE}' or '${HOUR} ${MINUTE}'
     local dateStr, timeStr = stringUtils:formatTimeMultiple(time, dateFormat, timeFormat)
     self.lastTickTime = currTime

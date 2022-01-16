@@ -87,7 +87,7 @@ function NoteListScreen:init()
 end
 
 function NoteListScreen:setupMenuItems(menu)
-  local detailsItem = menu:addMenuItem('Details', function()
+  local detailsItem = menu:addMenuItem(locales:getText('VIEW_MENU_DETAILS'), function()
     if self.selectedThumb then
       screens:push('details', transitions.kTransitionFade, nil, self.selectedThumb.path)
     end

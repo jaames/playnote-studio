@@ -57,18 +57,10 @@ function locales:getTextFormatted(key, ...)
   return string.format(str, ...)
 end
 
--- Get a translation string by its key, and use it as a formating string for a date
--- date format should match the playdate.getTime()
-function locales:getFormattedTimestamp(key, date)
-  local year, month, day, weekday, hour, minute, second = table.unpack(date)
-  local str = self:getText(key)
-  str = string.gsub(str, '$YEAR', year)
-  str = string.gsub(str, '$MONTH', month)
-  str = string.gsub(str, '$DAY', day)
-  str = string.gsub(str, '$HOUR', hour)
-  str = string.gsub(str, '$MINUTE', minute)
-  str = string.gsub(str, '$SECOND', second)
-  return str
+-- Get a translation string by its key, and use it as a formating string for a timestamp
+-- tiem should be formatted like result from playdate.getTime()
+function locales:getFormattedTimestamp(key, time)
+  return stringUtils:formatTime(time, self:getText(key))
 end
 
 -- Replace any string keys in a peice of text that are wrapped in percent signs (e.g. `%APP_TITLE%`)
