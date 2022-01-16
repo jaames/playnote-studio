@@ -6,7 +6,7 @@
   "credits": [
     {
       "id": "keke",
-      "name": "Keke",
+      "name": "Kéké",
       "links": [
         "twitter.com/Kekeflipnote",
         "k-eke.tumblr.com",
@@ -37,7 +37,24 @@
   ],
   "notes": [
     {
-      "filename": ""
+      "filename": "samplememo/bokeh.ppm",
+      "authorId": "bokeh"
+    },
+    {
+      "filename": "samplememo/keke.ppm",
+      "authorId": "keke"
+    },
+    {
+      "filename": "samplememo/keke2.ppm",
+      "authorId": "keke"
+    },
+    {
+      "filename": "samplememo/mrjohn.ppm",
+      "authorId": "mrjohn"
+    },
+    {
+      "filename": "samplememo/pekira_beach.ppm",
+      "authorId": "pekira"
     }
   ]
 }

@@ -325,7 +325,7 @@ end
 
 function SettingsScreen:update()
   gfx.setDrawOffset(0, 0)
-  gfxUtils:drawBgGridWithOffset(self.menuScroll)
+  gfxUtils:drawBgGridWithOffset(-self.menuScroll)
   bgGfx:draw(0, 0)
   self.scrollBar:draw()
   local y = 0 - self.menuScroll + MENU_GAP_TOP

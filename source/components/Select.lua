@@ -44,6 +44,13 @@ end
 function Select:onCloseEnded(value, index)
 end
 
+function Select:clearOptions()
+  self.numOptions = 0
+  self.optionLabels = {}
+  self.optionShortLabels = {}
+  self.optionValues = {}
+end
+
 function Select:addOption(value, label, shortLabel)
   table.insert(self.optionLabels, label)
   table.insert(self.optionShortLabels, shortLabel or label)

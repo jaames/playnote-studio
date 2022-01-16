@@ -1,14 +1,22 @@
-local PLAYDATE_W <const> = 400
-local PLAYDATE_H <const> = 240
-local FOLDERSELECT_ROW = -1
 local gfx <const> = playdate.graphics
+
 local pageCounterFont <const> = gfx.font.new('./fonts/WhalesharkCounter')
 
 local bgGfx <const> = gfx.image.new('./gfx/gfx_bg_notelist')
 local helpQrGfx <const> = gfx.image.new('./gfx/qr_filehelp')
 local boxGfx <const> = gfx.nineSlice.new('./gfx/shape_box', 5, 5, 2, 2)
 
-local TRANSITION_DUR <const> = 250
+local PLAYDATE_W <const> = 400
+local PLAYDATE_H <const> = 240
+local FOLDERSELECT_ROW = -1
+local PAGE_TRANSITION_DUR <const> = 250
+local THUMB_W <const> = 64
+local THUMB_H <const> = 48
+local GRID_GAP <const> = 16
+local GRID_ROWS <const> = 3
+local GRID_COLS <const> = 4
+local GRID_X <const> = 48
+local GRID_Y <const> = 48
 
 NoteListScreen = {}
 class('NoteListScreen').extends(ScreenBase)
@@ -30,6 +38,18 @@ function NoteListScreen:init()
 
   self.selectedRow = 0
   self.selectedCol = 0
+  self.selectedThumb = nil
+
+  -- setup folder select dropdown
+  local folderSelect = FolderSelect(0, 0, 232, 34)
+  folderSelect.variant = 'folderselect'
+  local s = self
+  function folderSelect:onClose(value, index)
+    s.setCurrentFolder(s, value)
+  end
+  self.folderSelect = folderSelect
+
+  self:setSelected(0, 0)
   
   self.inputHandlers = {
     leftButtonDown = function()
@@ -59,30 +79,32 @@ function NoteListScreen:init()
         self.folderSelect:openMenu()
       -- thumbnail is selected
       else
-        local i = self.selectedRow * 4 + self.selectedCol + 1
-        local tmb = self.currThumbs[i]
-        noteFs:setCurrentNote(tmb.path)
+        noteFs:setCurrentNote(self.selectedThumb.path)
         screens:push('player', transitions.kTransitionFade)
       end
     end,
   }
 end
 
+function NoteListScreen:setupMenuItems(menu)
+  local detailsItem = menu:addMenuItem('Details', function()
+    if self.selectedThumb then
+      screens:push('details', transitions.kTransitionFade, nil, self.selectedThumb.path)
+    end
+  end)
+  return {detailsItem}
+end
+
 function NoteListScreen:beforeEnter()
   NoteListScreen.super.beforeEnter(self)
   self:setCurrentPage(self.currPage)
-  -- setup folder select dropdown
-  local folderSelect = FolderSelect(0, 0, 232, 34)
-  folderSelect.variant = 'folderselect'
-  local s = self
-  function folderSelect:onClose(value, index)
-    s.setCurrentFolder(s, value)
-  end
+  -- update folderselect
+  local folderSelect = self.folderSelect
+  folderSelect:clearOptions()
   for _, folderItem in pairs(noteFs.folderList) do
     folderSelect:addOption(folderItem.path, folderItem.name)
   end
   folderSelect:setValue(noteFs.currentFolder)
-  self.folderSelect = folderSelect
   -- if there's no notes to display, force the folder button to be selected
   if self.notesOnCurrPage == 0 then
     self.hasNoNotes = true
@@ -94,7 +116,6 @@ function NoteListScreen:afterLeave()
   NoteListScreen.super.afterLeave(self)
   utils:clearArray(self.prevThumbs)
   utils:clearArray(self.currThumbs)
-  self.folderSelect = nil
   self.hasPrevPage = false -- prevent initial transition when returning to this page
   if self.transitionTimer then
     self.transitionTimer:remove()
@@ -107,13 +128,16 @@ function NoteListScreen:setSelected(row, col)
   if row == FOLDERSELECT_ROW or numNotes == 0 then
     self.folderSelect:select()
     self.selectedRow = FOLDERSELECT_ROW
+    self.selectedThumb = nil
   else
-    row = math.max(0, math.min(2, row))
-    col = math.max(0, math.min(3, col))
+    row = math.max(0, math.min(GRID_ROWS - 1, row))
+    col = math.max(0, math.min(GRID_COLS - 1, col))
     local index = math.min((row * 4 + col) + 1, numNotes) - 1
-    self.selectedRow = math.floor(index / 4)
+    self.selectedRow = math.floor(index / GRID_COLS)
     self.selectedCol = index % 4
     self.folderSelect:deselect()
+    local i = self.selectedRow * 4 + self.selectedCol + 1
+    self.selectedThumb = self.currThumbs[i]
   end
 end
 
@@ -148,7 +172,7 @@ function NoteListScreen:setCurrentPage(pageIndex)
   self.notesOnCurrPage = #page
   -- transition time!
   if self.hasPrevPage then
-    local transitionTimer = playdate.timer.new(TRANSITION_DUR, 0, PLAYDATE_W, playdate.easingFunctions.inQuad)
+    local transitionTimer = playdate.timer.new(PAGE_TRANSITION_DUR, 0, PLAYDATE_W, playdate.easingFunctions.inQuad)
     self.isTransitionActive = true
     self.transitionDir = pageIndex < self.currPage and -1 or 1
     self.transitionTimer = transitionTimer
@@ -176,36 +200,29 @@ function NoteListScreen:setCurrentPage(pageIndex)
 end
 
 function NoteListScreen:drawGrid(xOffset, thumbs)
-  local w <const> = 64
-  local h <const> = 48
-  local gap <const> = 16
-  local nRows <const> = 3
-  local nCols <const> = 4
-  local baseX <const> = 48
-  local baseY <const> = 48
   local i = 1
-  for row = 0, nRows - 1, 1 do
-    for col = 0, nCols - 1, 1 do
-      local x = xOffset + baseX + (col * w + gap * col)
-      local y = baseY + (row * h + gap * row)
+  for row = 0, GRID_ROWS - 1, 1 do
+    for col = 0, GRID_COLS - 1, 1 do
+      local x = GRID_X + xOffset + (col * THUMB_W + GRID_GAP * col)
+      local y = GRID_Y + (row * THUMB_H + GRID_GAP * row)
       if thumbs[i] ~= nil then
         if self.isTransitionActive == false and self.selectedRow == row and self.selectedCol == col then
           -- selection outline
           gfx.setColor(gfx.kColorWhite)
-          gfx.fillRect(x - 4, y - 4, w + 8, h + 8)
+          gfx.fillRect(x - 4, y - 4, THUMB_W + 8, THUMB_H + 8)
           gfx.setColor(gfx.kColorBlack)
           gfx.setLineWidth(2)
-          gfx.drawRoundRect(x - 3, y - 3, w + 6, h + 6, 4)
+          gfx.drawRoundRect(x - 3, y - 3, THUMB_W + 6, THUMB_H + 6, 4)
         else
           -- shadow
           gfx.setLineWidth(1)
           gfx.setColor(gfx.kColorBlack)
-          gfx.drawRect(x, y, w + 3, h + 3)
+          gfx.drawRect(x, y, THUMB_W + 3, THUMB_H + 3)
            -- black outer border
-          gfx.drawRect(x - 2, y - 2, w + 4, h + 4)
+          gfx.drawRect(x - 2, y - 2, THUMB_W + 4, THUMB_H + 4)
           -- white inner boarder
           gfx.setColor(gfx.kColorWhite)
-          gfx.drawRect(x - 1, y - 1, w + 2, h + 2)
+          gfx.drawRect(x - 1, y - 1, THUMB_W + 2, THUMB_H + 2)
         end
         -- thumbnail
         thumbs[i].bitmap:draw(x, y)
@@ -216,6 +233,7 @@ function NoteListScreen:drawGrid(xOffset, thumbs)
 end
 
 function NoteListScreen:update()
+  gfx.setDrawOffset(0, 0)
   -- page bg
   gfxUtils:drawBgGrid()
   bgGfx:draw(0, 0)
@@ -223,9 +241,9 @@ function NoteListScreen:update()
   self.folderSelect:draw()
   -- show 'no notes available'
   if self.hasNoNotes then
-    boxGfx:drawInRect(20, 52, 400 - 38, 240 - 72)
+    boxGfx:drawInRect(20, 52, PLAYDATE_W - 38, PLAYDATE_H - 72)
     gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES'), 40, 76, 360, 200, nil, nil)
-    helpQrGfx:draw(400 - 134, 102)
+    helpQrGfx:draw(PLAYDATE_W - 134, 102)
     gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES_INFO'), 40, 116, 232, 200, nil, nil)
     return
   end

@@ -146,10 +146,37 @@ static int tmb_index(lua_State* L)
 	tmblib_ctx* ctx = getTmbCtx(1);
 	const char* key = pd->lua->getArgString(2);
 
-	if (strcmp(key, "path") == 0)
-		pd->lua->pushString(ctx->ppmPath);
-	else if (strcmp(key, "bitmap") == 0)
+	if (strcmp(key, "bitmap") == 0)
 		pd->lua->pushBitmap(ctx->bitmap);
+	else if (strcmp(key, "path") == 0)
+		pd->lua->pushString(ctx->ppmPath);
+	else if (strcmp(key, "numFrames") == 0)
+		pd->lua->pushInt(ctx->tmb->hdr.numFrames);
+	else if (strcmp(key, "currentAuthor") == 0)
+		pd->lua->pushBytes((char*)ctx->tmb->hdr.currentAuthor, 22);
+	else if (strcmp(key, "previousAuthor") == 0)
+		pd->lua->pushBytes((char*)ctx->tmb->hdr.previousAuthor, 22);
+	else if (strcmp(key, "originalAuthor") == 0)
+		pd->lua->pushBytes((char*)ctx->tmb->hdr.originalAuthor, 22);
+	else if (strcmp(key, "currentAuthorId") == 0)
+		pd->lua->pushBytes((char*)ctx->tmb->hdr.currentAuthorId, 8);
+	else if (strcmp(key, "previousAuthorId") == 0)
+		pd->lua->pushBytes((char*)ctx->tmb->hdr.previousAuthorId, 8);
+	else if (strcmp(key, "originalAuthorId") == 0)
+		pd->lua->pushBytes((char*)ctx->tmb->hdr.originalAuthorId, 8);
+	else if (strcmp(key, "timestamp") == 0)
+		pd->lua->pushInt(ctx->tmb->hdr.timeStamp);
+	else if (strcmp(key, "ppmSize") == 0)
+	{
+		FileStat* stat = pd_malloc(sizeof(FileStat));
+		int res = pd->file->stat(ctx->ppmPath, stat);
+		if (res == 0)
+			pd->lua->pushInt(stat->size);
+		else
+			pd->lua->pushNil();
+		pd_free(stat);
+	}
+
 	else
 		pd->lua->pushNil();
 

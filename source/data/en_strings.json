@@ -3,8 +3,7 @@
 
   "HOME_VIEW": "View Flipnotes",
   "HOME_SETTINGS": "Settings",
-  "HOME_DATE_FORMAT": "$DAY/$MONTH/$YEAR",
-  "HOME_TIME_FORMAT": "$HOUR:$MINUTE",
+  "HOME_DATE_FORMAT": "${DAY}/${MONTH}/${YEAR}",
 
   "SETTINGS_ABOUT": "About",
   "SETTINGS_CREDITS": "Credits",
@@ -43,7 +42,7 @@
 
   "DETAILS_AUTHOR": "Author",
   "DETAILS_CREATED": "Created",
-  "DETAILS_DATE_FORMAT": "$DAY/$MONTH/$YEAR",
+  "DETAILS_DATE_FORMAT": "${DAY}/${MONTH}/${YEAR}",
   "DETAILS_FRAME_COUNT": "Frame count",
   "DETAILS_FILE_SIZE": "File size",
 

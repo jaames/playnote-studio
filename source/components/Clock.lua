@@ -21,12 +21,14 @@ end
 function Clock:tick()
   local currTime = playdate.getCurrentTimeMilliseconds()
   if (currTime - self.lastTickTime > 1000) then
-    local sep = self.blinkOn and ':' or ' '
     local time = playdate.getTime()
+    local dateFormat = '${DAY}/${MONTH}/${YEAR}'
+    local timeFormat = self.blinkOn and '${HOUR}:${MINUTE}' or '${HOUR} ${MINUTE}'
+    local dateStr, timeStr = stringUtils:formatTimeMultiple(time, dateFormat, timeFormat)
     self.lastTickTime = currTime
     self.blinkOn = not self.blinkOn
-    self.dateString = string.format('%02d/%02d/%04d', time.day, time.month, time.year)
-    self.timeString = string.format('%02d%s%02d', time.hour, sep, time.minute)
+    self.dateString = dateStr
+    self.timeString = timeStr
   end
 end
 

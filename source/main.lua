@@ -31,6 +31,7 @@ import './components/Scrollbar'
 import './screens/Screenbase'
 import './screens/Home'
 import './screens/NoteList'
+import './screens/Details'
 import './screens/Player'
 import './screens/Settings'
 import './screens/Dithering'
@@ -51,6 +52,7 @@ dialog:init()
 
 screens:register('home',      HomeScreen())
 screens:register('notelist',  NoteListScreen())
+screens:register('details',   DetailsScreen())
 screens:register('player',    PlayerScreen())
 screens:register('settings',  SettingsScreen())
 screens:register('dithering', DitheringScreen())

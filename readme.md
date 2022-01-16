@@ -5,7 +5,6 @@
 - Audio play/pause
 - Add DSi username chars to font
 - Function to delete sample notes
-- Flipnote details screen
 - Get audio design in
 - Get translators in
 - launchSoundPath in pdxinfo

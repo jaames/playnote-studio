@@ -28,6 +28,17 @@ function fsUtils:isInternalFolder(name)
   return table.indexOfElement(INTERNAL_FOLDERS, name) ~= nil
 end
 
+-- return size of file formatted in a human readable way
+function fsUtils:formatFileSize(nBytes)
+  if not nBytes or nBytes == 0 then
+    return 'Nil'
+  end
+  local k = 1000
+  local sizes = {'B', 'KB', 'MB', 'GB'}
+  local exp = math.floor(math.log(nBytes) / math.log(k))
+  return string.format('%.1f %s', nBytes / (k ^ exp), sizes[exp + 1]);
+end
+
 local VOICED_SOUND_MARK <const> = 12441
 local SEMI_VOICED_SOUND_MARK <const> = 12442
 

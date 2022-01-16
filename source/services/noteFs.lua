@@ -10,6 +10,7 @@ noteFs.currentNote = nil
 
 local noteList = {}
 local notesPerPage <const> = noteFs.notesPerPage
+local playnoteJsonCache = nil
 
 function noteFs:init()
   -- create initial note folder with instructions if it doesn't exist yet
@@ -44,16 +45,24 @@ function noteFs:init()
 end
 
 function noteFs:getFolderData(folderPath)
+  if playnoteJsonCache ~= nil then
+    return playnoteJsonCache
+  end
+  local res = {}
   local jsonPath = folderPath .. 'playnote.json'
   if fs.exists(jsonPath) then
     local data = json.decodeFile(jsonPath)
     if type(data) == 'table' then
-      return data
+      res = data
+    else
+      -- json probably got corrupted somehow
+      json.encodeToFile(jsonPath, false, {})
     end
   else
     json.encodeToFile(jsonPath, false, {})
   end
-  return {}
+  playnoteJsonCache = res
+  return res
 end
 
 function noteFs:getFolderName(folderPath)
@@ -114,6 +123,7 @@ function noteFs:updateNoteData(folderPath, filename, newData)
   -- save changes to file
   local jsonPath = folderPath .. 'playnote.json'
   json.encodeToFile(jsonPath, false, data)
+  playnoteJsonCache = nil
 end
 
 function noteFs:getArtistCredits()
@@ -133,6 +143,17 @@ function noteFs:getArtistCredits()
   return creditList
 end
 
+function noteFs:getArtistCreditsForId(artistId)
+  local data = self:getFolderData(self.currentFolder)
+  if type(data.credits) == 'table' then
+    for _, item in pairs(data.credits) do
+      if item.id == artistId then
+        return item
+      end
+    end
+  end
+end
+
 function noteFs:getNoteDitherSettings(filename)
   local data = self:getNoteData(self.currentFolder, filename)
   if type(data.dithering) == 'table' then
@@ -147,7 +168,36 @@ function noteFs:updateNoteDitherSettings(filename, ditherSettings)
   })
 end
 
+function noteFs:getNoteDetails(filename)
+  local data = self:getNoteData(self.currentFolder, filename)
+  if type(data.authorId) == 'string' then
+    data.credits = self:getArtistCreditsForId(data.authorId)
+  end
+  return data
+end
+
+function noteFs:getNoteCredits(filename)
+  local details = self:getNoteDetails(filename)
+  local name = nil
+  local links = nil
+  if type(details.credits) == 'table' then
+    local credits = details.credits
+    if type(credits.name) == 'string' then
+      name = credits.name
+    end
+    if type(credits.links) == 'table' then
+      links = {}
+      for _, link in pairs(credits.links) do
+        links[#links + 1] = stringUtils:escape(link)
+      end
+      links = table.concat(links, '\n')
+    end
+  end
+  return name, links
+end
+
 function noteFs:setDirectory(folderPath)
+  playnoteJsonCache = nil
   if folderPath == '/samplememo' and not fs.isdir(folderPath) then
     fs.mkdir(folderPath)
     table.insert(self.folderList, { path = folderPath, name = folderPath })
@@ -175,6 +225,10 @@ function noteFs:setCurrentNote(notePath)
   self.currentNote = notePath
 end
 
+function noteFs:getNoteTmb(notePath)
+  return TmbParser.new(notePath)
+end
+
 function noteFs:getPage(pageIndex)
   local page = table.create(notesPerPage, 0)
   local i = 1
@@ -182,7 +236,7 @@ function noteFs:getPage(pageIndex)
   local endIndex = math.min(startIndex + notesPerPage - 1, numNotes)
   for j = startIndex, endIndex do
     local path = noteList[j]
-    page[i] = TmbParser.new(path)
+    page[i] = self:getNoteTmb(path)
     i = i + 1
   end
   return page
