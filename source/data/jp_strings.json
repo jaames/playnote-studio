@@ -35,7 +35,7 @@
   "CREDITS_HEADER_PACKETS": "パケットキャプチャ",
   "CREDITS_HEADER_MISC": "Miscellaneous",
   "CREDITS_LEGAL": "Flipnote Studio is © Nintendo\nThis project is not endorsed by or affiliated with them in any way",
-  "CREDITS_END": "Keep on Flipnoting!",
+  "CREDITS_END": "Keep on Flipnoting! ",
 
   "VIEW_NO_FLIPNOTES": "There aren't any Flipnotes here",
   "VIEW_NO_FLIPNOTES_INFO": "To learn how to add Flipnotes, please visit\nplaynote.studio/filehelp",
@@ -57,7 +57,7 @@
 
   "DITHER_COLOUR_BLACK": "黒",
   "DITHER_COLOUR_RED": "赤",
-  "DITHER_COLOR_BLUE": "青",
+  "DITHER_COLOUR_BLUE": "青",
 
   "DIALOG_CONFIRM": "Confirm",
   "DIALOG_OK": "OK",

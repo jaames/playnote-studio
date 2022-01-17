@@ -104,7 +104,7 @@ function NoteListScreen:beforeEnter()
   for _, folderItem in pairs(noteFs.folderList) do
     folderSelect:addOption(folderItem.path, folderItem.name)
   end
-  folderSelect:setValue(noteFs.currentFolder)
+  folderSelect:setValue(noteFs.workingFolder)
   -- if there's no notes to display, force the folder button to be selected
   if self.notesOnCurrPage == 0 then
     self.hasNoNotes = true
@@ -142,7 +142,7 @@ function NoteListScreen:setSelected(row, col)
 end
 
 function NoteListScreen:setCurrentFolder(folder)
-  noteFs:setDirectory(folder)
+  noteFs:setWorkingFolder(folder)
   if noteFs.hasNotes then
     self.hasNoNotes = false
     self.hasPrevPage = false
@@ -165,7 +165,7 @@ function NoteListScreen:setCurrentPage(pageIndex)
     return
   end
   -- get paths and thumbnails for the requested page
-  local page = noteFs:getPage(pageIndex)
+  local page = noteFs:getNotePage(pageIndex)
   -- prepare previous and current thumbnail pages for the page transition
   self.prevThumbs = self.currThumbs
   self.currThumbs = page

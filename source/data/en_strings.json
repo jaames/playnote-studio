@@ -23,7 +23,7 @@
   "ABOUT_BUILT_BY": "Built by %s",
 
   "CREDITS_HEADER_JAMES": "Programming and UI Design",
-  "CREDITS_HEADER_PARSER": "PPM Parser",
+  "CREDITS_HEADER_PARSER": "Flipnote Decoder",
   "CREDITS_HEADER_SOUND": "Sound Design",
   "CREDITS_HEADER_TRANSLATION": "Translation",
   "CREDITS_HEADER_THANKS": "Special Thanks",
@@ -35,7 +35,7 @@
   "CREDITS_HEADER_PACKETS": "Packet Captures",
   "CREDITS_HEADER_MISC": "Miscellaneous",
   "CREDITS_LEGAL": "Flipnote Studio is © Nintendo.\nThis project is not endorsed by or affiliated with them in any way",
-  "CREDITS_END": "Keep on Flipnoting!",
+  "CREDITS_END": "Keep on Flipnoting! ",
 
   "VIEW_NO_FLIPNOTES": "There aren't any Flipnotes here",
   "VIEW_NO_FLIPNOTES_INFO": "To learn how to add Flipnotes, please visit\nplaynote.studio/filehelp",
@@ -57,7 +57,7 @@
 
   "DITHER_COLOUR_BLACK": "Black",
   "DITHER_COLOUR_RED": "Red",
-  "DITHER_COLOR_BLUE": "Blue",
+  "DITHER_COLOUR_BLUE": "Blue",
 
   "DIALOG_CONFIRM": "Confirm",
   "DIALOG_OK": "OK",

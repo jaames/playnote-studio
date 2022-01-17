@@ -1,0 +1,65 @@
+{
+  "APP_TITLE": "Playnote Studio",
+
+  "HOME_VIEW": "Bekijk Flipnotes",
+  "HOME_SETTINGS": "Instellingen",
+
+  "CLOCK_DATE_FORMAT": "${DAY}-${MONTH}-${YEAR}",
+
+  "SETTINGS_ABOUT": "Informatie",
+  "SETTINGS_CREDITS": "Credits",
+  "SETTINGS_DITHERING": "Dithering",
+  "SETTINGS_SOUND": "Geluidseffecten",
+  "SETTINGS_LANGUAGE": "Taal",
+  "SETTINGS_RESET": "Herstel instellingen",
+  "SETTINGS_ON": "Aan",
+  "SETTINGS_OFF": "Uit",
+  "SETTINGS_SOUND_ON": "Geluidseffecten aan",
+  "SETTINGS_SOUND_OFF": "Geluidseffecten uit",
+  "SETTINGS_RESET_CONFIRM": "Instellingen worden gewist",
+  "SETTINGS_RESET_DONE": "Instellingen zijn gewist",
+
+  "ABOUT_VERSION": "Versie %d",
+  "ABOUT_BUILT_BY": "Ontwikkeld door %s",
+
+  "CREDITS_HEADER_JAMES": "Programmeren en UI Ontwerp",
+  "CREDITS_HEADER_PARSER": "Flipnote Decoder",
+  "CREDITS_HEADER_SOUND": "Sounddesign",
+  "CREDITS_HEADER_TRANSLATION": "Vertaling",
+  "CREDITS_HEADER_THANKS": "Speciale dank",
+  "CREDITS_HEADER_ARTISTS": "*Flipnote artiesten*",
+  "CREDITS_HEADER_RESEARCH": "*Flipnote onderzoek*",
+  "CREDITS_HEADER_UGOCREW": "Japanse Flipnote onderzoekers",
+  "CREDITS_HEADER_AUDIO": "Geluidsdata",
+  "CREDITS_HEADER_DOCS": "Documentatie",
+  "CREDITS_HEADER_PACKETS": "Packet Captures",
+  "CREDITS_HEADER_MISC": "Overig",
+  "CREDITS_LEGAL": "Flipnote Studio is een merknaam van Nintendo.\nDit project is op geen enkele wijze ontwikkeld door of verbonden aan Nintendo",
+  "CREDITS_END": "Blijf een Flipnote devote! \n\n",
+
+  "VIEW_NO_FLIPNOTES": "Er zijn hier nog geen Flipnotes",
+  "VIEW_NO_FLIPNOTES_INFO": "Bezoek playnote.studio/filehelp om te leren hoe je Flipnotes kan toevoegen",
+  "VIEW_MENU_DETAILS": "Details",
+
+  "PLAY_MENU_DETAILS": "Details",
+  "PLAY_MENU_DITHERING": "Dithering",
+
+  "DETAILS_AUTHOR": "Maker",
+  "DETAILS_AUTHOR_ID": "Maker's FSID",
+  "DETAILS_LINKS": "Links",
+  "DETAILS_LAST_EDIT": "Laatst aangepast op",
+  "DETAILS_DATE_FORMAT": "${DAY}-${MONTH}-${YEAR}",
+  "DETAILS_FRAME_COUNT": "Aantal frames",
+  "DETAILS_FILE_SIZE": "Bestandsgrootte",
+  "DETAILS_FILE_PATH": "Bestandslocatie",
+  "DETAILS_PREV_AUTHOR": "Vorige maker",
+  "DETAILS_ORIG_AUTHOR": "Originele maker",
+
+  "DITHER_COLOUR_BLACK": "Zwart",
+  "DITHER_COLOUR_RED": "Rood",
+  "DITHER_COLOUR_BLUE": "Blauw",
+
+  "DIALOG_CONFIRM": "OK",
+  "DIALOG_OK": "OK",
+  "DIALOG_CANCEL": "Terug"
+}

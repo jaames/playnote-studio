@@ -26,7 +26,12 @@ TODO
 
 %CREDITS_HEADER_TRANSLATION%
 
-TODO
+Dutch
+
+Célistine Oosting
+_therealprocyon_
+_github.com/therealprocyon_
+_twitter.com/therealprocyon_
 
 
 %CREDITS_HEADER_THANKS%
@@ -114,7 +119,7 @@ _github.com/sudofox_
 
 
 
-%CREDITS_END% 
+%CREDITS_END%
 
 
 

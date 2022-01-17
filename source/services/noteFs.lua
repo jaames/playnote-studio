@@ -4,13 +4,13 @@ noteFs = {}
 
 noteFs.folderList = {}
 noteFs.folderPaths = {}
-noteFs.currentFolder = ''
+noteFs.workingFolder = ''
 noteFs.notesPerPage = 12
 noteFs.currentNote = nil
 
 local noteList = {}
 local notesPerPage <const> = noteFs.notesPerPage
-local playnoteJsonCache = nil
+local playnoteJsonCache = {}
 
 function noteFs:init()
   -- create initial note folder with instructions if it doesn't exist yet
@@ -40,20 +40,34 @@ function noteFs:init()
   self.folderList = folderList
   -- set samplememo as initial folder
   assert(fs.isdir('samplememo'), 'Sample Flipnote folder is missing?')
-  self:setDirectory(config.lastFolder)
+  self:setWorkingFolder(config.lastFolder)
   -- self:getArtistCredits()
 end
 
-function noteFs:getFolderData(folderPath)
-  if playnoteJsonCache ~= nil then
-    return playnoteJsonCache
+function noteFs:hasFolderDataCache(folderPath)
+  return type(playnoteJsonCache[folderPath]) == 'table'
+end
+
+function noteFs:getFolderDataCache(folderPath)
+  if self:hasFolderDataCache(folderPath) then
+    return playnoteJsonCache[folderPath]
   end
-  local res = {}
+end
+
+function noteFs:updateFolderDataCache(folderPath, data)
+  playnoteJsonCache[folderPath] = data
+end
+
+function noteFs:getFolderData(folderPath)
+  if self:hasFolderDataCache(folderPath) then
+    return self:getFolderDataCache(folderPath)
+  end
+  local data = {}
   local jsonPath = folderPath .. 'playnote.json'
   if fs.exists(jsonPath) then
-    local data = json.decodeFile(jsonPath)
-    if type(data) == 'table' then
-      res = data
+    local jsonData = json.decodeFile(jsonPath)
+    if type(jsonData) == 'table' then
+      data = jsonData
     else
       -- json probably got corrupted somehow
       json.encodeToFile(jsonPath, false, {})
@@ -61,8 +75,14 @@ function noteFs:getFolderData(folderPath)
   else
     json.encodeToFile(jsonPath, false, {})
   end
-  playnoteJsonCache = res
-  return res
+  self:updateFolderDataCache(folderPath, data)
+  return data
+end
+
+function noteFs:updateFolderData(folderPath, data)
+  local jsonPath = folderPath .. 'playnote.json'
+  json.encodeToFile(jsonPath, false, data)
+  self:updateFolderDataCache(folderPath, data)
 end
 
 function noteFs:getFolderName(folderPath)
@@ -97,7 +117,7 @@ function noteFs:getNoteData(folderPath, filename)
   return {}
 end
 
-function noteFs:updateNoteData(folderPath, filename, newData)
+function noteFs:updateNoteData(folderPath, filename, newNoteData)
   local data = self:getFolderData(folderPath)
   -- if there's no notes array, add it
   if type(data.notes) ~= 'table' then
@@ -108,7 +128,7 @@ function noteFs:updateNoteData(folderPath, filename, newData)
   local wasFound = false
   for _, noteData in pairs(data.notes) do
     if type(noteData) == 'table' and noteData.filename == filename then
-      for k, v in pairs(newData) do
+      for k, v in pairs(newNoteData) do
         noteData[k] = v
       end
       wasFound = true
@@ -117,13 +137,11 @@ function noteFs:updateNoteData(folderPath, filename, newData)
   end
   -- if there's no entry for this note, insert a new one
   if not wasFound then
-    newData.filename = filename
-    table.insert(data.notes, newData)
+    newNoteData.filename = filename
+    table.insert(data.notes, newNoteData)
   end
   -- save changes to file
-  local jsonPath = folderPath .. 'playnote.json'
-  json.encodeToFile(jsonPath, false, data)
-  playnoteJsonCache = nil
+  self:updateFolderData(folderPath, data)
 end
 
 function noteFs:getArtistCredits()
@@ -144,7 +162,7 @@ function noteFs:getArtistCredits()
 end
 
 function noteFs:getArtistCreditsForId(artistId)
-  local data = self:getFolderData(self.currentFolder)
+  local data = self:getFolderData(self.workingFolder)
   if type(data.credits) == 'table' then
     for _, item in pairs(data.credits) do
       if item.id == artistId then
@@ -155,7 +173,7 @@ function noteFs:getArtistCreditsForId(artistId)
 end
 
 function noteFs:getNoteDitherSettings(filename)
-  local data = self:getNoteData(self.currentFolder, filename)
+  local data = self:getNoteData(self.workingFolder, filename)
   if type(data.dithering) == 'table' then
     return data.dithering
   end
@@ -163,13 +181,13 @@ function noteFs:getNoteDitherSettings(filename)
 end
 
 function noteFs:updateNoteDitherSettings(filename, ditherSettings)
-  self:updateNoteData(self.currentFolder, filename, {
+  self:updateNoteData(self.workingFolder, filename, {
     dithering = ditherSettings
   })
 end
 
 function noteFs:getNoteDetails(filename)
-  local data = self:getNoteData(self.currentFolder, filename)
+  local data = self:getNoteData(self.workingFolder, filename)
   if type(data.authorId) == 'string' then
     data.credits = self:getArtistCreditsForId(data.authorId)
   end
@@ -196,19 +214,18 @@ function noteFs:getNoteCredits(filename)
   return name, links
 end
 
-function noteFs:setDirectory(folderPath)
-  playnoteJsonCache = nil
+function noteFs:setWorkingFolder(folderPath)
   if folderPath == '/samplememo' and not fs.isdir(folderPath) then
     fs.mkdir(folderPath)
     table.insert(self.folderList, { path = folderPath, name = folderPath })
-    noteFs:setDirectory(folderPath)
+    noteFs:setWorkingFolder(folderPath)
     return
   elseif not fs.isdir(folderPath) then
-    noteFs:setDirectory('/samplememo')
+    noteFs:setWorkingFolder('/samplememo')
     return
   end
   config.lastFolder = folderPath
-  self.currentFolder = folderPath
+  self.workingFolder = folderPath
   noteList = {}
   local list = fs.listFiles(folderPath)
   for _, name in pairs(list) do
@@ -229,7 +246,7 @@ function noteFs:getNoteTmb(notePath)
   return TmbParser.new(notePath)
 end
 
-function noteFs:getPage(pageIndex)
+function noteFs:getNotePage(pageIndex)
   local page = table.create(notesPerPage, 0)
   local i = 1
   local startIndex = ((pageIndex - 1) * notesPerPage) + 1 -- thanks lua, great programming language
@@ -242,10 +259,6 @@ function noteFs:getPage(pageIndex)
   return page
 end
 
-function noteFs:releasePage(pageTable)
-  utils:clearArray(pageTable)
-end
-
-function noteFs:deleteSampleMemo()
+function noteFs:deleteSampleNotes()
 
 end
