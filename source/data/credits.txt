@@ -26,10 +26,23 @@ TODO
 
 %CREDITS_HEADER_TRANSLATION%
 
+French
+
+Eva Lauren Kelly (thejsa)
+_www.evalauren.co.uk_
+_twitter.com/thejsa___
+
+thomasnet
+_twitter.com/thomasnet__mc_
+
+Italian
+
+Curren French
+_www.finecurry.newgrounds.com_
+
 Dutch
 
 Célistine Oosting
-_therealprocyon_
 _github.com/therealprocyon_
 _twitter.com/therealprocyon_
 
@@ -60,7 +73,7 @@ ${artistCredits}
 
 %CREDITS_HEADER_RESEARCH%
 
-Ugomemo Research Crew
+%CREDITS_HEADER_UGOCREW%
 
 Shinichiro Oba
 _github.com/bricklife_

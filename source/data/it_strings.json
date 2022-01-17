@@ -1,0 +1,67 @@
+{
+  "APP_TITLE": "Playnote Studio",
+
+  "FILESIZE_UNITS": ["B", "KB", "MB", "GB"],
+
+  "HOME_VIEW": "Vedere le Flipnote",
+  "HOME_SETTINGS": "Impostazioni",
+
+  "CLOCK_DATE_FORMAT": "${DAY}-${MONTH}-${YEAR}",
+
+  "SETTINGS_ABOUT": "Informazione",
+  "SETTINGS_CREDITS": "Titoli di coda",
+  "SETTINGS_DITHERING": "Dithering",
+  "SETTINGS_SOUND": "Effetti Sonori",
+  "SETTINGS_LANGUAGE": "Lingua",
+  "SETTINGS_RESET": "Ripristina le Impostazioni",
+  "SETTINGS_ON": "On",
+  "SETTINGS_OFF": "Off",
+  "SETTINGS_SOUND_ON": "Effetti sonori attivi",
+  "SETTINGS_SOUND_OFF": "Effetti sonori disattivati",
+  "SETTINGS_RESET_CONFIRM": "Le impostazioni verranno ripristinate",
+  "SETTINGS_RESET_DONE": "Impostazioni cancellate",
+
+  "ABOUT_VERSION": "La versione %d",
+  "ABOUT_BUILT_BY": "Costruito da %s",
+
+  "CREDITS_HEADER_JAMES": "Programmatore e UI Designer",
+  "CREDITS_HEADER_PARSER": "Flipnote Analizzatore",
+  "CREDITS_HEADER_SOUND": "Progettista del suono",
+  "CREDITS_HEADER_TRANSLATION": "I traduttori",
+  "CREDITS_HEADER_THANKS": "Ringraziamenti speciali",
+  "CREDITS_HEADER_ARTISTS": "*Artista della Flipnote*",
+  "CREDITS_HEADER_RESEARCH": "*Flipnote Ricerca*",
+  "CREDITS_HEADER_UGOCREW": "Ricercatore giapponese di Flipnote",
+  "CREDITS_HEADER_AUDIO": "Audio",
+  "CREDITS_HEADER_DOCS": "Documentazione",
+  "CREDITS_HEADER_PACKETS": "Acquisizioni di Pacchetti",
+  "CREDITS_HEADER_MISC": "Miscellaneo",
+  "CREDITS_LEGAL": "Flipnote Studio è copyright di Nintendo.\nQuesto programma non è approvato da Nintendo.",
+  "CREDITS_END": "Per favore, fai più Flipnote! ",
+
+  "VIEW_NO_FLIPNOTES": "Non ci sono Flipnote qui",
+  "VIEW_NO_FLIPNOTES_INFO": "Per sapere come aggiungere Flipnote, visita playnote.studio/filehelp",
+  "VIEW_MENU_DETAILS": "Particolari",
+
+  "PLAY_MENU_DETAILS": "Particolari",
+  "PLAY_MENU_DITHERING": "Dithering",
+
+  "DETAILS_AUTHOR": "L'autore",
+  "DETAILS_AUTHOR_ID": "ID dell'autore",
+  "DETAILS_LINKS": "Collegamenti",
+  "DETAILS_LAST_EDIT": "Ultima Modifica",
+  "DETAILS_DATE_FORMAT": "${DAY}-${MONTH}-${YEAR}",
+  "DETAILS_FRAME_COUNT": "Conteggio fotogrammi",
+  "DETAILS_FILE_SIZE": "Dimensione del file",
+  "DETAILS_FILE_PATH": "Percorso del file",
+  "DETAILS_PREV_AUTHOR": "Autore precedente",
+  "DETAILS_ORIG_AUTHOR": "Autore originale",
+
+  "DITHER_COLOUR_BLACK": "Nero",
+  "DITHER_COLOUR_RED": "Rosso",
+  "DITHER_COLOUR_BLUE": "Blu",
+
+  "DIALOG_CONFIRM": "Bene",
+  "DIALOG_OK": "Bene",
+  "DIALOG_CANCEL": "Annulla"
+}
