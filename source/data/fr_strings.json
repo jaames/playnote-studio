@@ -1,10 +1,10 @@
 {
   "APP_TITLE": "Playnote Studio",
 
-  "FILESIZE_UNITS": ["B", "KB", "MB", "GB"],
+  "FILESIZE_UNITS": ["Octet", "Ko", "Mo", "Go"],
 
-  "HOME_VIEW": "View Flipnotes",
-  "HOME_SETTINGS": "Settings",
+  "HOME_VIEW": "Voire une Flipnote",
+  "HOME_SETTINGS": "Options",
 
   "CLOCK_DATE_FORMAT": "${DAY}/${MONTH}/${YEAR}",
 

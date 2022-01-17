@@ -1,6 +1,8 @@
 {
   "APP_TITLE": "Playnote Studio",
 
+  "FILESIZE_UNITS": ["B", "KB", "MB", "GB"],
+
   "HOME_VIEW": "Bekijk Flipnotes",
   "HOME_SETTINGS": "Instellingen",
 

@@ -34,9 +34,9 @@ function fsUtils:formatFileSize(nBytes)
     return 'Nil'
   end
   local k = 1000
-  local sizes = {'B', 'KB', 'MB', 'GB'}
+  local units = locales:getArray('FILESIZE_UNITS')
   local exp = math.floor(math.log(nBytes) / math.log(k))
-  return string.format('%.1f %s', nBytes / (k ^ exp), sizes[exp + 1]);
+  return string.format('%.1f %s', nBytes / (k ^ exp), units[exp + 1]);
 end
 
 local VOICED_SOUND_MARK <const> = 12441

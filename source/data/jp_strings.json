@@ -1,6 +1,8 @@
 {
   "APP_TITLE": "プレイノートスタジオ",
 
+  "FILESIZE_UNITS": ["B", "KB", "MB", "GB"],
+
   "HOME_VIEW": "メモを見る",
   "HOME_SETTINGS": "設定",
 
