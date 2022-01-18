@@ -26,7 +26,7 @@ TODO
 
 %CREDITS_HEADER_TRANSLATION%
 
-French
+Français
 
 Eva Lauren Kelly (thejsa)
 _www.evalauren.co.uk_
@@ -35,16 +35,28 @@ _twitter.com/thejsa___
 thomasnet
 _twitter.com/thomasnet__mc_
 
-Italian
+Deutsch
+
+Mario Zoth
+_twitter.com/zothynine_
+
+Italiano
 
 Curren French
 _www.finecurry.newgrounds.com_
 
-Dutch
+Nederlands
 
 Célistine Oosting
 _github.com/therealprocyon_
 _twitter.com/therealprocyon_
+
+Русский
+
+Denis (Kashey) Chernesov
+Alina (\m/eerkat) Smirnova
+_youtube.com/channel/_
+_UCbyMzNGlTGHxLRlShJDoD3Q_
 
 
 %CREDITS_HEADER_THANKS%

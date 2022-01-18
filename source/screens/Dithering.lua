@@ -12,9 +12,9 @@ local ROW_LAYER1 <const> = 100
 local ROW_LAYER2 <const> = 164
 
 local RECT_LABELS <const> = playdate.geometry.rect.new(
-  COL_BLACK - 38,
+  COL_BLACK - 44,
   ROW_LABELS - 4, 
-  (COL_BLUE - COL_BLACK) + (38 * 2),
+  (COL_BLUE - COL_BLACK) + (44 * 2),
   27
 )
 

@@ -12,11 +12,19 @@
     "name": "Français"
   },
   {
+    "key": "de",
+    "name": "Deutsch"
+  },
+  {
     "key": "it",
     "name": "Italiano"
   },
   {
     "key": "nl",
     "name": "Nederlands"
+  },
+  {
+    "key": "ru",
+    "name": "Русский"
   }
 ]

@@ -1,0 +1,67 @@
+{
+  "APP_TITLE": "Playnote Studio",
+
+  "FILESIZE_UNITS": ["Б", "Кб", "Мб", "Гб"],
+
+  "HOME_VIEW": "Посмотреть Заметок",
+  "HOME_SETTINGS": "Настройки",
+
+  "CLOCK_DATE_FORMAT": "${DAY}/${MONTH}/${YEAR}",
+
+  "SETTINGS_ABOUT": "О программе",
+  "SETTINGS_CREDITS": "Титры",
+  "SETTINGS_DITHERING": "Эффект шума",
+  "SETTINGS_SOUND": "Звуковые эффекты",
+  "SETTINGS_LANGUAGE": "Язык",
+  "SETTINGS_RESET": "Сброс настроек",
+  "SETTINGS_ON": "Включить",
+  "SETTINGS_OFF": "Выключить",
+  "SETTINGS_SOUND_ON": "Звуковые эффекты включены",
+  "SETTINGS_SOUND_OFF": "Звуковые эффекты выключены",
+  "SETTINGS_RESET_CONFIRM": "Все настройки будут сброшены",
+  "SETTINGS_RESET_DONE": "Настройки сброшены",
+
+  "ABOUT_VERSION": "Версия %d",
+  "ABOUT_BUILT_BY": "Создано %s",
+
+  "CREDITS_HEADER_JAMES": "Программирование и UI-Дизайн",
+  "CREDITS_HEADER_PARSER": "Flipnote-Анализатор",
+  "CREDITS_HEADER_SOUND": "Звуковое оформление",
+  "CREDITS_HEADER_TRANSLATION": "Перевод",
+  "CREDITS_HEADER_THANKS": "Особая благодарность",
+  "CREDITS_HEADER_ARTISTS": "-Художники Flipnote-",
+  "CREDITS_HEADER_RESEARCH": "-Разработчик Flipnote-",
+  "CREDITS_HEADER_UGOCREW": "Японский Разработчики Flipnote",
+  "CREDITS_HEADER_AUDIO": "Звуки",
+  "CREDITS_HEADER_DOCS": "Документация",
+  "CREDITS_HEADER_PACKETS": "Анализатор сети",
+  "CREDITS_HEADER_MISC": "Другое",
+  "CREDITS_LEGAL": "Этот проект никак не одобрен и не связан с Flipnote Studio от © Nintendo.",
+  "CREDITS_END": "В скором времени! ",
+
+  "VIEW_NO_FLIPNOTES": "Здесь нет никаких Заметок",
+  "VIEW_NO_FLIPNOTES_INFO": "Чтобы узнать, как добавить Заметки, пожалуйста, посетите\nplaynote.studio/filehelp",
+  "VIEW_MENU_DETAILS": "Details",
+
+  "PLAY_MENU_DETAILS": "Details",
+  "PLAY_MENU_DITHERING": "Dithering",
+
+  "DETAILS_AUTHOR": "Создатель",
+  "DETAILS_AUTHOR_ID": "ID-Создателя",
+  "DETAILS_LINKS": "Ссылки",
+  "DETAILS_LAST_EDIT": "Последнее редактирование",
+  "DETAILS_DATE_FORMAT": "${DAY}/${MONTH}/${YEAR}",
+  "DETAILS_FRAME_COUNT": "Количество",
+  "DETAILS_FILE_SIZE": "Размер файла",
+  "DETAILS_FILE_PATH": "Путь файла",
+  "DETAILS_PREV_AUTHOR": "Предыдущий создатель",
+  "DETAILS_ORIG_AUTHOR": "Первый создатель",
+
+  "DITHER_COLOUR_BLACK": "Black",
+  "DITHER_COLOUR_RED": "Red",
+  "DITHER_COLOUR_BLUE": "Blue",
+
+  "DIALOG_CONFIRM": "ОК",
+  "DIALOG_OK": "OK",
+  "DIALOG_CANCEL": "Отмена"
+}

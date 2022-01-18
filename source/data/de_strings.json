@@ -1,0 +1,67 @@
+{
+  "APP_TITLE": "Playnote Studio",
+
+  "FILESIZE_UNITS": ["B", "KB", "MB", "GB"],
+
+  "HOME_VIEW": "Zeige Flipnotes",
+  "HOME_SETTINGS": "Einstellungen",
+
+  "CLOCK_DATE_FORMAT": "${DAY}/${MONTH}/${YEAR}",
+
+  "SETTINGS_ABOUT": "Über",
+  "SETTINGS_CREDITS": "Mitwirkende",
+  "SETTINGS_DITHERING": "Dithering",
+  "SETTINGS_SOUND": "Soundeffekte",
+  "SETTINGS_LANGUAGE": "Sprache",
+  "SETTINGS_RESET": "Einstellungen zurücksetzen",
+  "SETTINGS_ON": "Ein",
+  "SETTINGS_OFF": "Aus",
+  "SETTINGS_SOUND_ON": "Soundeffekte ein",
+  "SETTINGS_SOUND_OFF": "Soundeffekte aus",
+  "SETTINGS_RESET_CONFIRM": "Alle Einstellungen werden gelöscht",
+  "SETTINGS_RESET_DONE": "Einstellungen wurden gelöscht",
+
+  "ABOUT_VERSION": "Version %d",
+  "ABOUT_BUILT_BY": "Kreiert von %s",
+
+  "CREDITS_HEADER_JAMES": "Programmierung und UI Design",
+  "CREDITS_HEADER_PARSER": "Flipnote Decoder",
+  "CREDITS_HEADER_SOUND": "Sound Design",
+  "CREDITS_HEADER_TRANSLATION": "Übersetzung",
+  "CREDITS_HEADER_THANKS": "Danke an",
+  "CREDITS_HEADER_ARTISTS": "*Flipnote Künstler*",
+  "CREDITS_HEADER_RESEARCH": "*Flipnote Recherche*",
+  "CREDITS_HEADER_UGOCREW": "Flipnote Rechercheure - Japan",
+  "CREDITS_HEADER_AUDIO": "Audio",
+  "CREDITS_HEADER_DOCS": "Dokumentation",
+  "CREDITS_HEADER_PACKETS": "Packet Captures",
+  "CREDITS_HEADER_MISC": "Verschiedenes",
+  "CREDITS_LEGAL": "Flipnote - © Nintendo. Dieses Projekt ist in keiner Form bestätigt von oder verbunden mit Flipnote Studio oder Nintendo",
+  "CREDITS_END": "Auf viele, viele Flipnotes! ",
+
+  "VIEW_NO_FLIPNOTES": "Es sind noch keine Flipnotes vorhanden",
+  "VIEW_NO_FLIPNOTES_INFO": "Lerne wie man Flipnotes erstellt, auf playnote.studio/filehelp",
+  "VIEW_MENU_DETAILS": "Details",
+
+  "PLAY_MENU_DETAILS": "Details",
+  "PLAY_MENU_DITHERING": "Dithering",
+
+  "DETAILS_AUTHOR": "Autor",
+  "DETAILS_AUTHOR_ID": "Autoren ID",
+  "DETAILS_LINKS": "Links",
+  "DETAILS_LAST_EDIT": "Letzte Bearbeitung",
+  "DETAILS_DATE_FORMAT": "${DAY}/${MONTH}/${YEAR}",
+  "DETAILS_FRAME_COUNT": "Frame count",
+  "DETAILS_FILE_SIZE": "Dateigröße",
+  "DETAILS_FILE_PATH": "Pfad",
+  "DETAILS_PREV_AUTHOR": "Voriger Autor",
+  "DETAILS_ORIG_AUTHOR": "Original-Autor",
+
+  "DITHER_COLOUR_BLACK": "Schwarz",
+  "DITHER_COLOUR_RED": "Rot",
+  "DITHER_COLOUR_BLUE": "Blau",
+
+  "DIALOG_CONFIRM": "Bestätigen",
+  "DIALOG_OK": "OK",
+  "DIALOG_CANCEL": "Abbrechen"
+}

@@ -12,6 +12,7 @@ function locales:init()
 end
 
 function locales:getAvailableLanguages()
+  assert(type(LANGS) == 'table', 'lang.json is missing or corrupted')
   return LANGS
 end
 
