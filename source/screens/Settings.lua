@@ -25,6 +25,13 @@ class('SettingsScreen').extends(ScreenBase)
 
 function SettingsScreen:init()
   SettingsScreen.super.init(self)
+  self.scrollBar = Scrollbar(PLAYDATE_W - 26, MENU_GAP_TOP, PLAYDATE_H - MENU_GAP_TOP - MENU_GAP_BOTTOM)
+  
+  self.scroll = ScrollController()
+  self.scroll.updateCallback = function (scroll)
+    self.scrollBar.progress = scroll.progress
+  end
+
   self.inputHandlers = {
     upButtonDown = function ()
       self:selectPrev()
@@ -37,10 +44,6 @@ function SettingsScreen:init()
       item:onClick(item)
     end
   }
-  self.scrollBar = Scrollbar(PLAYDATE_W - 26, MENU_GAP_TOP, PLAYDATE_H - MENU_GAP_TOP - MENU_GAP_BOTTOM)
-  self.menuScroll = 0
-  self.menuHeight = 0
-  self.menuScrollTransitionActive = false
   self.activeItemIndex = 1
 end
 
@@ -253,16 +256,16 @@ function SettingsScreen:beforeEnter()
   for _, item in pairs(items) do
     item.init(item)
   end
-
-  self.menuHeight = #items * (ITEM_GAP + ITEM_HEIGHT) + MENU_GAP_TOP + MENU_GAP_BOTTOM
+  self.scroll:setHeight(#items * (ITEM_GAP + ITEM_HEIGHT) + MENU_GAP_TOP + MENU_GAP_BOTTOM)
+  self.scroll.range -= ITEM_GAP
   self.numItems = #items
   self.items = items
-  self.scrollMax = self.menuHeight - PLAYDATE_H - ITEM_GAP
   self:scrollToItemByIndex(self.activeItemIndex)
 end
 
 function SettingsScreen:afterLeave()
   SettingsScreen.super.afterLeave(self)
+  self.scroll:setOffset(0)
   -- autosave on leave
   config:save()
   -- free ui items
@@ -281,23 +284,13 @@ function SettingsScreen:scrollToItemByIndex(index, animate)
   local lastItem = self.items[self.activeItemIndex]
   lastItem.deselect(lastItem)
   -- figure out how far to scroll for the selected option
-  local currScroll = self.menuScroll
   local nextItemY = (index - 1) * (ITEM_HEIGHT + ITEM_GAP)
-  local nextScroll = utils:clamp(nextItemY - MENU_MID, 0, self.scrollMax)
-  -- scroll with animation
+  local nextOffset = -(nextItemY - MENU_MID)
+  -- do scroll
   if animate == true then
-    self.menuScrollTransitionActive = true
-    local timer = playdate.timer.new(MENU_SCROLL_DUR, currScroll, nextScroll, playdate.easingFunctions.outCubic)
-    timer.updateCallback = function ()
-      self:setScroll(timer.value)
-    end
-    timer.timerEndedCallback = function ()
-      self:setScroll(nextScroll)
-      self.menuScrollTransitionActive = false
-    end
-  -- or not
+    self.scroll:animateToOffset(nextOffset, MENU_SCROLL_DUR, playdate.easingFunctions.outCubic)
   else
-    self:setScroll(nextScroll)
+    self.scroll:setOffset(nextOffset)
   end
   -- update state
   self.activeItemIndex = index
@@ -305,11 +298,6 @@ function SettingsScreen:scrollToItemByIndex(index, animate)
   -- update selected item
   local currItem = self.activeItem
   currItem.select(currItem)
-end
-
-function SettingsScreen:setScroll(pos)
-  self.menuScroll = pos
-  self.scrollBar.progress = pos / self.scrollMax
 end
 
 function SettingsScreen:selectNext()
@@ -322,24 +310,18 @@ end
 
 function SettingsScreen:update()
   gfx.setDrawOffset(0, 0)
-  gfxUtils:drawBgGridWithOffset(-self.menuScroll)
+  gfxUtils:drawBgGridWithOffset(self.scroll.offset)
   bgGfx:draw(0, 0)
   self.scrollBar:draw()
-  local y = 0 - self.menuScroll + MENU_GAP_TOP
+  gfx.setDrawOffset(0, self.scroll.offset)
+  local y = MENU_GAP_TOP
   for _, item in pairs(self.items) do
-    if y < -ITEM_HEIGHT then
-      goto nextItem
-    elseif y > PLAYDATE_H then
-      break
-    else
-      item.draw(item, MENU_X, y)
-    end
-    ::nextItem::
+    item.draw(item, MENU_X, y)
     y = y + ITEM_GAP + ITEM_HEIGHT
   end
   -- use crank to scroll through items
   local crankChange = playdate.getCrankTicks(6)
   if crankChange ~= 0 then
-    self:scrollToItemByIndex(self.activeItemIndex + crankChange, true)
+    self:scrollToItemByIndex(self.activeItemIndex - crankChange, true)
   end
 end

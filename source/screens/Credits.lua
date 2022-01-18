@@ -1,10 +1,6 @@
 local gfx <const> = playdate.graphics
 
 local PLAYDATE_W <const> = 400
-local PLAYDATE_H <const> = 240
-local SCROLL_START <const> = 200
-local SCROLL_AUTO_STEP <const> = -1
-
 local logoGfx <const> = gfx.image.new('./gfx/gfx_logo_credits')
 
 CreditsScreen = {}
@@ -12,16 +8,11 @@ class('CreditsScreen').extends(ScreenBase)
 
 function CreditsScreen:init()
   CreditsScreen.super.init(self)
-  -- don't scroll to begin with
-  self.autoScroll = false
-  self.scrollY = 0
   self.creditsTexture = nil
-  self.inputHandlers = {
-    cranked = function(change, acceleratedChange)
-      self.autoScroll = false
-      self.scrollY = utils:clampScroll(self.scrollY + change, SCROLL_START, self.creditsHeight)
-    end,
-  }
+
+  self.scroll = ScrollController()
+  self.scroll:setStart(200)
+  self.inputHandlers = self.scroll:extendInputHandlers(self.inputHandlers)
 end
 
 function CreditsScreen:getArtistCredits()
@@ -51,7 +42,6 @@ end
 
 function CreditsScreen:beforeEnter()
   CreditsScreen.super.beforeEnter(self)
-  self.scrollY = SCROLL_START
   gfx.setFontFamily({
     [gfx.font.kVariantNormal] = MAIN_FONT,
     [gfx.font.kVariantBold] = gfx.font.new('./fonts/Asheville-Rounded-24-px'),
@@ -72,14 +62,16 @@ function CreditsScreen:beforeEnter()
     [gfx.font.kVariantItalic] = MAIN_FONT
   })
   text = nil
-  self.creditsHeight = height
+  self.scroll.autoScroll = false
+  self.scroll:resetOffset()
+  self.scroll:setHeight(height)
   self.creditsTexture = cache
 end
 
 function CreditsScreen:afterEnter()
   CreditsScreen.super.afterEnter(self)
   -- begin scrolling after enter transition
-  self.autoScroll = true
+  self.scroll.autoScroll = true
 end
 
 function CreditsScreen:afterLeave()
@@ -88,13 +80,11 @@ function CreditsScreen:afterLeave()
 end
 
 function CreditsScreen:update()
-  gfx.setDrawOffset(0, self.scrollY)
+  gfx.setDrawOffset(0, self.scroll.offset)
   gfx.setBackgroundColor(gfx.kColorBlack)
   gfx.clear()
   logoGfx:drawCentered(200, -30)
   self.creditsTexture:draw(0, 0)
   -- auto scroll
-  if self.autoScroll then
-    self.scrollY = utils:clampScroll(self.scrollY + SCROLL_AUTO_STEP, SCROLL_START, self.creditsHeight)
-  end
+  self.scroll:update()
 end

@@ -6,7 +6,7 @@
 - Add DSi username chars to font
 - Function to delete sample notes
 - Get audio design in
-- Get translators in
+- Fix UI for other language strings
 - launchSoundPath in pdxinfo
 - Create a PPM test suite to verify against
 - Website

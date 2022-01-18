@@ -30,7 +30,10 @@ end
 
 -- draw a full-screen grid background, with a given offset
 function gfxUtils:drawBgGridWithOffset(offset)
-  gfx.setPattern(GRID_PATTERNS[(math.floor(offset % 8) + 1)])
+  -- clamp because this can apparently end up as 9 in certain cases? how the fuck does that happen?
+  local pattern = utils:clamp((math.floor(offset % 8) + 1), 1, 8)
+  print()
+  gfx.setPattern(GRID_PATTERNS[pattern])
   gfx.fillRect(0, 0, PLAYDATE_W, PLAYDATE_H)
   -- white outline around the screen
   gfx.setColor(gfx.kColorWhite)
