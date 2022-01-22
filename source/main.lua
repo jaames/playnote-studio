@@ -1,6 +1,7 @@
 import 'CoreLibs/math'
 import 'CoreLibs/object'
 import 'CoreLibs/graphics'
+import 'CoreLibs/sprites'
 import 'CoreLibs/nineslice'
 import 'CoreLibs/crank'
 import 'CoreLibs/timer'
@@ -68,6 +69,7 @@ function playdate.update()
   utils:doDeferredDraws()
   playdate.timer.updateTimers()
   playdate.frameTimer.updateTimers()
+  playdate.graphics.sprite.update()
 end
 
 -- import 'CoreLibs/qrcode'

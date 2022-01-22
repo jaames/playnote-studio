@@ -56,6 +56,7 @@ end
 function HomeScreen:update()
   -- draw background
   gfxUtils:drawBgGrid()
+  gfx.setDrawOffset(0, 0)
   -- main logo
   logo:draw(52, 52)
   -- clock
