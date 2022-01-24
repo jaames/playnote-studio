@@ -74,9 +74,9 @@ function dialog:show(text, type)
   _, currentTextHeight = gfx.getTextSizeForMaxWidth(text, PLAYDATE_W - 64, nil, font)
   isVisible = true
   -- setup buttons
-  okButton:setText(locales:getText('DIALOG_OK'))
-  cancelButton:setText(locales:getText('DIALOG_CANCEL'))
-  confirmButton:setText(locales:getText('DIALOG_CONFIRM'))
+  -- okButton:setText(locales:getText('DIALOG_OK'))
+  -- cancelButton:setText(locales:getText('DIALOG_CANCEL'))
+  -- confirmButton:setText(locales:getText('DIALOG_CONFIRM'))
   -- disable input
   playdate.inputHandlers.push({}, true)
   -- setup transition

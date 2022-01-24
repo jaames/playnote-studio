@@ -6,6 +6,7 @@ local prevScreen = nil
 local activeScreen = nil
 
 local isTransitionActive = false
+local drawTransition = nil
 
 local screenHistory = {}
 local transitionHistory = {}
@@ -16,6 +17,11 @@ local menuItems = {}
 local isShakeActive = false
 local moveX = 0
 local moveY = 0
+
+spritelib.setAlwaysRedraw(false)
+spritelib.setBackgroundDrawingCallback(function (x, y, w, h)
+  screens:drawBg(x, y, w, h)
+end)
 
 function screens:register(id, screenInst)
   SCREENS[id] = screenInst
@@ -61,7 +67,7 @@ function screens:setScreen(id, transitionFn, ...)
 
   menuItems = activeScreen:setupMenuItems(menu)
 
-  transitionFn(prevScreen, activeScreen, function()
+  drawTransition = transitionFn(prevScreen, activeScreen, function()
     if hasPrevScreen then prevScreen:afterLeave() end
     activeScreen:afterEnter()
     isTransitionActive = false
@@ -74,7 +80,7 @@ function screens:reloadCurrent(transitionFn)
   activeScreen:afterLeave()
   activeScreen:beforeEnter()
 
-  transitionFn(activeScreen, activeScreen, function()
+  drawTransition = transitionFn(activeScreen, activeScreen, function()
     isTransitionActive = false
   end)
 end
@@ -98,11 +104,97 @@ function screens:shakeX()
   end
 end
 
+function screens:drawBg(x, y, w, h)
+  if isTransitionActive then
+    drawTransition()
+  else
+    if isShakeActive then
+      gfx.setDrawOffset(moveX, moveY)
+    end
+    activeScreen:drawBg(x, y, w, h)
+  end
+end
+
 function screens:update()
   if not isTransitionActive then
-    if isShakeActive then
-      playdate.graphics.setDrawOffset(moveX, moveY)
-    end
     activeScreen:update()
   end
 end
+
+function screens:newTransition(duration, initialState, transitionFn, easing)
+  easing = easing or playdate.easingFunctions.linear
+  return function(a, b, completedCallback)
+    local timer = playdate.timer.new(duration, 0, 1, easing)
+    local value = 0
+    local state = {}
+
+    local function drawFn()
+      transitionFn(value, a, b, state)
+    end
+
+    if type(initialState) == 'function' then
+      state = initialState(drawFn)
+    elseif type(initialState) == 'table' then
+      state = table.deepcopy(initialState)
+    end
+
+    timer.updateCallback = function ()
+      spritelib.redrawBackground()
+      value = timer.value
+    end
+
+    timer.timerEndedCallback = function ()
+      spritelib.redrawBackground()
+      value = 1
+      -- sometimes (depends on easing and frame timing) transition values don't reach 1 before isTransitionActive is set to false, 
+      -- leaving thigns hanging on the last frame. doing tthe completed callback on the next frame seems to fix this
+      utils:nextTick(function ()
+        value = 1
+        spritelib.redrawBackground()
+        completedCallback()
+      end)
+    end
+
+    return drawFn
+  end
+end
+
+function screens:newInOutTransition(duration, setup, inFn, outFn, easing)
+  return self:newTransition(duration, setup, function (t, a, b, state)
+    if t < 0.5 then
+      inFn(t * 2, a, b, state)
+    else
+      outFn((t - 0.5) * 2, a, b, state)
+    end
+  end, easing)
+end
+
+screens.kTransitionNone = screens:newTransition(0, nil, function () end)
+
+screens.kTransitionStartup = screens:newTransition(320, nil,
+  function (t, a, b, state)
+    if b ~= nil then
+      if not b.active then
+        b:enter()
+      end
+      b:drawBg()
+      overlayBg:setWhiteFade(t)
+    end
+  end
+)
+
+screens.kTransitionFade = screens:newInOutTransition(300, {nextIn = false},
+  function (t, a, b, state)
+    a:drawBg()
+    overlayBg:setWhiteFade(1 - t)
+  end,
+  function (t, a, b, state)
+    if not state.nextIn then
+      a:leave()
+      b:enter()
+      state.nextIn = true
+    end
+    b:drawBg()
+    overlayBg:setWhiteFade(t)
+  end
+)

@@ -1,9 +1,7 @@
-local PLAYDATE_H <const> = 240
-
 ScrollController = {}
 class('ScrollController').extends()
 
-function ScrollController:init()
+function ScrollController:init(screen)
   self.start = 0
   self.offset = 0
   self.height = 0
@@ -12,15 +10,21 @@ function ScrollController:init()
 
   self.autoScroll = false
   self.autoScrollStep = -1
+  self.controlDrawOffset = true
+  self.scrollBar = nil
 
   self.scrollAnimationActive = false
 
   self.updateCallback = function(scroll) end
+
+  if screen ~= nil then
+    self:connectScreen(screen)
+  end
 end
 
 function ScrollController:setStart(s)
   self.start = s
-  self:setOffset(s)
+  -- self:setOffset(s)
 end
 
 function ScrollController:setHeight(h)
@@ -34,10 +38,18 @@ function ScrollController:setOffset(o)
   self.progress = -self.offset / self.range
   if not (self.offset == oldOffset) then
     self.updateCallback(self)
+    if self.controlDrawOffset then
+      gfx.setDrawOffset(0, self.offset)
+      spritelib.redrawBackground()
+    end
+    if self.scrollBar ~= nil then
+      self.scrollBar:setProgress(self.progress)
+    end
   end
 end
 
 function ScrollController:animateToOffset(offset, duration, easing)
+  if self.scrollAnimationActive then return end
   self.scrollAnimationActive = true
   local endOffset = self:clampOffset(offset)
   local timer = playdate.timer.new(duration, self.offset, endOffset, easing)
@@ -54,16 +66,13 @@ function ScrollController:resetOffset()
   self:setOffset(self.start)
 end
 
-function ScrollController:extendInputHandlers(handlers)
-  handlers.cranked = function(c, ac)
-    self:crankHandler(c, ac)
+function ScrollController:clampOffset(o)
+  if o <= -self.range then
+    return -self.range
+  elseif o >= self.start then
+    return self.start
   end
-  return handlers
-end
-
-function ScrollController:crankHandler(change, acceleratedChange)
-  self:setOffset(self.offset + change)
-  self.autoScroll = false
+  return o
 end
 
 function ScrollController:update()
@@ -72,11 +81,27 @@ function ScrollController:update()
   end
 end
 
-function ScrollController:clampOffset(pos)
-  if pos <= -self.range then
-    return -self.range
-  elseif pos >= self.start then
-    return self.start
+function ScrollController:crankHandler(change, acceleratedChange)
+  self:setOffset(self.offset + math.floor(change))
+  self.autoScroll = false
+end
+
+function ScrollController:connectScreen(screen)
+  assert(type(screen.inputHandlers) == 'table', 'input handlers not a table')
+  local inputHandlers = screen.inputHandlers
+  local origCrankCallback = inputHandlers.cranked
+  local hasOrigCrankCallback = type(origCrankCallback) == 'function'
+  inputHandlers.cranked = function(c, ac)
+    if hasOrigCrankCallback then
+      origCrankCallback(c, ac)
+    end
+    self:crankHandler(c, ac)
   end
-  return pos
+  screen.inputHandlers = inputHandlers
+end
+
+
+function ScrollController:connectScrollBar(scrollBar)
+  self.scrollBar = scrollBar
+  scrollBar:setProgress(self.progress)
 end

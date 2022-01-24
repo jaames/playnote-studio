@@ -73,7 +73,7 @@ function noteFs:getFolderData(folderPath)
       json.encodeToFile(jsonPath, false, {})
     end
   else
-    json.encodeToFile(jsonPath, false, {})
+    -- json.encodeToFile(jsonPath, false, {})
   end
   self:updateFolderDataCache(folderPath, data)
   return data

@@ -12,13 +12,9 @@ class('DetailsScreen').extends(ScreenBase)
 function DetailsScreen:init()
   DetailsScreen.super.init(self)
   self.inputHandlers = {}
-  self.scroll = ScrollController()
-  self.scrollBar = Scrollbar(PLAYDATE_W - 26, BOX_Y, PLAYDATE_H - BOX_Y * 2)
+  self.scroll = ScrollController(self)
+  self.scrollBar = ScrollBar(PLAYDATE_W - 26, BOX_Y, PLAYDATE_H - BOX_Y * 2)
   self.list = KeyValList(BOX_X, BOX_Y, BOX_W)
-  self.inputHandlers = self.scroll:extendInputHandlers(self.inputHandlers)
-  self.scroll.updateCallback = function (scroll)
-    self.scrollBar.progress = scroll.progress
-  end
 end
 
 function DetailsScreen:renderNoteDetails(ppmPath)
@@ -56,10 +52,10 @@ function DetailsScreen:afterLeave()
   self.scroll:setOffset(0)
 end
 
-function DetailsScreen:update()
-  gfx.setDrawOffset(0, 0)
-  gfxUtils:drawBgGridWithOffset(self.scroll.offset)
-  self.scrollBar:draw()
-  gfx.setDrawOffset(0, self.scroll.offset)
-  -- self.list:draw(0, 0)
-end
+-- function DetailsScreen:update()
+--   gfx.setDrawOffset(0, 0)
+--   gfxUtils:drawBgGridWithOffset(self.scroll.offset)
+--   self.scrollBar:draw()
+--   gfx.setDrawOffset(0, self.scroll.offset)
+--   -- self.list:draw(0, 0)
+-- end

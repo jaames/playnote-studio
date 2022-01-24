@@ -1,26 +1,8 @@
-local PLAYDATE_W <const> = 400
-local PLAYDATE_H <const> = 240
-local gfx <const> = playdate.graphics
-
-local logo <const> = gfx.animation.loop.new(1000 / 4, gfx.imagetable.new('./gfx/gfx_logo_anim'))
-
-local viewButtonGfx <const> = gfx.image.new('./gfx/icon_view')
-local settingsButtonGfx <const> = gfx.image.new('./gfx/icon_settings')
-
 HomeScreen = {}
 class('HomeScreen').extends(ScreenBase)
 
 function HomeScreen:init()
   HomeScreen.super.init(self)
-
-  self.viewButton = Button(PLAYDATE_W / 2 - 98, PLAYDATE_H - 52, 196, 34)
-  self.viewButton:setIcon(viewButtonGfx)
-  self.viewButton:select()
-
-  self.settingsButton = Button(PLAYDATE_W - 136, 6, 128, 26)
-  self.settingsButton:setIcon(settingsButtonGfx)
-
-  self.clock = Clock(8, 8, 152, 24)
 
   self.inputHandlers = {
     upButtonDown = function ()
@@ -38,30 +20,36 @@ function HomeScreen:init()
     AButtonDown = function()
       if self.viewButton.isSelected then
         self.viewButton:click()
-        screens:push('notelist', transitions.kTransitionStartup)
+        screens:push('notelist', screens.kTransitionFade)
       elseif self.settingsButton.isSelected then
         self.settingsButton:click()
-        screens:push('settings', transitions.kTransitionStartup)
+        screens:push('settings', screens.kTransitionFade)
       end
     end,
   }
 end
 
-function HomeScreen:beforeEnter()
-  HomeScreen.super.beforeEnter(self)
-  self.viewButton:setText(locales:getText('HOME_VIEW'))
-  self.settingsButton:setText(locales:getText('HOME_SETTINGS'))
+function HomeScreen:setupComponents()
+  local viewButton = Button(PLAYDATE_W / 2, PLAYDATE_H - 52, 196, 34, locales:getText('HOME_VIEW'))
+  viewButton.autoWidth = true
+  viewButton:setIcon('./gfx/icon_view')
+  viewButton:setAnchor('center', 'top')
+  viewButton:select()
+  self.viewButton = viewButton
+
+  local settingsButton = Button(PLAYDATE_W - 8, 6, 128, 26, locales:getText('HOME_SETTINGS'))
+  settingsButton.autoWidth = true
+  settingsButton:setIcon('./gfx/icon_settings')
+  settingsButton:setAnchor('right', 'top')
+  self.settingsButton = settingsButton
+
+  local clock = Clock(8, 8, 152, 24)
+
+  local homeLogo = HomeLogo(52, 54)
+  
+  return {viewButton, settingsButton, clock, homeLogo}
 end
 
-function HomeScreen:update()
-  -- draw background
-  gfxUtils:drawBgGrid()
-  gfx.setDrawOffset(0, 0)
-  -- main logo
-  logo:draw(52, 52)
-  -- clock
-  self.clock:draw()
-  -- buttons
-  self.settingsButton:draw()
-  self.viewButton:draw()
+function HomeScreen:drawBg(x, y, w, h)
+  grid:draw(x, y, w, h)
 end

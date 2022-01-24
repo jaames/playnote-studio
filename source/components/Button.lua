@@ -1,16 +1,15 @@
-local gfx <const> = playdate.graphics
 local newNineSlice = gfx.nineSlice.new
 
 local buttonGfx = {
   default = {
-    base =   gfx.nineSlice.new('./gfx/shape_button_default', 8, 8, 2, 2),
-    select = gfx.nineSlice.new('./gfx/shape_button_default_selected', 8, 8, 2, 2),
-    click =  gfx.nineSlice.new('./gfx/shape_button_default_clicked', 8, 8, 2, 2)
+    base =   newNineSlice('./gfx/shape_button_default', 8, 8, 2, 2),
+    select = newNineSlice('./gfx/shape_button_default_selected', 8, 8, 2, 2),
+    click =  newNineSlice('./gfx/shape_button_default_clicked', 8, 8, 2, 2)
   },
   folderselect = {
-    base =   gfx.nineSlice.new('./gfx/shape_button_folderselect', 8, 8, 2, 2),
-    select = gfx.nineSlice.new('./gfx/shape_button_folderselect_selected', 8, 8, 2, 2),
-    click =  gfx.nineSlice.new('./gfx/shape_button_folderselect_clicked', 8, 8, 2, 2)
+    base =   newNineSlice('./gfx/shape_button_folderselect', 8, 8, 2, 2),
+    select = newNineSlice('./gfx/shape_button_folderselect_selected', 8, 8, 2, 2),
+    click =  newNineSlice('./gfx/shape_button_folderselect_clicked', 8, 8, 2, 2)
   },
   -- settings = {
   --   base =   gfx.nineSlice.new('./gfx/shape_button_settings', 8, 8, 2, 2),
@@ -19,82 +18,145 @@ local buttonGfx = {
   -- },
 }
 
-Button = {}
-class('Button').extends()
+local align <const> = {
+  left = 0,
+  top = 0,
+  center = 0.5,
+  right = 1,
+  bottom = 1
+}
 
-function Button:init(x, y, w, h)
-  Button.super.init(self)
-  self.x = x
-  self.y = y
-  self.w = w
-  self.h = h
+Button = {}
+class('Button').extends(playdate.graphics.sprite)
+
+function Button:init(x, y, w, h, text)
   self.variant = 'default'
   self.state = 'base'
   self.isSelected = false
+  
+  self.padLeft = 12
+  self.padRight = 12
+  self.padTop = 6
+  self.padBottom = 6
+  self.autoWidth = false
+  self.autoHeight = false
+
   self.text = nil
-  self.textY = nil
+  self.textAlign = kTextAlignment.center
+  self.textY = 0
+  self.textW = 0
+  self.textH = 0
+
   self.icon = nil
-  self.iconW = nil
-  self:setText('')
+  self.iconY = 0
+  self.iconW = 0
+  self.iconH = 0
+  self.iconPadRight = 12
+
+  self.clickCallback = function (btn) end
+
+  self:moveTo(x, y)
+  self:setSize(w, h)
+  self:setCenter(0, 0)
+  self:setZIndex(100)
+  if text then
+    self:setText(text)
+  end
+end
+
+function Button:onClick(fn)
+  assert(type(fn) == 'function', 'callback mush be a function')
+  self.clickCallback = fn
+end
+
+function Button:click()
+  self.clickCallback(self)
+end
+
+function Button:setAnchor(x, y)
+  if type(x) == 'string' then
+    x = align[x]
+  end
+  if type(y) == 'string' then
+    y = align[y]
+  end
+  self:setCenter(x, y)
 end
 
 function Button:setText(text)
-  gfx.setFontTracking(2)
-  local y = self.y
-  local h = self.h
-  local _, textH = gfx.getTextSize(text)
-  local textY = (h / 2) - (textH / 2)
   self.text = text
-  self.textY = textY
+  gfx.setFontTracking(2)
+  local textW, textH = gfx.getTextSize(text)
+  self.text = text
+  self.textW = textW
+  self.textH = textH
+  self:updateLayout()
 end
 
-function Button:setIcon(icon)
-  local iconW, _ = icon:getSize()
+function Button:setIcon(imgPath)
+  if type(imgPath) ~= 'string' then
+    print('tried to load button icon the old way')
+    return
+  end
+  local icon = gfx.image.new(imgPath)
+  local iconW, iconH = icon:getSize()
   self.icon = icon
   self.iconW = iconW
+  self.iconH = iconH
+  self:updateLayout()
+end
+
+function Button:updateLayout()
+  local w = self.width
+  local h = self.height
+  if self.autoWidth and self.icon then
+    w = self.padLeft + self.iconW + self.iconPadRight + self.textW + self.padRight
+  elseif self.autoWidth then
+    w = self.padLeft + self.textW + self.padRight
+  end
+  if self.autoHeight and self.icon then
+    h = self.padTop + math.max(self.iconH, self.textH) + self.padBottom
+  end
+  self.textY = (h / 2) - (self.textH / 2)
+  self.iconY = (h / 2) - (self.iconH / 2)
+  self:setSize(w, h)
+  self:markDirty()
 end
 
 function Button:select()
   self.state = 'select'
   self.isSelected = true
+  self:markDirty()
 end
 
 function Button:deselect()
   self.state = 'base'
   self.isSelected = false
+  self:markDirty()
 end
 
-function Button:click()
-  local s = self
-  self.state = 'click'
-  playdate.timer.performAfterDelay(150, function () s.state = 'base' end)
-end
-
-function Button:draw()
-  self:drawAt(self.x, self.y)
-end
-
-function Button:drawAt(x, y)
-  local w = self.w
-  local h = self.h
-  local textX = x + 6
-  local textW = w - 12
+function Button:draw(clipX, clipY, clipW, clipH)
+  local w = self.width
+  local h = self.height
+  local bgX, bgyY, bgW, bgH = -3, -3, w + 6, h + 6
+  local textX = self.padLeft
+  local textW = self.width - self.padLeft - self.padRight
   -- draw background
-  buttonGfx[self.variant][self.state]:drawInRect(x - 3, y - 3, w + 6, h + 6)
+  gfx.setClipRect(bgX, bgyY, bgW, bgH)
+  buttonGfx[self.variant][self.state]:drawInRect(bgX, bgyY, bgW, bgH)
   -- draw icon if present
   if self.icon then
-    local pad = 12
-    local gap = 16
-    textX = textX + self.iconW + gap
-    textW = textW - (self.iconW + gap + pad)
-    self.icon:drawAnchored(x + pad, y + (h / 2), 0, 0.5)
+    local iconSpace = self.iconW + self.iconPadRight
+    textX = textX + iconSpace
+    textW = textW - iconSpace
+    self.icon:draw(self.padLeft, self.iconY)
   end
   -- draw text if present
   if self.text then
-    gfx.setFont(fontBold)
+    -- gfx.setFont(fontBold)
     gfx.setFontTracking(2)
     gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-    gfx.drawTextInRect(self.text, textX, y + self.textY, textW, h, nil, '...', kTextAlignment.center)
+    gfx.drawTextInRect(self.text, textX, self.textY, textW, self.textH, nil, '...', self.textAlign)
     gfx.setImageDrawMode(0)
   end
 end

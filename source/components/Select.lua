@@ -1,9 +1,3 @@
-import './Button.lua'
-
-local gfx <const> = playdate.graphics
-
-local PLAYDATE_W <const> = 400
-local PLAYDATE_H <const> = 240
 local OPTION_GAP <const> = 12
 local OPTION_WIDTH <const> = 304
 local OPTION_HEIGHT <const> = 40
@@ -15,8 +9,8 @@ local MENU_SCROLL_DUR = 100
 Select = {}
 class('Select').extends(Button)
 
-function Select:init(x, y, w, h)
-  Select.super.init(self, x, y, w, h)
+function Select:init(x, y, w, h, text)
+  Select.super.init(self, x, y, w, h, text)
   self.isOpen = false
   self.openTransitionActive = false
   self.numOptions = 0
@@ -68,7 +62,7 @@ end
 function Select:setValue(value, animate)
   local index = 0
   local vals = self.optionValues
-  -- indexOfElement apparently won't work for bools and other types  here...
+  -- indexOfElement apparently won't work for bools and other types here...
   for i = 1,self.numOptions do
     if vals[i] == value then
       index = i
@@ -125,12 +119,12 @@ function Select:selectPrev()
   self:setValueByIndex(self.activeOptionIndex - 1, true)
 end
 
-function Select:drawAt(x, y)
-  Select.super.drawAt(self, x, y)
-
+function Select:draw(clipX, clipY, clipW, clipH)
+  Select.super.draw(self, clipX, clipY, clipW, clipH)
+  local w, h = self.width, self.height
   local currValueLabel = self.optionShortLabels[self.activeOptionIndex]
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  gfx.drawTextInRect(currValueLabel, x, y + self.textY, self.w - 16, self.h, nil, '...', kTextAlignment.right)
+  gfx.drawTextInRect(currValueLabel, 0, self.textY, w - 16, h, nil, '...', kTextAlignment.right)
   gfx.setImageDrawMode(0)
 
   if self.isOpen then

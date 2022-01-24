@@ -80,7 +80,7 @@ function NoteListScreen:init()
       -- thumbnail is selected
       else
         noteFs:setCurrentNote(self.selectedThumb.path)
-        screens:push('player', transitions.kTransitionFade)
+        screens:push('player', screens.kTransitionFade)
       end
     end,
   }
@@ -89,7 +89,7 @@ end
 function NoteListScreen:setupMenuItems(menu)
   local detailsItem = menu:addMenuItem(locales:getText('VIEW_MENU_DETAILS'), function()
     if self.selectedThumb then
-      screens:push('details', transitions.kTransitionFade, nil, self.selectedThumb.path)
+      screens:push('details', screens.kTransitionFade, nil, self.selectedThumb.path)
     end
   end)
   return {detailsItem}
@@ -232,37 +232,37 @@ function NoteListScreen:drawGrid(xOffset, thumbs)
   end
 end
 
-function NoteListScreen:update()
-  gfx.setDrawOffset(0, 0)
-  -- page bg
-  gfxUtils:drawBgGrid()
-  bgGfx:draw(0, 0)
-  -- folder select
-  self.folderSelect:draw()
-  -- show 'no notes available'
-  if self.hasNoNotes then
-    boxGfx:drawInRect(20, 52, PLAYDATE_W - 38, PLAYDATE_H - 72)
-    gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES'), 40, 76, 360, 200, nil, nil)
-    helpQrGfx:draw(PLAYDATE_W - 134, 102)
-    gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES_INFO'), 40, 116, 232, 200, nil, nil)
-    return
-  end
-  -- page counter
-  local counterText = string.format('%d/%d', self.currPage, noteFs.numPages)
-  gfx.setFontTracking(2)
-  local w = pageCounterFont:getTextWidth(counterText)
-  gfx.fillRoundRect(PLAYDATE_W - w - 28, 4, w + 28, 24, 4)
-  pageCounterFont:drawTextAligned(counterText, PLAYDATE_W - 12, 8, kTextAlignment.right)
-  -- grid: right transition
-  if self.isTransitionActive and self.transitionDir == 1 then
-    self:drawGrid(-self.xOffset,             self.prevThumbs)
-    self:drawGrid(PLAYDATE_W - self.xOffset, self.currThumbs)
-  -- grid: left transition 
-  elseif self.isTransitionActive and self.transitionDir == -1 then
-    self:drawGrid(self.xOffset,               self.prevThumbs)
-    self:drawGrid(-PLAYDATE_W + self.xOffset, self.currThumbs)
-  -- grid: rest state
-  else
-    self:drawGrid(0, self.currThumbs)
-  end
-end
+-- function NoteListScreen:update()
+--   gfx.setDrawOffset(0, 0)
+--   -- page bg
+--   gfxUtils:drawBgGrid()
+--   bgGfx:draw(0, 0)
+--   -- folder select
+--   self.folderSelect:draw()
+--   -- show 'no notes available'
+--   if self.hasNoNotes then
+--     boxGfx:drawInRect(20, 52, PLAYDATE_W - 38, PLAYDATE_H - 72)
+--     gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES'), 40, 76, 360, 200, nil, nil)
+--     helpQrGfx:draw(PLAYDATE_W - 134, 102)
+--     gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES_INFO'), 40, 116, 232, 200, nil, nil)
+--     return
+--   end
+--   -- page counter
+--   local counterText = string.format('%d/%d', self.currPage, noteFs.numPages)
+--   gfx.setFontTracking(2)
+--   local w = pageCounterFont:getTextWidth(counterText)
+--   gfx.fillRoundRect(PLAYDATE_W - w - 28, 4, w + 28, 24, 4)
+--   pageCounterFont:drawTextAligned(counterText, PLAYDATE_W - 12, 8, kTextAlignment.right)
+--   -- grid: right transition
+--   if self.isTransitionActive and self.transitionDir == 1 then
+--     self:drawGrid(-self.xOffset,             self.prevThumbs)
+--     self:drawGrid(PLAYDATE_W - self.xOffset, self.currThumbs)
+--   -- grid: left transition 
+--   elseif self.isTransitionActive and self.transitionDir == -1 then
+--     self:drawGrid(self.xOffset,               self.prevThumbs)
+--     self:drawGrid(-PLAYDATE_W + self.xOffset, self.currThumbs)
+--   -- grid: rest state
+--   else
+--     self:drawGrid(0, self.currThumbs)
+--   end
+-- end

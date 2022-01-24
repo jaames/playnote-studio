@@ -8,27 +8,32 @@ import 'CoreLibs/timer'
 import 'CoreLibs/frameTimer'
 import 'CoreLibs/animation'
 
+import './globals'
+
 import './services/config'
 import './services/locales'
 import './services/noteFs'
 import './services/sounds'
 import './services/screens'
-import './services/transitions'
 import './services/dialog'
 
 import './utils/utils'
 import './utils/stringUtils'
-import './utils/gfxUtils'
 import './utils/fsUtils'
 import './utils/scrollController'
 
+import './ui/grid'
+import './ui/overlayBg'
+
+import './components/AutoLayout'
 import './components/Button'
 import './components/Select'
 import './components/FolderSelect'
 import './components/Clock'
+import './components/HomeLogo'
 import './components/Timeline'
 import './components/DitherSwatch'
-import './components/Scrollbar'
+import './components/ScrollBar'
 import './components/KeyValList'
 
 import './screens/Screenbase'
@@ -61,15 +66,13 @@ screens:register('settings',  SettingsScreen())
 screens:register('dithering', DitheringScreen())
 screens:register('credits',   CreditsScreen())
 
-screens:push('home', transitions.kTransitionStartup, transitions.kTransitionFade)
+screens:push('home', screens.kTransitionStartup, screens.kTransitionFade)
 
 function playdate.update()
-  screens:update()
-  dialog:update()
-  utils:doDeferredDraws()
+  playdate.graphics.sprite.update()
   playdate.timer.updateTimers()
   playdate.frameTimer.updateTimers()
-  playdate.graphics.sprite.update()
+  screens:update()
 end
 
 -- import 'CoreLibs/qrcode'

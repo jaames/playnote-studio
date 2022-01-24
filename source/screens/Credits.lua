@@ -10,9 +10,8 @@ function CreditsScreen:init()
   CreditsScreen.super.init(self)
   self.creditsTexture = nil
 
-  self.scroll = ScrollController()
+  self.scroll = ScrollController(self)
   self.scroll:setStart(200)
-  self.inputHandlers = self.scroll:extendInputHandlers(self.inputHandlers)
 end
 
 function CreditsScreen:getArtistCredits()
@@ -79,12 +78,12 @@ function CreditsScreen:afterLeave()
   self.creditsTexture = nil
 end
 
-function CreditsScreen:update()
-  gfx.setDrawOffset(0, self.scroll.offset)
-  gfx.setBackgroundColor(gfx.kColorBlack)
-  gfx.clear()
-  logoGfx:drawCentered(200, -30)
-  self.creditsTexture:draw(0, 0)
-  -- auto scroll
-  self.scroll:update()
-end
+-- function CreditsScreen:update()
+--   gfx.setDrawOffset(0, self.scroll.offset)
+--   gfx.setBackgroundColor(gfx.kColorBlack)
+--   gfx.clear()
+--   logoGfx:drawCentered(200, -30)
+--   self.creditsTexture:draw(0, 0)
+--   -- auto scroll
+--   self.scroll:update()
+-- end
