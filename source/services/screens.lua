@@ -27,6 +27,12 @@ end)
 function screens:register(id, screenInst)
   SCREENS[id] = screenInst
   screenInst.id = id
+  -- B button should return to the previous screen, globally
+  if screenInst.inputHandlers.BButtonDown == nil then
+    screenInst.inputHandlers.BButtonDown = function ()
+      screens:pop()
+    end
+  end
 end
 
 function screens:push(id, transitionFn, backTransitionFn, ...)
@@ -94,14 +100,16 @@ function screens:shakeX()
   isShakeActive = true
   moveX = 0
   moveY = 0
+  spritelib.setAlwaysRedraw(true)
 
   timer.updateCallback = function (t)
-    moveX = (playdate.graphics.perlin(t.value, 0, 0, 0) - 0.5) * 40
+    moveX = (playdate.graphics.perlin(t.value, 0, 0, 0) - 0.5) * 60
   end
   timer.timerEndedCallback = function ()
     moveX = 0
     utils:nextTick(function ()
       isShakeActive = false
+      spritelib.setAlwaysRedraw(false)
     end)
   end
 end
@@ -115,6 +123,9 @@ function screens:drawBg(x, y, w, h)
 end
 
 function screens:update()
+  if isTransitionActive then
+    self:drawBg()
+  end
   if not isTransitionActive then
     if isShakeActive then
       gfx.setDrawOffset(shakeOrigin[1] + moveX, shakeOrigin[2] + moveY)
@@ -135,6 +146,9 @@ function screens:newTransition(duration, initialState, transitionFn, easing)
       transitionFn(value, a, b, state)
     end
 
+    -- redraw sprites on every frame until the transition is done
+    spritelib.setAlwaysRedraw(true)
+
     if type(initialState) == 'function' then
       state = initialState(drawFn)
     elseif type(initialState) == 'table' then
@@ -142,19 +156,17 @@ function screens:newTransition(duration, initialState, transitionFn, easing)
     end
 
     timer.updateCallback = function ()
-      spritelib.redrawBackground()
       value = timer.value
     end
 
     timer.timerEndedCallback = function ()
-      spritelib.redrawBackground()
       value = 1
       -- sometimes (depends on easing and frame timing) transition values don't reach 1 before isTransitionActive is set to false, 
       -- leaving thigns hanging on the last frame. doing tthe completed callback on the next frame seems to fix this
       utils:nextTick(function ()
         value = 1
-        spritelib.redrawBackground()
         completedCallback()
+        spritelib.setAlwaysRedraw(false)
       end)
     end
 

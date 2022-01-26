@@ -33,18 +33,15 @@ function ScrollController:setHeight(h)
 end
 
 function ScrollController:setOffset(o)
-  local oldOffset = self.offset
   self.offset = self:clampOffset(o)
   self.progress = -self.offset / self.range
-  if not (self.offset == oldOffset) then
-    self.updateCallback(self)
-    if self.controlDrawOffset then
-      gfx.setDrawOffset(0, self.offset)
-      spritelib.redrawBackground()
-    end
-    if self.scrollBar ~= nil then
-      self.scrollBar:setProgress(self.progress)
-    end
+  self.updateCallback(self)
+  if self.controlDrawOffset then
+    gfx.setDrawOffset(0, self.offset)
+    spritelib.redrawBackground()
+  end
+  if self.scrollBar ~= nil then
+    self.scrollBar:setProgress(self.progress)
   end
 end
 

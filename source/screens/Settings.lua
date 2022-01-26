@@ -110,18 +110,26 @@ function SettingsScreen:setupComponents()
   self.scroll:setHeight(layout.height)
   self.numItems = #layout.children
   self.items = layout.children
-  self:scrollToItemByIndex(self.activeItemIndex)
+
+  self.activeItemIndex = 1
+  self.activeItem = about
+  about:select()
+
   return { scrollBar, about, credits, language, dithering, sound, reset }
 end
 
 function SettingsScreen:beforeEnter()
   SettingsScreen.super.beforeEnter(self)
-  -- self:scrollToItemByIndex(self.activeItemIndex)
 end
 
 function SettingsScreen:leave()
   SettingsScreen.super.leave(self)
-  self.scroll:setOffset(0)
+  -- self.scroll:setOffset(0)
+end
+
+function SettingsScreen:enter()
+  SettingsScreen.super.enter(self)
+  self:scrollToItemByIndex(1)
 end
 
 -- function SettingsScreen:beforeEnter()
@@ -342,8 +350,6 @@ end
 
 function SettingsScreen:afterLeave()
   SettingsScreen.super.afterLeave(self)
-  -- self.scroll:setOffset(0)
-  -- autosave on leave
   config:save()
 end
 

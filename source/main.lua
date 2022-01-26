@@ -20,10 +20,11 @@ import './services/dialog'
 import './utils/utils'
 import './utils/stringUtils'
 import './utils/fsUtils'
-import './utils/scrollController'
 
 import './ui/grid'
 import './ui/overlayBg'
+
+import './controllers/ScrollController'
 
 import './components/AutoLayout'
 import './components/Button'
