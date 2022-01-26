@@ -21,12 +21,18 @@ end
 
 function ScreenBase:enter()
   self.active = true
+  gfx.setDrawOffset(0, 0)
   self:setComponentsVisible(true)
-  self:forceComponentUpdate()
-  utils:nextTick(function ()
-    gfx.setDrawOffset(0, 0)
-    self:forceComponentUpdate()
-  end)
+  spritelib.redrawBackground()
+  
+  -- I don't know why, and I don't care, but I've spend hours on a transition bug where the scroll offset on one page will affect another.
+  -- Waiting for one frame here is literally the only way to make sure this doesn't happen. Yeah, I don't get it either. Just trust me.
+  -- Bug: side effect of this is that components are invisible for one frame of the transition
+  -- utils:nextTick(function ()
+    -- gfx.setDrawOffset(0, 0)
+    -- self:setComponentsVisible(true)
+    -- spritelib.redrawBackground()
+  -- end)
 end
 
 function ScreenBase:afterEnter()

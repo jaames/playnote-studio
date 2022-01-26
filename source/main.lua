@@ -69,10 +69,10 @@ screens:register('credits',   CreditsScreen())
 screens:push('home', screens.kTransitionStartup, screens.kTransitionFade)
 
 function playdate.update()
+  screens:update()
   playdate.graphics.sprite.update()
   playdate.timer.updateTimers()
   playdate.frameTimer.updateTimers()
-  screens:update()
 end
 
 -- import 'CoreLibs/qrcode'

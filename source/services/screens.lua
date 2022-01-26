@@ -15,6 +15,7 @@ local menu = playdate.getSystemMenu()
 local menuItems = {}
 
 local isShakeActive = false
+local shakeOrigin = {0,0}
 local moveX = 0
 local moveY = 0
 
@@ -89,6 +90,7 @@ function screens:shakeX()
   if isShakeActive then return end
 
   local timer = playdate.timer.new(200, 0, 1)
+  shakeOrigin[1], shakeOrigin[2] = gfx.getDrawOffset()
   isShakeActive = true
   moveX = 0
   moveY = 0
@@ -108,15 +110,16 @@ function screens:drawBg(x, y, w, h)
   if isTransitionActive then
     drawTransition()
   else
-    if isShakeActive then
-      gfx.setDrawOffset(moveX, moveY)
-    end
     activeScreen:drawBg(x, y, w, h)
   end
 end
 
 function screens:update()
   if not isTransitionActive then
+    if isShakeActive then
+      gfx.setDrawOffset(shakeOrigin[1] + moveX, shakeOrigin[2] + moveY)
+      spritelib.redrawBackground()
+    end
     activeScreen:update()
   end
 end
