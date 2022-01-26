@@ -1,0 +1,18 @@
+// https://web.dev/prefers-reduced-motion/
+@mixin prefers-no-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
+
+@mixin disable-motion-if-preferred {
+  @include prefers-no-motion {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}

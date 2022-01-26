@@ -1,0 +1,30 @@
+@use 'sass:math';
+
+// use new css math functions in scss (which has conflicts)
+// https://github.com/sass/sass/issues/2849
+@function css-function($name, $args...) {
+  @return $name + unquote('(') + $args + unquote(')');
+}
+
+@function css-min($args...) {
+  @return css-function(min, $args);
+}
+
+@function css-max($args...) {
+  @return css-function(max, $args);
+}
+
+// apply styles to all of an svg's sub-elements
+// useful for overriding icon colors
+@mixin svg-content-style {
+  line, path, polyline, polygon, rect, circle, ellipse {
+    @content;  
+  }
+}
+
+@mixin user-select($select) {
+  -webkit-user-select: $select;
+  -moz-user-select: $select;
+  -ms-user-select: $select;
+  user-select: $select; 
+}

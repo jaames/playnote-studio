@@ -1,0 +1,24 @@
+@use 'sass:math';
+
+// layout wrapper - constrains the overall page width
+@mixin wrapper {
+  width: 100%;
+  max-width: $mobile-wrapper-width;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $wrapper-padding;
+  padding-right: $wrapper-padding;
+  // account for the notch on modern phones when held in landscape
+  // https://webkit.org/blog/7929/designing-websites-for-iphone-x/
+  padding-left: css-max(env(safe-area-inset-left), #{ $wrapper-padding });
+  padding-right: css-max(env(safe-area-inset-right), #{ $wrapper-padding });
+
+  @include breakpoint-tablet {
+    max-width: $tablet-wrapper-width;
+  }
+
+  @include breakpoint-desktop {
+    max-width: $wrapper-width;
+  }
+
+}

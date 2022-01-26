@@ -1,0 +1,37 @@
+// responsive breakpoints
+// styles set inside these will only be applied if the viewport width matches the specified device breakpoint
+
+// anything below tablet width
+@mixin breakpoint-phone-only {
+  @media (max-width: 859px) {
+    @content;
+  }
+}
+
+// tablet width and up
+@mixin breakpoint-tablet {
+  @media (min-width: 860px) {
+    @content;
+  }
+}
+
+// only tablet width
+@mixin breakpoint-tablet-only {
+  @media (min-width: 860px) and (max-width: 1199px) {
+    @content;
+  }
+}
+
+// desktop width and up
+@mixin breakpoint-desktop {
+  @media (min-width: 1200px) {
+    @content;
+  }
+}
+
+// only desktop width
+@mixin breakpoint-desktop-only {
+  @media (min-width: 1200px) {
+    @content;
+  }
+}
