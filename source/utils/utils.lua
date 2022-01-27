@@ -1,5 +1,17 @@
 utils = {}
 
+function table.combine(...)
+  local tbl = {}
+  local i = 1
+  for _, b in pairs({...}) do
+    for _, v in pairs(b) do
+      tbl[i] = v
+      i = i + 1
+    end
+  end
+  return tbl
+end
+
 -- execute callback function on next frame
 function utils:nextTick(callback)
   playdate.frameTimer.new(1, callback)
@@ -31,19 +43,20 @@ function utils:createRepeater(delayAfterInitialFiring, delayAfterSecondFiring, c
   return buttonDown, buttonUp, remove
 end
 
+function utils:hookFn(origFn, hookFn)
+  if type(origFn) == 'function' then
+    return function (...)
+      origFn(...)
+      hookFn(...)
+    end
+  else
+    return hookFn
+  end
+end
+
 -- clamp value between lower and upper
 function utils:clamp(val, lower, upper)
   return math.max(lower, math.min(upper, val))
-end
-
--- clamp scroll position pos between start (usually 0) and height (usually page height)
-function utils:clampScroll(pos, start, height)
-  if pos <= -(height - 240) then
-    return -(height - 240)
-  elseif pos >= start then
-    return start
-  end
-  return pos
 end
 
 -- set all the elements in a table to nil

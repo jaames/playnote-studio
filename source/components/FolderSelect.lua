@@ -1,6 +1,3 @@
-import './Select.lua'
-
-local gfx <const> = playdate.graphics
 local folderGfx <const> = gfx.image.new('./gfx/icon_folder')
 
 FolderSelect = {}

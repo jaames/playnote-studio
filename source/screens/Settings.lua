@@ -13,23 +13,12 @@ class('SettingsScreen').extends(ScreenBase)
 
 function SettingsScreen:init()
   SettingsScreen.super.init(self)
-  self.inputHandlers = {
-    upButtonDown = function ()
-      self:selectPrev()
-    end,
-    downButtonDown = function ()
-      self:selectNext()
-    end,
-    AButtonDown = function()
-      local item = self.items[self.activeItemIndex]
-      item:click()
-    end
-  }
-  self.scroll = ScrollController()
-  self.activeItemIndex = 1
+  self.scroll = ScrollController(self)
+  self.scroll.selectionMode = ScrollController.kModeKeepCenter
+  self.focus = FocusController(self)
 end
 
-function SettingsScreen:setupComponents()
+function SettingsScreen:setupSprites()
   local scrollBar = ScrollBar(PLAYDATE_W - 26, MENU_GAP_TOP, PLAYDATE_H - MENU_GAP_TOP - MENU_GAP_BOTTOM)
   self.scroll:connectScrollBar(scrollBar)
 
@@ -97,7 +86,7 @@ function SettingsScreen:setupComponents()
   reset:onClick(function ()
     dialog:sequence({
       {type = 'confirm', message = locales:getText('SETTINGS_RESET_CONFIRM'), callback = function ()
-        s:scrollToItemByIndex(1, true)
+        -- s:scrollToItemByIndex(1, true)
         config:reset()
         locales:setLanguage(config.lang)
         screens:reloadCurrent(screens.kTransitionNone)
@@ -108,12 +97,7 @@ function SettingsScreen:setupComponents()
   layout:add(reset)
 
   self.scroll:setHeight(layout.height)
-  self.numItems = #layout.children
-  self.items = layout.children
-
-  self.activeItemIndex = 1
-  self.activeItem = about
-  about:select()
+  self.focus:setFocus(about)
 
   return { scrollBar, about, credits, language, dithering, sound, reset }
 end
@@ -129,7 +113,7 @@ end
 
 function SettingsScreen:enter()
   SettingsScreen.super.enter(self)
-  self:scrollToItemByIndex(1)
+  -- self:scrollToItemByIndex(1)
 end
 
 -- function SettingsScreen:beforeEnter()
@@ -353,45 +337,41 @@ function SettingsScreen:afterLeave()
   config:save()
 end
 
-function SettingsScreen:scrollToItemByIndex(index, animate)
-  -- don't update if menu is transitioning to another item
-  if self.menuScrollTransitionActive then return end
-  -- ignore out of bounds option indecies
-  if index > self.numItems or index < 1 then
-    -- TODO: play 'not allowed' sound effect here
-    index = utils:clamp(index, 1, self.numItems)
-  end
-  -- deselect last item
-  local lastItem = self.items[self.activeItemIndex]
-  lastItem:deselect()
-  -- figure out how far to scroll for the selected option
-  local nextItem = self.items[index]
-  local nextItemY = nextItem.y
-  local nextOffset = -(nextItemY - (PLAYDATE_H / 2) + (ITEM_HEIGHT / 2))
-  -- do scroll
-  if animate == true then
-    self.scroll:animateToOffset(nextOffset, MENU_SCROLL_DUR, playdate.easingFunctions.outCubic)
-  else
-    self.scroll:setOffset(nextOffset)
-  end
-  -- update state
-  self.activeItemIndex = index
-  self.activeItem = nextItem
-  -- update selected item
-  nextItem:select()
-  -- BUG/TODO: for some reason the last button in the list never gets redrawn when it's selected
-  -- the playdate's sprite library is shit, don't use it
-  -- this seems to be a workaround for now:
-  spritelib.redrawBackground()
-end
+-- function SettingsScreen:scrollToItemByIndex(index, animate)
+--   -- don't update if menu is transitioning to another item
+--   if self.menuScrollTransitionActive then return end
+--   -- ignore out of bounds option indecies
+--   if index > self.numItems or index < 1 then
+--     -- TODO: play 'not allowed' sound effect here
+--     index = utils:clamp(index, 1, self.numItems)
+--   end
+--   -- deselect last item
+--   local lastItem = self.items[self.activeItemIndex]
+--   lastItem:deselect()
+--   -- figure out how far to scroll for the selected option
+--   local nextItem = self.items[index]
+--   local nextItemY = nextItem.y
+--   local nextOffset = -(nextItemY - (PLAYDATE_H / 2) + (ITEM_HEIGHT / 2))
+--   -- do scroll
+--   if animate == true then
+--     self.scroll:animateToOffset(nextOffset, MENU_SCROLL_DUR, playdate.easingFunctions.outCubic)
+--   else
+--     self.scroll:setOffset(nextOffset)
+--   end
+--   -- update state
+--   self.activeItemIndex = index
+--   self.activeItem = nextItem
+--   -- update selected item
+--   nextItem:select()
+-- end
 
-function SettingsScreen:selectNext()
-  self:scrollToItemByIndex(self.activeItemIndex + 1, true)
-end
+-- function SettingsScreen:selectNext()
+--   self:scrollToItemByIndex(self.activeItemIndex + 1, true)
+-- end
 
-function SettingsScreen:selectPrev()
-  self:scrollToItemByIndex(self.activeItemIndex - 1, true)
-end
+-- function SettingsScreen:selectPrev()
+--   self:scrollToItemByIndex(self.activeItemIndex - 1, true)
+-- end
 
 function SettingsScreen:drawBg(x, y, w, h)
   grid:drawWithOffset(x, y, w, h, self.scroll.offset)
@@ -399,8 +379,8 @@ function SettingsScreen:drawBg(x, y, w, h)
 end
 
 function SettingsScreen:update()
-  local crankChange = playdate.getCrankTicks(6)
-  if crankChange ~= 0 then
-    self:scrollToItemByIndex(self.activeItemIndex - crankChange, true)
-  end
+  -- local crankChange = playdate.getCrankTicks(6)
+  -- if crankChange ~= 0 then
+  --   self:scrollToItemByIndex(self.activeItemIndex - crankChange, true)
+  -- end
 end

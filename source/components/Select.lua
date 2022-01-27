@@ -11,6 +11,8 @@ class('Select').extends(Button)
 
 function Select:init(x, y, w, h, text)
   Select.super.init(self, x, y, w, h, text)
+  self.selectable = true
+  
   self.isOpen = false
   self.openTransitionActive = false
   self.numOptions = 0

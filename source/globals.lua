@@ -1,5 +1,5 @@
-PLAYDATE_W = 400
-PLAYDATE_H = 240
+PLAYDATE_W = playdate.display.getWidth()
+PLAYDATE_H = playdate.display.getHeight()
 
 gfx = playdate.graphics
 spritelib = playdate.graphics.sprite

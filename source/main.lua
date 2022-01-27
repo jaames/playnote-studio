@@ -25,6 +25,7 @@ import './ui/grid'
 import './ui/overlayBg'
 
 import './controllers/ScrollController'
+import './controllers/FocusController'
 
 import './components/AutoLayout'
 import './components/Button'
@@ -51,8 +52,14 @@ debug = nil -- disallow debugging
 MAIN_FONT = playdate.graphics.font.new('./fonts/WhalesharkSans')
 playdate.graphics.setFont(MAIN_FONT)
 playdate.display.setRefreshRate(30)
--- TODO: list common sfx
-sounds:prepareSfxGroup('common', {})
+
+sounds:prepareSfxGroup('common', {
+  'navigationForward',
+  'navigationBackward',
+  'navigationNotAllowed',
+  'selectionChange',
+  'selectionNotAllowed',
+})
 
 config:init()
 locales:init()

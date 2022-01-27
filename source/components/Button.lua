@@ -30,6 +30,8 @@ Button = {}
 class('Button').extends(playdate.graphics.sprite)
 
 function Button:init(x, y, w, h, text)
+  self.selectable = true
+
   self.variant = 'default'
   self.state = 'base'
   self.isSelected = false
@@ -64,8 +66,27 @@ function Button:init(x, y, w, h, text)
   end
 end
 
+function Button:focus()
+  self.state = 'select'
+  self.isSelected = true
+  self:markDirty()
+end
+
+function Button:select()
+  print('old select called')
+end
+function Button:onSelect()
+  print('old onselect called')
+end
+
+function Button:unfocus()
+  self.state = 'base'
+  self.isSelected = false
+  self:markDirty()
+end
+
 function Button:onClick(fn)
-  assert(type(fn) == 'function', 'callback mush be a function')
+  assert(type(fn) == 'function', 'callback must be a function')
   self.clickCallback = fn
 end
 
@@ -120,18 +141,6 @@ function Button:updateLayout()
   self.textY = (h / 2) - (self.textH / 2)
   self.iconY = (h / 2) - (self.iconH / 2)
   self:setSize(w, h)
-  self:markDirty()
-end
-
-function Button:select()
-  self.state = 'select'
-  self.isSelected = true
-  self:markDirty()
-end
-
-function Button:deselect()
-  self.state = 'base'
-  self.isSelected = false
   self:markDirty()
 end
 

@@ -38,6 +38,9 @@ end
 function screens:push(id, transitionFn, backTransitionFn, ...)
   if not isTransitionActive then
     self:setScreen(id, transitionFn, ...)
+    if #screenHistory > 0 then
+      sounds:playSfx('navigationForward')
+    end
     table.insert(screenHistory, activeScreen)
     table.insert(transitionHistory, backTransitionFn or transitionFn)
   end
@@ -50,8 +53,10 @@ function screens:pop()
     local lastSreen = screenHistory[#screenHistory]
     local lastTransition = transitionHistory[#transitionHistory]
     self:setScreen(lastSreen.id, lastTransition)
+    sounds:playSfx('navigationBackward')
   else
     self:shakeX()
+    sounds:playSfx('navigationNotAllowed')
   end
 end
 

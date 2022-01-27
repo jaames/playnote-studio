@@ -21,6 +21,8 @@ class('DitherSwatch').extends()
 
 function DitherSwatch:init(x, y)
   DitherSwatch.super.init(self)
+  self.selectable = true
+  
   -- ~40 seems to be the sweet spot for avoiding graphical glitches with stencils
   local w = SWATCH_SIZE
   local h = SWATCH_SIZE
