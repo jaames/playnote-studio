@@ -18,7 +18,9 @@ function FocusController:init(screen)
   self.selectionRect = nil
   self.selectionCenter = nil
   self.selectionCenterRect = nil
-  self.distanceFn = nil
+  self.distanceFn = self:generateDistanceFunction()
+
+  self.silenceNotAllowedSfx = false
 
   self.focusMoveCallback = function(sprite) end
   self.cantMoveCallback = function(dir) end
@@ -37,14 +39,15 @@ function FocusController:setFocus(sprite)
   self.selectionRect = rect
   self.selectionCenter = center
   self.selectionCenterRect = playdate.geometry.rect.new(center.x, center.y, 0, 0)
-  self.distanceFn = self:generateDistanceFunction()
   self:emitScreenHook('select:change', sprite, rect)
   sounds:playSfx('selectionChange')
   self.focusMoveCallback(sprite)
 end
 
 function FocusController:cantMove(direction)
-  sounds:playSfx('selectionNotAllowed')
+  if not self.silenceNotAllowedSfx then
+    sounds:playSfx('selectionNotAllowed')
+  end
   self.cantMoveCallback(direction)
 end
 
@@ -371,26 +374,53 @@ end
 function FocusController:connectScreen(screen)
   assert(type(screen.inputHandlers) == 'table', 'input handlers not a table')
 
-  screen:addHook('sprites:setup', function ()
-    self.elements = screen.selectableSprites
-  end)
-
   local inputHandlers = screen.inputHandlers
+
+  local delay = 400
+  local delayRepeat = 250
+
+  local downButtonDown, downButtonUp, rmvRepeat1 = utils:createRepeater(delay, delayRepeat, function (isRepeat)
+    self.silenceNotAllowedSfx = isRepeat
+    self:navigate(FocusController.kDirectionDown)
+  end)
+  local upButtonDown, upButtonUp, rmvRepeat2 = utils:createRepeater(delay, delayRepeat, function (isRepeat)
+    self.silenceNotAllowedSfx = isRepeat
+    self:navigate(FocusController.kDirectionUp)
+  end)
+  local leftButtonDown, leftButtonUp, rmvRepeat3 = utils:createRepeater(delay, delayRepeat, function (isRepeat)
+    self.silenceNotAllowedSfx = isRepeat
+    self:navigate(FocusController.kDirectionLeft)
+  end)
+  local rightButtonDown, rightButtonUp, rmvRepeat4 = utils:createRepeater(delay, delayRepeat, function (isRepeat)
+    self.silenceNotAllowedSfx = isRepeat
+    self:navigate(FocusController.kDirectionRight)
+  end)
 
   inputHandlers.AButtonDown = utils:hookFn(inputHandlers.AButtonDown, function ()
     self:clickSelection()
   end)
-  inputHandlers.downButtonDown = utils:hookFn(inputHandlers.downButtonDown, function ()
-    self:navigate(FocusController.kDirectionDown)
+
+  inputHandlers.downButtonDown = utils:hookFn(inputHandlers.downButtonDown, downButtonDown)
+  inputHandlers.downButtonUp = utils:hookFn(inputHandlers.downButtonUp, downButtonUp)
+
+  inputHandlers.upButtonDown = utils:hookFn(inputHandlers.upButtonDown, upButtonDown)
+  inputHandlers.upButtonUp = utils:hookFn(inputHandlers.upButtonUp, upButtonUp)
+
+  inputHandlers.leftButtonDown = utils:hookFn(inputHandlers.leftButtonDown, leftButtonDown)
+  inputHandlers.leftButtonUp = utils:hookFn(inputHandlers.leftButtonUp, leftButtonUp)
+
+  inputHandlers.rightButtonDown = utils:hookFn(inputHandlers.rightButtonDown, rightButtonDown)
+  inputHandlers.rightButtonUp = utils:hookFn(inputHandlers.rightButtonUp, rightButtonUp)
+
+  screen:addHook('sprites:setup', function ()
+    self.elements = screen.selectableSprites
   end)
-  inputHandlers.upButtonDown = utils:hookFn(inputHandlers.upButtonDown, function ()
-    self:navigate(FocusController.kDirectionUp)
-  end)
-  inputHandlers.leftButtonDown = utils:hookFn(inputHandlers.leftButtonDown, function ()
-    self:navigate(FocusController.kDirectionLeft)
-  end)
-  inputHandlers.rightButtonDown = utils:hookFn(inputHandlers.rightButtonDown, function ()
-    self:navigate(FocusController.kDirectionRight)
+
+  screen:addHook('leave:before', function ()
+    rmvRepeat1()
+    rmvRepeat2()
+    rmvRepeat3()
+    rmvRepeat4()
   end)
 
   self.screen = screen

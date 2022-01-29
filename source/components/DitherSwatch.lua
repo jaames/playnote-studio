@@ -1,5 +1,3 @@
-local gfx <const> = playdate.graphics
-
 local PATTERNS <const> = {
   -- none
   {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
@@ -10,26 +8,20 @@ local PATTERNS <const> = {
   -- polka
   {0xAA, 0x00, 0xAA, 0x00, 0xAA, 0x00, 0xAA, 0x00},
 }
-local SWATCH_SIZE <const> = 40
+local SWATCH_SIZE <const> = 46
 -- mask size needs to be multiple of 32 to avoid graphical glitches
 -- https://devforum.play.date/t/graphical-glitch-with-setstencilimage/2097
 local MASK_SIZE <const> = 64
 local MASK_OFFSET <const> = (MASK_SIZE - SWATCH_SIZE) / 2
 
 DitherSwatch = {}
-class('DitherSwatch').extends()
+class('DitherSwatch').extends(playdate.graphics.sprite)
 
 function DitherSwatch:init(x, y)
-  DitherSwatch.super.init(self)
   self.selectable = true
-  
-  -- ~40 seems to be the sweet spot for avoiding graphical glitches with stencils
-  local w = SWATCH_SIZE
-  local h = SWATCH_SIZE
-  self.x = x - w / 2
-  self.y = y - h / 2
-  self.w = w
-  self.h = h
+
+  self.clickCallback = function (btn) end
+
   self.pattern = 3
   self.isSelected = false
   self.isTransitionActive = false
@@ -37,29 +29,54 @@ function DitherSwatch:init(x, y)
   self.mask = gfx.image.new(MASK_SIZE, MASK_SIZE, gfx.kColorBlack)
   gfx.pushContext(self.mask)
   gfx.setColor(gfx.kColorWhite)
-  gfx.fillCircleInRect(MASK_OFFSET, MASK_OFFSET, w, h)
+  gfx.fillCircleInRect(MASK_OFFSET, MASK_OFFSET, SWATCH_SIZE, SWATCH_SIZE)
   gfx.popContext()
+
+  self:moveTo(x, y)
+  self:setSize(SWATCH_SIZE, SWATCH_SIZE)
+  self:setCenter(0.5, 0.5)
+  self:setZIndex(100)
+end
+
+function DitherSwatch:focus()
+  self.isSelected = true
+  self:markDirty()
+end
+
+function DitherSwatch:unfocus()
+  self.isSelected = false
+  self:markDirty()
+end
+
+function DitherSwatch:onClick(fn)
+  assert(type(fn) == 'function', 'callback must be a function')
+  self.clickCallback = fn
+end
+
+function DitherSwatch:click()
+  self:switchPattern()
+  self.clickCallback(self)
 end
 
 function DitherSwatch:draw()
-  local x = self.x
-  local y = self.y
-  local w = self.w
-  local h = self.h
-  local offsetX, offsetY = gfx.getDrawOffset()
-  gfx.setDrawOffset(x, y)
-  if self.isSelected then
-    gfx.setColor(gfx.kColorBlack)
-    gfx.fillCircleInRect(-3, -3, w + 6, h + 6)
-  else
-    gfx.setColor(gfx.kColorBlack)
-    gfx.fillCircleInRect(-2, -2, w + 4, h + 4)
-  end
+  local w = self.width
+  local h = self.height
   self.bitmap:draw(-MASK_OFFSET, -MASK_OFFSET)
-  gfx.setColor(gfx.kColorWhite)
-  gfx.setLineWidth(2)
-  gfx.drawCircleInRect(1, 1, w - 2, h - 2)
-  gfx.setDrawOffset(offsetX, offsetY)
+  if self.isSelected then
+    gfx.setColor(gfx.kColorWhite)
+    gfx.setLineWidth(2)
+    gfx.drawCircleInRect(4, 4, w - 8, h - 8)
+    gfx.setLineWidth(3)
+    gfx.setColor(gfx.kColorBlack)
+    gfx.drawCircleInRect(1, 1, w - 2, h - 2)
+  else
+    gfx.setColor(gfx.kColorWhite)
+    gfx.setLineWidth(2)
+    gfx.drawCircleInRect(3, 3, w - 6, h - 6)
+    gfx.setLineWidth(2)
+    gfx.setColor(gfx.kColorBlack)
+    gfx.drawCircleInRect(1, 1, w - 2, h - 2)
+  end
 end
 
 function DitherSwatch:setPattern(pattern)
@@ -76,20 +93,20 @@ function DitherSwatch:switchPattern()
   
   self.pattern = nextPattern
   self.isTransitionActive = true
-  local transitionTimer = playdate.timer.new(200, 0, self.h, playdate.easingFunctions.outCubic)
+  local transitionTimer = playdate.timer.new(200, 0, self.height, playdate.easingFunctions.outCubic)
 
   transitionTimer.updateCallback = function (timer)
     self:updateBitmap(nextPattern, lastPattern, timer.value)
   end
   transitionTimer.timerEndedCallback = function ()
-    self:updateBitmap(nextPattern, lastPattern, self.h)
+    self:updateBitmap(nextPattern, lastPattern, self.height)
     self.isTransitionActive = false
   end
 end
 
 function DitherSwatch:updateBitmap(newPattern, lastPattern, y)
-  local w = self.w
-  local h = self.h
+  local w = self.width
+  local h = self.height
   gfx.pushContext(self.bitmap)
   gfx.clear(gfx.kColorClear)
   gfx.setStencilImage(self.mask)
@@ -103,4 +120,5 @@ function DitherSwatch:updateBitmap(newPattern, lastPattern, y)
     gfx.fillCircleInRect(MASK_OFFSET, MASK_OFFSET + h-y, w, h)
   end
   gfx.popContext()
+  self:markDirty()
 end

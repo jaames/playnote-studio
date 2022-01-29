@@ -8,21 +8,21 @@ import 'CoreLibs/timer'
 import 'CoreLibs/frameTimer'
 import 'CoreLibs/animation'
 
-import './globals'
-
-import './services/config'
-import './services/locales'
-import './services/noteFs'
-import './services/sounds'
-import './services/screens'
-import './services/dialog'
-
 import './utils/utils'
 import './utils/stringUtils'
 import './utils/fsUtils'
 
+import './globals'
+
+import './config'
+import './locales'
+import './noteFs'
+import './sounds'
+import './screens'
+
 import './ui/grid'
 import './ui/overlayBg'
+import './ui/dialog'
 
 import './controllers/ScrollController'
 import './controllers/FocusController'
@@ -51,7 +51,7 @@ debug = nil -- disallow debugging
 
 MAIN_FONT = playdate.graphics.font.new('./fonts/WhalesharkSans')
 playdate.graphics.setFont(MAIN_FONT)
-playdate.display.setRefreshRate(30)
+playdate.display.setRefreshRate(50)
 
 sounds:prepareSfxGroup('common', {
   'navigationForward',

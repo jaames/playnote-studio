@@ -134,7 +134,6 @@ function screens:update()
   if not isTransitionActive then
     if isShakeActive then
       gfx.setDrawOffset(shakeOrigin[1] + moveX, shakeOrigin[2] + moveY)
-      spritelib.redrawBackground()
     end
     activeScreen:update()
   end
@@ -198,7 +197,7 @@ screens.kTransitionStartup = screens:newTransition(320, nil,
         b:enter()
       end
       b:drawBg()
-      overlayBg:setWhiteFade(t)
+      overlayBg:setWhiteFade(1 - t)
     end
   end
 )
@@ -206,7 +205,7 @@ screens.kTransitionStartup = screens:newTransition(320, nil,
 screens.kTransitionFade = screens:newInOutTransition(300, {nextIn = false},
   function (t, a, b, state)
     a:drawBg()
-    overlayBg:setWhiteFade(1 - t)
+    overlayBg:setWhiteFade(t)
   end,
   function (t, a, b, state)
     if not state.nextIn then
@@ -215,6 +214,6 @@ screens.kTransitionFade = screens:newInOutTransition(300, {nextIn = false},
       state.nextIn = true
     end
     b:drawBg()
-    overlayBg:setWhiteFade(t)
+    overlayBg:setWhiteFade(1 - t)
   end
 )

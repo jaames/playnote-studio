@@ -36,8 +36,8 @@ function Button:init(x, y, w, h, text)
   self.state = 'base'
   self.isSelected = false
   
-  self.padLeft = 12
-  self.padRight = 12
+  self.padLeft = 16
+  self.padRight = 16
   self.padTop = 6
   self.padBottom = 6
   self.autoWidth = false
@@ -55,6 +55,9 @@ function Button:init(x, y, w, h, text)
   self.iconH = 0
   self.iconPadRight = 12
 
+  self.tx = 0
+  self.ty = 0
+
   self.clickCallback = function (btn) end
 
   self:moveTo(x, y)
@@ -66,9 +69,35 @@ function Button:init(x, y, w, h, text)
   end
 end
 
+function Button:moveTo(x, y)
+  Button.super.moveTo(self, x + self.tx, y + self.ty)
+  self.bx = x
+  self.by = y
+end
+
+function Button:moveToX(x)
+  self:moveTo(x, self.y)
+end
+
+function Button:moveToY(y)
+  self:moveTo(self.x, y)
+end
+
+function Button:offsetBy(x, y)
+  Button.super.moveTo(self, self.bx + x, self.by + y)
+  self.tx = x
+  self.ty = y
+end
+
 function Button:focus()
   self.state = 'select'
   self.isSelected = true
+  self:markDirty()
+end
+
+function Button:unfocus()
+  self.state = 'base'
+  self.isSelected = false
   self:markDirty()
 end
 
@@ -77,12 +106,6 @@ function Button:select()
 end
 function Button:onSelect()
   print('old onselect called')
-end
-
-function Button:unfocus()
-  self.state = 'base'
-  self.isSelected = false
-  self:markDirty()
 end
 
 function Button:onClick(fn)
@@ -147,12 +170,10 @@ end
 function Button:draw(clipX, clipY, clipW, clipH)
   local w = self.width
   local h = self.height
-  local bgX, bgyY, bgW, bgH = -3, -3, w + 6, h + 6
   local textX = self.padLeft
   local textW = self.width - self.padLeft - self.padRight
   -- draw background
-  gfx.setClipRect(bgX, bgyY, bgW, bgH)
-  buttonGfx[self.variant][self.state]:drawInRect(bgX, bgyY, bgW, bgH)
+  buttonGfx[self.variant][self.state]:drawInRect(0, 0, w, h)
   -- draw icon if present
   if self.icon then
     local iconSpace = self.iconW + self.iconPadRight

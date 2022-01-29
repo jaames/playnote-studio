@@ -1,7 +1,3 @@
-local gfx <const> = playdate.graphics
-
-local PLAYDATE_W <const> = 400
-local PLAYDATE_H <const> = 240
 local COL_ICON <const> = 92
 local COL_BLACK <const> = 136
 local COL_RED <const> = 218
@@ -41,40 +37,32 @@ class('DitheringScreen').extends(ScreenBase)
 function DitheringScreen:init()
   DitheringScreen.super.init(self)
   self.ditherConf = config.dithering
-  self.inputHandlers = {
-    leftButtonDown = function()
-      self:setSelected(self.selectedLayer, self.selectedColour - 1)
-    end,
-    rightButtonDown = function()
-      self:setSelected(self.selectedLayer, self.selectedColour + 1)
-    end,
-    upButtonDown = function()
-      self:setSelected(self.selectedLayer - 1, self.selectedColour)
-    end,
-    downButtonDown = function()
-      self:setSelected(self.selectedLayer + 1, self.selectedColour)
-    end,
-    AButtonDown = function()
-      local layer = self.selectedLayer
-      local colour = self.selectedColour
-      local selectedSwatch = self.swatches[layer][colour]
-      selectedSwatch:switchPattern()
-      self.ditherConf[layer][colour] = selectedSwatch.pattern
-    end,
+  self.focus = FocusController(self)
+end
+
+function DitheringScreen:setupSprites()
+  local swatch1 = DitherSwatch(COL_BLACK, ROW_LAYER1)
+  local swatch2 = DitherSwatch(COL_RED,   ROW_LAYER1)
+  local swatch3 = DitherSwatch(COL_BLUE,  ROW_LAYER1)
+  local swatch4 = DitherSwatch(COL_BLACK, ROW_LAYER2)
+  local swatch5 = DitherSwatch(COL_RED,   ROW_LAYER2)
+  local swatch6 = DitherSwatch(COL_BLUE,  ROW_LAYER2)
+
+  local swatches = {
+    {swatch1, swatch2, swatch3},
+    {swatch4, swatch5, swatch6},
   }
-  self.swatches = {
-    {
-      DitherSwatch(COL_BLACK, ROW_LAYER1),
-      DitherSwatch(COL_RED,   ROW_LAYER1),
-      DitherSwatch(COL_BLUE,  ROW_LAYER1),
-    },
-    {
-      DitherSwatch(COL_BLACK, ROW_LAYER2),
-      DitherSwatch(COL_RED,   ROW_LAYER2),
-      DitherSwatch(COL_BLUE,  ROW_LAYER2),
-    }
-  }
-  self:setSelected(1, 1)
+
+  for layer, row in pairs(swatches) do
+    for colour, swatch in pairs(row) do
+      swatch:onClick(function ()
+        self.ditherConf[layer][colour] = swatch.pattern
+      end)
+    end
+  end
+  self.focus:setFocus(swatches[1][1])
+  self.swatches = swatches
+  return { swatch1, swatch2, swatch3, swatch4, swatch5, swatch6 }
 end
 
 function DitheringScreen:beforeEnter(ditherConf, callback)
@@ -97,19 +85,8 @@ function DitheringScreen:beforeLeave()
   self.callback = nil
 end
 
-function DitheringScreen:setSelected(layer, colour)
-  if self.selectedLayer ~= nil then
-    self.swatches[self.selectedLayer][self.selectedColour].isSelected = false
-  end
-  layer = math.max(1, math.min(layer, 2))
-  colour = math.max(1, math.min(colour, 3))
-  self.swatches[layer][colour].isSelected = true
-  self.selectedLayer = layer
-  self.selectedColour = colour
-end
-
-function DitheringScreen:update()
-  gfxUtils:drawBgGrid()
+function DitheringScreen:drawBg(x, y, w, h)
+  grid:draw(x, w, w, h)
 
   gfx.setColor(gfx.kColorBlack)
   gfx.fillRoundRect(RECT_LABELS, 6)
@@ -126,10 +103,4 @@ function DitheringScreen:update()
 
   layer1Icon:drawAnchored(COL_ICON, ROW_LAYER1, 0.80, 0.5)
   layer2Icon:drawAnchored(COL_ICON, ROW_LAYER2, 0.80, 0.5)
-
-  for _, row in pairs(self.swatches) do
-    for _, swatch in pairs(row) do
-      swatch:draw()
-    end
-  end
 end

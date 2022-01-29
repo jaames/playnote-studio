@@ -1,7 +1,7 @@
 local bgGfx <const> = gfx.image.new('./gfx/gfx_bg_settings')
 
 local ITEM_WIDTH <const> = 300
-local ITEM_HEIGHT <const> = 48
+local ITEM_HEIGHT <const> = 54
 local MENU_X <const> = (PLAYDATE_W / 2) - (ITEM_WIDTH / 2)
 local MENU_GAP_TOP <const> = 24
 local MENU_GAP_BOTTOM <const> = 24
@@ -26,10 +26,10 @@ function SettingsScreen:setupSprites()
   self.layout = layout
 
   -- about button
-  local about = Button(0, 0, ITEM_WIDTH, 48, locales:getText('SETTINGS_ABOUT'))
+  local about = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, locales:getText('SETTINGS_ABOUT'))
   about:setIcon('./gfx/icon_about')
   about:onClick(function ()
-    dialog:show(''
+    dialog:alert(''
       .. '*Playnote Studio*\n'
       .. 'https://playnote.studio\n'
       .. '\n'
@@ -40,7 +40,7 @@ function SettingsScreen:setupSprites()
   layout:add(about)
 
   -- credits button
-  local credits = Button(0, 0, ITEM_WIDTH, 48, locales:getText('SETTINGS_CREDITS'))
+  local credits = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, locales:getText('SETTINGS_CREDITS'))
   credits:setIcon('./gfx/icon_credits')
   credits:onClick(function ()
     screens:push('credits', screens.kTransitionFade)
@@ -48,7 +48,7 @@ function SettingsScreen:setupSprites()
   layout:add(credits)
 
   -- language select
-  local language = Select(0, 0, ITEM_WIDTH, 48, locales:getText('SETTINGS_LANGUAGE'))
+  local language = Select(0, 0, ITEM_WIDTH, ITEM_HEIGHT, locales:getText('SETTINGS_LANGUAGE'))
   language:setIcon('./gfx/icon_lang')
   for _, lang in pairs(locales:getAvailableLanguages()) do
     language:addOption(lang.key, lang.name, string.upper(lang.key))
@@ -62,7 +62,7 @@ function SettingsScreen:setupSprites()
   layout:add(language)
 
   -- dithering button
-  local dithering = Button(0, 0, ITEM_WIDTH, 48, locales:getText('SETTINGS_DITHERING'))
+  local dithering = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, locales:getText('SETTINGS_DITHERING'))
   dithering:setIcon('./gfx/icon_dither')
   dithering:onClick(function ()
     screens:push('dithering', screens.kTransitionFade, nil, config.dithering)
@@ -70,7 +70,7 @@ function SettingsScreen:setupSprites()
   layout:add(dithering)
 
   -- sound select
-  local sound = Select(0, 0, ITEM_WIDTH, 48, locales:getText('SETTINGS_SOUND'))
+  local sound = Select(0, 0, ITEM_WIDTH, ITEM_HEIGHT, locales:getText('SETTINGS_SOUND'))
   sound:setIcon('./gfx/icon_sound')
   sound:addOption(true,  locales:getText('SETTINGS_SOUND_ON'),  locales:getText('SETTINGS_ON'))
   sound:addOption(false, locales:getText('SETTINGS_SOUND_OFF'), locales:getText('SETTINGS_OFF'))
@@ -81,17 +81,17 @@ function SettingsScreen:setupSprites()
   layout:add(sound)
 
   -- reset button
-  local reset = Button(0, 0, ITEM_WIDTH, 48, locales:getText('SETTINGS_RESET'))
+  local reset = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, locales:getText('SETTINGS_RESET'))
   reset:setIcon('./gfx/icon_reset')
   reset:onClick(function ()
     dialog:sequence({
-      {type = 'confirm', message = locales:getText('SETTINGS_RESET_CONFIRM'), callback = function ()
+      {type = dialog.kTypeConfirm, message = locales:getText('SETTINGS_RESET_CONFIRM'), callback = function ()
         -- s:scrollToItemByIndex(1, true)
         config:reset()
         locales:setLanguage(config.lang)
         screens:reloadCurrent(screens.kTransitionNone)
       end},
-      {type = 'alert', message = locales:getText('SETTINGS_RESET_DONE')}
+      {type = dialog.kTypeAlert, message = locales:getText('SETTINGS_RESET_DONE')}
     })
   end)
   layout:add(reset)

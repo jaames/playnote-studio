@@ -65,18 +65,3 @@ function utils:clearArray(t)
     t[k] = nil
   end
 end
-
--- ugly as shit draw deferring
-
-local deferredDraws = {}
-
-function utils:deferDraw(callback)
-  table.insert(deferredDraws, callback)
-end
-
-function utils:doDeferredDraws()
-  for _, fn in pairs(deferredDraws) do
-    fn()
-  end
-  deferredDraws = {}
-end

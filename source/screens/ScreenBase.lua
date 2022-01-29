@@ -27,6 +27,7 @@ function ScreenBase:beforeEnter(...)
   end
   self:registerSprites()
   -- self:update()
+  self:emitHook('enter:before')
 end
 
 -- called somewhere during a transition, on the first frame that this screen has become visible
@@ -34,27 +35,32 @@ function ScreenBase:enter()
   self.active = true
   gfx.setDrawOffset(0, 0)
   self:setSpritesVisible(true)
+  self:emitHook('enter')
 end
 
 -- called at the very end of a transition, where this screen is being transitioned to
 function ScreenBase:afterEnter()
   playdate.inputHandlers.push(self.inputHandlers, true)
+  self:emitHook('enter:after')
 end
 
 -- called at the very beginning of a transition, where this screen is being transitioned from
 function ScreenBase:beforeLeave()
   playdate.inputHandlers.pop()
+  self:emitHook('leave:before')
 end
 
 -- called somewhere during a transition, on the first frame that this screen has become invisible
 function ScreenBase:leave()
   self.active = false
   self:setSpritesVisible(false)
+  self:emitHook('leave')
 end
 
 -- called at the very end of a transition, where this screen is being transitioned from
 function ScreenBase:afterLeave()
   self:unregisterSprites()
+  self:emitHook('leave:after')
 end
 
 -- register a table of menu items to pass to the system menu

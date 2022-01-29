@@ -62,7 +62,7 @@ function CreditsScreen:beforeEnter()
   })
   text = nil
   self.scroll.autoScroll = false
-  self.scroll:resetOffset()
+  -- self.scroll:resetOffset()
   self.scroll:setHeight(height)
   self.creditsTexture = cache
 end
@@ -78,12 +78,14 @@ function CreditsScreen:afterLeave()
   self.creditsTexture = nil
 end
 
--- function CreditsScreen:update()
---   gfx.setDrawOffset(0, self.scroll.offset)
---   gfx.setBackgroundColor(gfx.kColorBlack)
---   gfx.clear()
---   logoGfx:drawCentered(200, -30)
---   self.creditsTexture:draw(0, 0)
---   -- auto scroll
---   self.scroll:update()
--- end
+function CreditsScreen:drawBg()
+end
+
+function CreditsScreen:update()
+  -- auto scroll
+  self.scroll:update()
+  gfx.setBackgroundColor(gfx.kColorBlack)
+  gfx.clear()
+  logoGfx:drawCentered(200, -30)
+  self.creditsTexture:draw(0, 0)
+end

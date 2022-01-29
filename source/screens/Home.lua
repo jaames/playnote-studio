@@ -7,13 +7,13 @@ function HomeScreen:init()
 end
 
 function HomeScreen:setupSprites()
-  local viewButton = Button(PLAYDATE_W / 2, PLAYDATE_H - 52, 196, 34, locales:getText('HOME_VIEW'))
+  local viewButton = Button(PLAYDATE_W / 2, PLAYDATE_H - 52, 196, 40, locales:getText('HOME_VIEW'))
   viewButton.autoWidth = true
   viewButton:setIcon('./gfx/icon_view')
   viewButton:setAnchor('center', 'top')
   self.viewButton = viewButton
 
-  local settingsButton = Button(PLAYDATE_W - 8, 6, 128, 26, locales:getText('HOME_SETTINGS'))
+  local settingsButton = Button(PLAYDATE_W - 8, 4, 128, 32, locales:getText('HOME_SETTINGS'))
   settingsButton.autoWidth = true
   settingsButton:setIcon('./gfx/icon_settings')
   settingsButton:setAnchor('right', 'top')

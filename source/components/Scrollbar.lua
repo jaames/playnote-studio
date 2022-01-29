@@ -12,10 +12,10 @@ class('ScrollBar').extends(playdate.graphics.sprite)
 function ScrollBar:init(x, y, h)
   self.progress = 0
   self.trackX = (BAR_W / 2)
-  self.trackY = HANDLE_PAD
-  self.trackH = h - HANDLE_PAD * 2
+  self.trackY = HANDLE_PAD + 2
+  self.trackH = h - HANDLE_PAD * 2 - 4
   self:moveTo(x, y)
-  self:setSize(BAR_W, h)
+  self:setSize(HANDLE_W, h)
   self:setCenter(0, 0)
   self:setZIndex(100)
   self:setIgnoresDrawOffset(true)
@@ -28,7 +28,7 @@ end
 
 function ScrollBar:draw()
   local w, h = self.width, self.height
-  gfx.setClipRect(-4, -4, w + 8, h + 8)
-  shape_scrollBar:drawInRect(0, 0, w, h)
-  ui_scrollHandle:draw(self.trackX - HANDLE_R, (self.trackY + self.progress * self.trackH) - HANDLE_R)
+  -- gfx.setClipRect(-4, -4, w + 8, h + 8)
+  shape_scrollBar:drawInRect(1, 1, BAR_W, h - 2)
+  ui_scrollHandle:draw(self.trackX - HANDLE_R + 1, (self.trackY + self.progress * self.trackH) - HANDLE_R)
 end

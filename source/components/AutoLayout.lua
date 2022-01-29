@@ -9,7 +9,7 @@ function AutoLayout:init(x, y, direction, staticAxis)
   self.y = y
   self.width = 0
   self.height = 0
-  self.gap = 12
+  self.gap = 10
   self.padLeft = 24
   self.padRight = 24
   self.padTop = 24
