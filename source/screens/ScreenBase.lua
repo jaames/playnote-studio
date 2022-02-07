@@ -17,12 +17,12 @@ end
 -- called at the very beginning of a transition, where this screen is being transitioned to
 function ScreenBase:beforeEnter(...)
   if self.spritesSetup == false then
+    self.spritesSetup = true
     local sprites = self:setupSprites()
     for i = 1, #sprites do
       self:addSprite(sprites[i])
     end
     self:setSpritesVisible(false)
-    self.spritesSetup = true
     self:emitHook('sprites:setup')
   end
   self:registerSprites()
@@ -76,13 +76,14 @@ end
 -- add a sprite to this screen
 function ScreenBase:addSprite(sprite)
   table.insert(self.sprites, sprite)
+  sprite:setVisible(self.spritesVisible)
   if sprite.selectable then
     table.insert(self.selectableSprites, sprite)
   end
   if self.spritesActive then
     sprite:add()
   end
-  self:emitHook('sprite:add')
+  self:emitHook('sprite:add', sprite)
 end
 
 -- remove a sprite from this screen
@@ -94,7 +95,7 @@ function ScreenBase:removeSprite(sprite)
   if self.spritesActive then
     sprite:remove()
   end
-  self:emitHook('sprite:remove')
+  self:emitHook('sprite:remove', sprite)
 end
 
 -- hide/unhide all of this screen's sprites at once

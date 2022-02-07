@@ -106,8 +106,7 @@ end
 
 function PlayerScreen:afterEnter()
   PlayerScreen.super.afterEnter(self)
-  gfxUtils:drawBgGrid()
-  self:update()
+  -- self:update()
 end
 
 function PlayerScreen:beforeLeave()
@@ -303,53 +302,57 @@ function PlayerScreen:transitionUiControls(show)
   end
 end
 
+function PlayerScreen:drawBg(x, y, w, h)
+  grid:draw(x, y, w, h)
+end
+
 function PlayerScreen:update()
-  -- playdate.drawFPS(8, 16)
-  if (not self.isPlaying) then
-    local frameChange = playdate.getCrankTicks(24)
-    self:setCurrentFrame(self.currentFrame + frameChange)
-  end
-  -- this effectively clears the screen
-  -- which is only needed if the ui is moving, everything else is static, so it's faster to not always draw the grid
-  if self.isPlayTransitionActive or self.isFrameTransitionActive then
-    gfxUtils.drawBgGrid()
-  end
-  -- 
-  if self.isFrameTransitionActive then
-    gfx.setColor(gfx.kColorBlack)
-    gfx.drawRect(NOTE_X - 2, NOTE_Y - 2, NOTE_W + 4, NOTE_H + 4)
-    gfx.setColor(gfx.kColorWhite)
-    gfx.drawRect(NOTE_X - 1, NOTE_Y - 1, NOTE_W + 2, NOTE_H + 2)
-    self.frameTransitionStaticBitmap:draw(NOTE_X, NOTE_Y)
-    self.frameTransitionBitmap:draw(self.frameTransitionPos, 16)
-  -- draw the current frame
-  -- TODO: only if the frame has changed?
-  else
-    self.ppm:draw(NOTE_X, NOTE_Y)
-  end
-  -- draw player UI
-  if self.isUiVisible then
-    -- using transition offset
-    gfx.setDrawOffset(0, self.playTransitionVal * 48)
-    -- TODO: make component
-    -- frame counter
-    gfx.setColor(gfx.kColorWhite)
-    gfx.fillRoundRect(PLAYDATE_W - 104, PLAYDATE_H - 26, 100, 22, 4)
-    -- frame counter text
-    counterFont:drawTextAligned(self.currentFrame, PLAYDATE_W - 78, PLAYDATE_H - 24, kTextAlignment.center)
-    counterFont:drawTextAligned('/', PLAYDATE_W - 54, PLAYDATE_H - 24, kTextAlignment.center)
-    counterFont:drawTextAligned(self.numFrames, PLAYDATE_W - 30, PLAYDATE_H - 24, kTextAlignment.center)
-    -- dpad hint (TODO: redraw so it feels less distracting?)
-    -- gfx.setDrawOffset(0, self.playTransitionValue * 64)
-    -- dpadGfx[self.dpadState]:draw(6, PLAYDATE_H - 60)
-    -- frame timeline
-    gfx.setDrawOffset(0, self.playTransitionVal * 32)
-    self.timeline:draw()
-    -- reset offset
-    gfx.setDrawOffset(0, 0)
-  end
-  -- TODO: proper frame timing
-  if self.isPlaying then
-    self:setCurrentFrame(self.currentFrame + 1)
-  end
+--   -- playdate.drawFPS(8, 16)
+--   if (not self.isPlaying) then
+--     local frameChange = playdate.getCrankTicks(24)
+--     self:setCurrentFrame(self.currentFrame + frameChange)
+--   end
+--   -- this effectively clears the screen
+--   -- which is only needed if the ui is moving, everything else is static, so it's faster to not always draw the grid
+--   if self.isPlayTransitionActive or self.isFrameTransitionActive then
+--     gfxUtils.drawBgGrid()
+--   end
+--   -- 
+--   if self.isFrameTransitionActive then
+--     gfx.setColor(gfx.kColorBlack)
+--     gfx.drawRect(NOTE_X - 2, NOTE_Y - 2, NOTE_W + 4, NOTE_H + 4)
+--     gfx.setColor(gfx.kColorWhite)
+--     gfx.drawRect(NOTE_X - 1, NOTE_Y - 1, NOTE_W + 2, NOTE_H + 2)
+--     self.frameTransitionStaticBitmap:draw(NOTE_X, NOTE_Y)
+--     self.frameTransitionBitmap:draw(self.frameTransitionPos, 16)
+--   -- draw the current frame
+--   -- TODO: only if the frame has changed?
+--   else
+--     self.ppm:draw(NOTE_X, NOTE_Y)
+--   end
+--   -- draw player UI
+--   if self.isUiVisible then
+--     -- using transition offset
+--     gfx.setDrawOffset(0, self.playTransitionVal * 48)
+--     -- TODO: make component
+--     -- frame counter
+--     gfx.setColor(gfx.kColorWhite)
+--     gfx.fillRoundRect(PLAYDATE_W - 104, PLAYDATE_H - 26, 100, 22, 4)
+--     -- frame counter text
+--     counterFont:drawTextAligned(self.currentFrame, PLAYDATE_W - 78, PLAYDATE_H - 24, kTextAlignment.center)
+--     counterFont:drawTextAligned('/', PLAYDATE_W - 54, PLAYDATE_H - 24, kTextAlignment.center)
+--     counterFont:drawTextAligned(self.numFrames, PLAYDATE_W - 30, PLAYDATE_H - 24, kTextAlignment.center)
+--     -- dpad hint (TODO: redraw so it feels less distracting?)
+--     -- gfx.setDrawOffset(0, self.playTransitionValue * 64)
+--     -- dpadGfx[self.dpadState]:draw(6, PLAYDATE_H - 60)
+--     -- frame timeline
+--     gfx.setDrawOffset(0, self.playTransitionVal * 32)
+--     self.timeline:draw()
+--     -- reset offset
+--     gfx.setDrawOffset(0, 0)
+--   end
+--   -- TODO: proper frame timing
+--   if self.isPlaying then
+--     self:setCurrentFrame(self.currentFrame + 1)
+--   end
 end

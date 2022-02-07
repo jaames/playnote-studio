@@ -20,6 +20,7 @@ function FocusController:init(screen)
   self.selectionCenterRect = nil
   self.distanceFn = self:generateDistanceFunction()
 
+  self.allowNavigation = true
   self.silenceNotAllowedSfx = false
 
   self.focusMoveCallback = function(sprite) end
@@ -27,11 +28,12 @@ function FocusController:init(screen)
   self.clickCallback = function(selectedEl) end
 end
 
-function FocusController:setFocus(sprite)
+function FocusController:setFocus(sprite, muteSfx)
   if sprite == self.selection then return end
   if self.selection then
     self.selection:unfocus()
   end
+  if sprite == nil then return end
   sprite:focus()
   local rect = sprite:getBoundsRect()
   local center = rect:centerPoint()
@@ -40,15 +42,17 @@ function FocusController:setFocus(sprite)
   self.selectionCenter = center
   self.selectionCenterRect = playdate.geometry.rect.new(center.x, center.y, 0, 0)
   self:emitScreenHook('select:change', sprite, rect)
-  sounds:playSfx('selectionChange')
+  if muteSfx ~= true then
+    sounds:playSfx('selectionChange')
+  end
   self.focusMoveCallback(sprite)
 end
 
 function FocusController:cantMove(direction)
-  if not self.silenceNotAllowedSfx then
+  local override = self.cantMoveCallback(direction)
+  if (not override == true) and (not self.silenceNotAllowedSfx) then
     sounds:playSfx('selectionNotAllowed')
   end
-  self.cantMoveCallback(direction)
 end
 
 function FocusController:clickSelection()
@@ -57,6 +61,16 @@ function FocusController:clickSelection()
     selectedEl:click()
   end
   self.clickCallback(selectedEl)
+end
+
+function FocusController:add(element)
+  if element.selectable == true then
+    table.insert(self.elements, element)
+  end
+end
+
+function FocusController:remove(element)
+  table.remove(self.elements, table.indexOfElement(self.elements, element))
 end
 
 function FocusController:debugModeEnabled(enabled)
@@ -242,8 +256,12 @@ end
 function FocusController:navigate(direction)
   assert(direction)
 
+  if not self.allowNavigation then
+    return
+  end
+
   if #self.elements == 0 then
-    self:cantMove()
+    self:cantMove(direction)
     return
   end
 
@@ -367,7 +385,7 @@ function FocusController:navigate(direction)
   if nextRect then
     self:setFocus(rectMap[nextRect])
   else
-    self:cantMove()
+    self:cantMove(direction)
   end
 end
 
@@ -377,7 +395,7 @@ function FocusController:connectScreen(screen)
   local inputHandlers = screen.inputHandlers
 
   local delay = 400
-  local delayRepeat = 250
+  local delayRepeat = 200
 
   local downButtonDown, downButtonUp, rmvRepeat1 = utils:createRepeater(delay, delayRepeat, function (isRepeat)
     self.silenceNotAllowedSfx = isRepeat
@@ -412,8 +430,12 @@ function FocusController:connectScreen(screen)
   inputHandlers.rightButtonDown = utils:hookFn(inputHandlers.rightButtonDown, rightButtonDown)
   inputHandlers.rightButtonUp = utils:hookFn(inputHandlers.rightButtonUp, rightButtonUp)
 
-  screen:addHook('sprites:setup', function ()
-    self.elements = screen.selectableSprites
+  screen:addHook('sprite:add', function (sprite)
+    self:add(sprite)
+  end)
+
+  screen:addHook('sprite:remove', function (sprite)
+    self:remove(sprite)
   end)
 
   screen:addHook('leave:before', function ()

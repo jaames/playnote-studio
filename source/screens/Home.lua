@@ -11,6 +11,9 @@ function HomeScreen:setupSprites()
   viewButton.autoWidth = true
   viewButton:setIcon('./gfx/icon_view')
   viewButton:setAnchor('center', 'top')
+  viewButton:onClick(function ()
+    screens:push('notelist', screens.kTransitionFade)
+  end)
   self.viewButton = viewButton
 
   local settingsButton = Button(PLAYDATE_W - 8, 4, 128, 32, locales:getText('HOME_SETTINGS'))
