@@ -35,7 +35,8 @@ function Button:init(x, y, w, h, text)
   self.autoWidth = false
   self.autoHeight = false
 
-  self.text = nil
+  self.prelocaleText = ''
+  self.localisedText = nil
   self.textAlign = kTextAlignment.center
   self.textY = 0
   self.textW = 0
@@ -62,14 +63,20 @@ function Button:unfocus()
   Button.super.unfocus(self)
 end
 
-function Button:setText(text)
-  self.text = text
+function Button:setText(prelocaleText)
   gfx.setFontTracking(2)
+  local text = locales:replaceKeysInText(prelocaleText)
   local textW, textH = gfx.getTextSize(text)
-  self.text = text
+  self.prelocaleText = prelocaleText
+  self.localisedText = text
   self.textW = textW
   self.textH = textH
   self:updateLayout()
+end
+
+function Button:addedToScreen()
+  -- update text when added to screen
+  self:setText(self.prelocaleText)
 end
 
 function Button:setIcon(imgPath)
@@ -117,11 +124,11 @@ function Button:draw(clipX, clipY, clipW, clipH)
     self.icon:draw(self.padLeft, self.iconY)
   end
   -- draw text if present
-  if self.text then
+  if self.localisedText then
     -- gfx.setFont(fontBold)
     gfx.setFontTracking(2)
     gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-    gfx.drawTextInRect(self.text, textX, self.textY, textW, self.textH, nil, '...', self.textAlign)
+    gfx.drawTextInRect(self.localisedText, textX, self.textY, textW, self.textH, nil, '...', self.textAlign)
     gfx.setImageDrawMode(0)
   end
 end

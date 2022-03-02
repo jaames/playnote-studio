@@ -26,7 +26,7 @@ function SettingsScreen:setupSprites()
   self.layout = layout
 
   -- about button
-  local about = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, locales:getText('SETTINGS_ABOUT'))
+  local about = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, '%SETTINGS_ABOUT%')
   about:setIcon('./gfx/icon_about')
   about:onClick(function ()
     dialog:alert(''
@@ -40,7 +40,7 @@ function SettingsScreen:setupSprites()
   layout:add(about)
 
   -- credits button
-  local credits = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, locales:getText('SETTINGS_CREDITS'))
+  local credits = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, '%SETTINGS_CREDITS%')
   credits:setIcon('./gfx/icon_credits')
   credits:onClick(function ()
     screens:push('credits', screens.kTransitionFade)
@@ -48,7 +48,7 @@ function SettingsScreen:setupSprites()
   layout:add(credits)
 
   -- language select
-  local language = Select(0, 0, ITEM_WIDTH, ITEM_HEIGHT, locales:getText('SETTINGS_LANGUAGE'))
+  local language = Select(0, 0, ITEM_WIDTH, ITEM_HEIGHT, '%SETTINGS_LANGUAGE%')
   language:setIcon('./gfx/icon_lang')
   for _, lang in pairs(locales:getAvailableLanguages()) do
     language:addOption(lang.key, lang.name, string.upper(lang.key))
@@ -57,12 +57,17 @@ function SettingsScreen:setupSprites()
   language:onCloseEnded(function(value)
     locales:setLanguage(value)
     noteFs:refreshFolderNames()
-    screens:reloadCurrent(screens.kTransitionNone)
+    -- refresh sprites to force components to take new locale
+    self:performOnAllSprites(function (sprite)
+      sprite:remove()
+      sprite:add()
+    end)
   end)
   layout:add(language)
+  self.languageSelect = language
 
   -- dithering button
-  local dithering = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, locales:getText('SETTINGS_DITHERING'))
+  local dithering = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, '%SETTINGS_DITHERING%')
   dithering:setIcon('./gfx/icon_dither')
   dithering:onClick(function ()
     screens:push('dithering', screens.kTransitionFade, nil, config.dithering)
@@ -70,28 +75,28 @@ function SettingsScreen:setupSprites()
   layout:add(dithering)
 
   -- sound select
-  local sound = Select(0, 0, ITEM_WIDTH, ITEM_HEIGHT, locales:getText('SETTINGS_SOUND'))
+  local sound = Select(0, 0, ITEM_WIDTH, ITEM_HEIGHT, '%SETTINGS_SOUND%')
   sound:setIcon('./gfx/icon_sound')
-  sound:addOption(true,  locales:getText('SETTINGS_SOUND_ON'),  locales:getText('SETTINGS_ON'))
-  sound:addOption(false, locales:getText('SETTINGS_SOUND_OFF'), locales:getText('SETTINGS_OFF'))
-  sound:setValue(config.enableSoundEffects)
+  sound:addOption(true,  '%SETTINGS_SOUND_ON%',  '%SETTINGS_ON%')
+  sound:addOption(false, '%SETTINGS_SOUND_OFF%', '%SETTINGS_OFF%')
   sound:onChange(function(value)
     config.enableSoundEffects = value
   end)
   layout:add(sound)
+  self.soundSelect = sound
 
   -- reset button
-  local reset = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, locales:getText('SETTINGS_RESET'))
+  local reset = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, '%SETTINGS_RESET%')
   reset:setIcon('./gfx/icon_reset')
   reset:onClick(function ()
     dialog:sequence({
-      {type = dialog.kTypeConfirm, message = locales:getText('SETTINGS_RESET_CONFIRM'), callback = function ()
+      {type = dialog.kTypeConfirm, message = '%SETTINGS_RESET_CONFIRM%', callback = function ()
         -- s:scrollToItemByIndex(1, true)
         config:reset()
         locales:setLanguage(config.lang)
         screens:reloadCurrent(screens.kTransitionNone)
       end},
-      {type = dialog.kTypeAlert, message = locales:getText('SETTINGS_RESET_DONE')}
+      {type = dialog.kTypeAlert, message = '%SETTINGS_RESET_DONE%'}
     })
   end)
   layout:add(reset)
@@ -105,33 +110,8 @@ end
 
 function SettingsScreen:beforeEnter()
   SettingsScreen.super.beforeEnter(self)
-end
-
-function SettingsScreen:leave()
-  SettingsScreen.super.leave(self)
-  -- local ox, oy = gfx.getDrawOffset()
-  -- spritelib.performOnAllSprites(function(sprite)
-  --   gfx.setDrawOffset(0, 0)
-  --   local x, y, w, h = sprite:getBounds()
-  --   sprite:setBounds(x, y + oy, w, h)
-  -- end)
-  -- gfx.setDrawOffset(0, 0)
-  -- utils:nextTick(function ()
-  --   gfx.setDrawOffset(0, 0)
-  -- end)
-  -- self.focus:setFocus(self.firstItem, true)
-  -- spritelib.setAlwaysRedraw(true)
-  -- utils:nextTick(function ()
-  --   gfx.clearClipRect()
-  --   gfx.clearClipRect()
-  --   -- spritelib.redrawBackground()
-  --   -- utils:markScreenDirty()
-  --   utils:nextTick(function ()
-  --     gfx.clearClipRect()
-  -- -- --     spritelib.setAlwaysRedraw(false)
-  -- --     gfx.setDrawOffset(0, 0)
-  --   end)
-  -- end)
+  self.languageSelect:setValue(locales:getLanguage())
+  self.soundSelect:setValue(config.enableSoundEffects)
 end
 
 function SettingsScreen:afterLeave()

@@ -15,7 +15,9 @@ function Select:init(x, y, w, h, text)
 
   self.menu = SelectMenu(self)
 
+  self.prelocaleOptionLabels = {}
   self.optionLabels = {} -- string label per option
+  self.prelocaleOptionShortLabels = {}
   self.optionShortLabels = {} -- shortened string lables to show on select button
   self.optionValues = {} -- values for each option
   self.activeOptionValue = ''
@@ -30,6 +32,16 @@ function Select:addedToScreen()
   sounds:prepareSfxGroup('select', {
     'optionMenuOpen',
   })
+  -- update labels and text when added to screen
+  local optionLabels = self.optionLabels
+  local optionShortLabels = self.optionShortLabels
+  local prelocaleOptionLabels = self.prelocaleOptionLabels
+  local prelocaleOptionShortLabels = self.prelocaleOptionShortLabels
+  for i = 1, #prelocaleOptionLabels do
+    optionLabels[i] = locales:replaceKeysInText(prelocaleOptionLabels[i])
+    optionShortLabels[i] = locales:replaceKeysInText(prelocaleOptionShortLabels[i])
+  end
+  self:setText(self.prelocaleText)
 end
 
 function Select:removedFromScreen()
@@ -74,6 +86,8 @@ function Select:click()
 end
 
 function Select:clearOptions()
+  self.prelocaleOptionLabels = {}
+  self.prelocaleOptionShortLabels = {}
   self.optionLabels = {}
   self.optionShortLabels = {}
   self.optionValues = {}
@@ -83,8 +97,8 @@ function Select:clearOptions()
 end
 
 function Select:addOption(value, label, shortLabel)
-  table.insert(self.optionLabels, label)
-  table.insert(self.optionShortLabels, shortLabel or label)
+  table.insert(self.prelocaleOptionLabels, label)
+  table.insert(self.prelocaleOptionShortLabels, shortLabel or label)
   table.insert(self.optionValues, value)
   if #self.optionLabels == 1 then
     self:setValue(value)
@@ -161,6 +175,7 @@ function SelectMenu:open()
   local numLabels = #self.optionLabels
   self.numOptions = numLabels
   self.menuHeight = (numLabels * OPTION_HEIGHT) + (numLabels -1 * OPTION_GAP)
+  self.menuScroll = (self.activeOptionIndex - 1) * (OPTION_HEIGHT + OPTION_GAP)
   -- transition setup
   local timer = playdate.timer.new(MENU_OPEN_DUR, 0, 1)
   local startPos = PLAYDATE_H

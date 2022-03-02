@@ -1,4 +1,5 @@
 build/*
 *.pdx
+*.pdx.zip
 *.bin
 *.dylib

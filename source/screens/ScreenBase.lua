@@ -139,6 +139,20 @@ end
 function ScreenBase:update()
 end
 
+-- returns the number of sprites in this screen
+-- equiv to playdate.graphics.sprite.spriteCount()
+function ScreenBase:spriteCount()
+  return #self.sprites
+end
+
+-- performs the function fn on all sprites in the screen. fn should take one argument, which will be a sprite
+-- equiv to playdate.graphics.sprite.performOnAllSprites()
+function ScreenBase:performOnAllSprites(fn)
+  for i = 1, #self.sprites do
+    fn(self.sprites[i])
+  end
+end
+
 -- (internal) add this screen's sprites to the sprite library scenegraph
 function ScreenBase:registerSprites()
   if self.spritesActive == false then
@@ -153,9 +167,7 @@ end
 -- (internal) remove this screen's sprites from the sprite library scenegraph
 function ScreenBase:unregisterSprites()
   if self.spritesActive == true then
-    for i = 1, #self.sprites do
-      self.sprites[i]:remove()
-    end
+    spritelib.removeSprites(self.sprites)
   end
   self.spritesActive = false
   self:emitHook('sprites:unregistered')
