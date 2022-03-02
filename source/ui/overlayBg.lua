@@ -4,6 +4,7 @@ overlayBg:setSize(PLAYDATE_W, PLAYDATE_H)
 overlayBg:add()
 overlayBg:setZIndex(900)
 overlayBg:setIgnoresDrawOffset(true)
+overlayBg:setCollisionsEnabled(false)
 overlayBg:setCenter(0, 0)
 
 overlayBg.whiteLevel = 0

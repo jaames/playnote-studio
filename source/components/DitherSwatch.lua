@@ -15,12 +15,11 @@ local MASK_SIZE <const> = 64
 local MASK_OFFSET <const> = (MASK_SIZE - SWATCH_SIZE) / 2
 
 DitherSwatch = {}
-class('DitherSwatch').extends(playdate.graphics.sprite)
+class('DitherSwatch').extends(ComponentBase)
 
 function DitherSwatch:init(x, y)
+  DitherSwatch.super.init(self, x, y, SWATCH_SIZE, SWATCH_SIZE)
   self.selectable = true
-
-  self.clickCallback = function (btn) end
 
   self.pattern = 3
   self.isSelected = false
@@ -32,25 +31,7 @@ function DitherSwatch:init(x, y)
   gfx.fillCircleInRect(MASK_OFFSET, MASK_OFFSET, SWATCH_SIZE, SWATCH_SIZE)
   gfx.popContext()
 
-  self:moveTo(x, y)
-  self:setSize(SWATCH_SIZE, SWATCH_SIZE)
   self:setCenter(0.5, 0.5)
-  self:setZIndex(100)
-end
-
-function DitherSwatch:focus()
-  self.isSelected = true
-  self:markDirty()
-end
-
-function DitherSwatch:unfocus()
-  self.isSelected = false
-  self:markDirty()
-end
-
-function DitherSwatch:onClick(fn)
-  assert(type(fn) == 'function', 'callback must be a function')
-  self.clickCallback = fn
 end
 
 function DitherSwatch:click()

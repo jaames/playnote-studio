@@ -23,10 +23,12 @@ import './screens'
 import './ui/grid'
 import './ui/overlayBg'
 import './ui/dialog'
+import './ui/debugOverlay'
 
 import './controllers/ScrollController'
 import './controllers/FocusController'
 
+import './components/ComponentBase'
 import './components/AutoLayout'
 import './components/Button'
 import './components/Select'
@@ -54,13 +56,7 @@ MAIN_FONT = playdate.graphics.font.new('./fonts/WhalesharkSans')
 playdate.graphics.setFont(MAIN_FONT)
 playdate.display.setRefreshRate(50)
 
-sounds:prepareSfxGroup('common', {
-  'navigationForward',
-  'navigationBackward',
-  'navigationNotAllowed',
-  'selectionChange',
-  'selectionNotAllowed',
-})
+-- debugOverlay:start()
 
 config:init()
 locales:init()
@@ -82,6 +78,7 @@ function playdate.update()
   playdate.graphics.sprite.update()
   playdate.timer.updateTimers()
   playdate.frameTimer.updateTimers()
+  -- playdate.drawFPS(8, PLAYDATE_H - 20)
 end
 
 -- import 'CoreLibs/qrcode'

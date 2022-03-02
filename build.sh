@@ -21,24 +21,31 @@ fi
 
 if [ $CMD == "dev" ]; then
   echo "compiling dev device build..."
+  # compile C
   cd build
   cmake -DCMAKE_TOOLCHAIN_FILE=${SDK}/C_API/buildsupport/arm.cmake ..
   make
+  # compile lua and assets
   cd ..
   make pdc
+  # copy to Playdate Simulator disk location
+  cp -a ./${PRODUCT} ${SDK}/Disk/Games/${PRODUCT}
 fi
 
 if [ $CMD == "build" ]; then
   echo "compiling prod device build..."
+  # compile C
   cd build
   cmake -DCMAKE_TOOLCHAIN_FILE=${SDK}/C_API/buildsupport/arm.cmake ..
   make
   cd ..
-  # tell pdc to compile lua without debug symbols
+  # compile lua and assets, tell pdc to compile lua without debug symbols
   pdc -s Source ${PRODUCT}
   # strip unused .pdz files and macOS C binaries
   find ./${PRODUCT} -name "*.pdz" -type f -depth 2 -delete
+  find ./${PRODUCT} -name "*.pdz" -not -name "main.pdz" -type f -delete
   find ./${PRODUCT} -name "*.dylib" -type f -delete
+  find ./${PRODUCT} -name "*.dll" -type f -delete
   find ./${PRODUCT} -empty -type d -delete
   # zip result, skipping pesky DS_Store files
   zip -vr ./${PRODUCT}.zip ./${PRODUCT}/ -x "*.DS_Store"
@@ -65,9 +72,9 @@ if [ $CMD == "release" ]; then
     exit 1
   fi
   ./build.sh build
-  zip -r ./Playnote.pdx.zip ./Playnote.pdx
-  gh release create v${2} --draft './Playnote.pdx.zip#Playnote PDX'
-  rm ./Playnote.pdx.zip
+  zip -r ./${PRODUCT}.zip ./${PRODUCT}
+  gh release create v${2} --draft "./${PRODUCT}.zip#Device Build"
+  rm ./{PRODUCT}.zip
 fi
 
 exit 0

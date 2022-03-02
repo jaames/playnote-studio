@@ -26,6 +26,11 @@ function FocusController:init(screen)
   self.focusMoveCallback = function(sprite) end
   self.cantMoveCallback = function(dir) end
   self.clickCallback = function(selectedEl) end
+
+  sounds:prepareSfxGroup('selection', {
+    'selectionChange',
+    'selectionNotAllowed',
+  })
 end
 
 function FocusController:setFocus(sprite, muteSfx)
@@ -42,15 +47,39 @@ function FocusController:setFocus(sprite, muteSfx)
   self.selectionCenter = center
   self.selectionCenterRect = playdate.geometry.rect.new(center.x, center.y, 0, 0)
   self:emitScreenHook('select:change', sprite, rect)
-  if muteSfx ~= true then
+  if not muteSfx then
     sounds:playSfx('selectionChange')
   end
   self.focusMoveCallback(sprite)
 end
 
+function FocusController:setFocusPure(sprite)
+  if sprite == self.selection then return end
+  if self.selection then
+    self.selection:unfocus()
+  end
+  if sprite == nil then return end
+  sprite:focus()
+  local rect = sprite:getBoundsRect()
+  local center = rect:centerPoint()
+  self.selection = sprite
+  self.selectionRect = rect
+  self.selectionCenter = center
+  self.selectionCenterRect = playdate.geometry.rect.new(center.x, center.y, 0, 0)
+end
+
 function FocusController:cantMove(direction)
   local override = self.cantMoveCallback(direction)
   if (not override == true) and (not self.silenceNotAllowedSfx) then
+    if direction == FocusController.kDirectionLeft then
+      screens:bounceLeft()
+    elseif direction == FocusController.kDirectionRight then
+      screens:bounceRight()
+    elseif direction == FocusController.kDirectionUp then
+      screens:bounceUp()
+    elseif direction == FocusController.kDirectionDown then
+      screens:bounceDown()
+    end
     sounds:playSfx('selectionNotAllowed')
   end
 end

@@ -12,67 +12,100 @@ class('Select').extends(Button)
 function Select:init(x, y, w, h, text)
   Select.super.init(self, x, y, w, h, text)
   self.selectable = true
-  
-  self.isOpen = false
-  self.openTransitionActive = false
-  self.numOptions = 0
+
+  self.menu = SelectMenu(self)
+
   self.optionLabels = {} -- string label per option
   self.optionShortLabels = {} -- shortened string lables to show on select button
   self.optionValues = {} -- values for each option
-  self.activeOptionIndex = 0
-  self.activeOptionValue = nil
-  self.bgFade = 0.5
-  self.menuScroll = 0
-  self.menuHeight = 0
-  self.menuOpenShift = 0
-  self.menuScrollTransitionActive = false
+  self.activeOptionValue = ''
+  self.activeOptionIndex = 1
+
+  self.changeCallback = function (val, idx) end
+  self.closeCallback = function (val, idx) end
+  self.closeEndCallback = function (val, idx) end
 end
 
--- override this to be notified of a selection change
-function Select:onChange(value, index)
+function Select:addedToScreen()
+  sounds:prepareSfxGroup('select', {
+    'optionMenuOpen',
+  })
 end
 
--- override this to be notified of a menu close
-function Select:onClose(value, index)
+function Select:removedFromScreen()
+  sounds:releaseSfxGroup('select')
 end
 
--- override this to be notified of a menu close, after the transition
-function Select:onCloseEnded(value, index)
+function Select:onChange(fn)
+  assert(type(fn) == 'function', 'callback must be a function')
+  self.changeCallback = fn
+end
+
+function Select:onClose(fn)
+  assert(type(fn) == 'function', 'callback must be a function')
+  self.closeCallback = fn
+end
+
+function Select:onCloseEnded(fn)
+  assert(type(fn) == 'function', 'callback must be a function')
+  self.closeEndCallback = fn
+end
+
+function Select:menuChangeCallback(value, index)
+  self:setValue(value)
+  self.changeCallback(value, index)
+end
+
+function Select:menuCloseCallback()
+  self.closeCallback(self.activeOptionValue, self.activeOptionIndex)
+end
+
+function Select:menuCloseEndCallback()
+  self.closeEndCallback(self.activeOptionValue, self.activeOptionIndex)
+end
+
+function Select:click()
+  local menu = self.menu
+  menu.optionLabels = self.optionLabels
+  menu.optionValues = self.optionValues
+  menu.activeOptionValue = self.activeOptionValue
+  menu.activeOptionIndex = self.activeOptionIndex
+  menu:open()
 end
 
 function Select:clearOptions()
-  self.numOptions = 0
   self.optionLabels = {}
   self.optionShortLabels = {}
   self.optionValues = {}
+  self.activeOptionValue = ''
+  self.activeOptionIndex = 1
+  self:markDirty()
 end
 
 function Select:addOption(value, label, shortLabel)
   table.insert(self.optionLabels, label)
   table.insert(self.optionShortLabels, shortLabel or label)
   table.insert(self.optionValues, value)
-  self.numOptions = self.numOptions + 1
-  -- adjust menu height to accomodate the new option
-  if self.numOptions > 1 then
-    self.menuHeight = self.menuHeight + OPTION_GAP + OPTION_HEIGHT
-  -- (first option doesn't need a gap above it)
-  else
-    self.menuHeight = self.menuHeight + OPTION_HEIGHT
+  if #self.optionLabels == 1 then
+    self:setValue(value)
   end
 end
 
-function Select:setValue(value, animate)
+function Select:setValue(value)
   local index = 0
   local vals = self.optionValues
+  local n = #vals
   -- indexOfElement apparently won't work for bools and other types here...
-  for i = 1,self.numOptions do
+  for i = 1,n do
     if vals[i] == value then
       index = i
       break
     end
   end
   if index ~= nil then
-    self:setValueByIndex(index, animate)
+    self.activeOptionValue = value
+    self.activeOptionIndex = index
+    self:markDirty()
   end
 end
 
@@ -80,7 +113,149 @@ function Select:getValue()
   return self.activeOptionValue
 end
 
-function Select:setValueByIndex(index, animate)
+function Select:draw(clipX, clipY, clipW, clipH)
+  Select.super.draw(self, clipX, clipY, clipW, clipH)
+  local w, h = self.width, self.height
+  local currValueLabel = self.optionShortLabels[self.activeOptionIndex]
+  gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+  gfx.drawTextInRect(currValueLabel, 0, self.textY, w - 16, h, nil, '...', kTextAlignment.right)
+  gfx.setImageDrawMode(0)
+end
+
+SelectMenu = {}
+class('SelectMenu').extends(ComponentBase)
+
+function SelectMenu:init(selectComponent)
+  SelectMenu.super.init(self, 0, 0, PLAYDATE_W, PLAYDATE_H)
+  self:setZIndex(1200)
+  self:setIgnoresDrawOffset(true)
+
+  self.select = selectComponent
+
+  self.isOpen = false
+  self.openTransitionActive = false
+  self.numOptions = 0
+  self.optionLabels = {} -- string label per option
+  self.optionValues = {} -- values for each option
+  self.activeOptionIndex = 0
+  self.activeOptionValue = nil
+  self.menuHeight = 0
+  self.menuScroll = 0
+  self.menuScrollTransitionActive = false
+end
+
+function SelectMenu:open()
+  if self.isOpen or self.openTransitionActive then return end
+  -- prep and play sfx
+  sounds:prepareSfxGroup('select:menu', {
+    'selectionNotAllowed',
+    'optionMenuClose',
+    'optionMenuChangeSelectionUp',
+    'optionMenuChangeSelectionDown',
+  })
+  sounds:playSfx('optionMenuOpen')
+  -- add self to display list and freeze input during transition
+  self:add()
+  playdate.inputHandlers.push({}, true)
+  -- calculate layout variables
+  local numLabels = #self.optionLabels
+  self.numOptions = numLabels
+  self.menuHeight = (numLabels * OPTION_HEIGHT) + (numLabels -1 * OPTION_GAP)
+  -- transition setup
+  local timer = playdate.timer.new(MENU_OPEN_DUR, 0, 1)
+  local startPos = PLAYDATE_H
+  self.openTransitionActive = true
+  self.isOpen = true
+  self:offsetByY(startPos)
+
+  spritelib.setAlwaysRedraw(true)
+
+  timer.updateCallback = function ()
+    overlayBg:setBlackFade(timer.value * 0.5)
+    self:offsetByY(startPos - playdate.easingFunctions.outBack(timer.value, 0, startPos, 1))
+  end
+
+  timer.timerEndedCallback = function ()
+    self.openTransitionActive = false
+    overlayBg:setBlackFade(0.5)
+    self:offsetByY(0)
+
+    utils:nextTick(function ()
+      spritelib.setAlwaysRedraw(false)
+    end)
+
+    local delay = 400
+    local delayRepeat = 200
+
+    local upButtonDown, upButtonUp, rmvRepeat1 = utils:createRepeater(delay, delayRepeat, function (isRepeat)
+      self.silenceNotAllowedSfx = isRepeat
+      self:selectPrev()
+    end)
+    local downButtonDown, downButtonUp, rmvRepeat2 = utils:createRepeater(delay, delayRepeat, function (isRepeat)
+      self.silenceNotAllowedSfx = isRepeat
+      self:selectNext()
+    end)
+
+    self.removeRepeaters = function()
+      rmvRepeat1()
+      rmvRepeat2()
+    end
+
+    playdate.inputHandlers.pop()
+    playdate.inputHandlers.push({
+      AButtonDown = function()
+        self:close()
+      end,
+      BButtonDown = function()
+        self:close()
+      end,
+      upButtonDown = upButtonDown,
+      upButtonUp = upButtonUp,
+      downButtonDown = downButtonDown,
+      downButtonUp = downButtonUp
+    }, true)
+  end
+end
+
+function SelectMenu:close()
+  if (not self.isOpen) or self.openTransitionActive then return end
+  sounds:playSfx('optionMenuClose')
+  self.select:menuCloseCallback()
+
+  self.openTransitionActive = true
+  self:offsetByY(0)
+
+  local timer = playdate.timer.new(MENU_OPEN_DUR, 0, 1)
+
+  spritelib.setAlwaysRedraw(true)
+
+  timer.updateCallback = function ()
+    overlayBg:setBlackFade((1 - timer.value) * 0.5)
+    self:offsetByY(playdate.easingFunctions.inBack(timer.value, 0, PLAYDATE_H, 1))
+  end
+
+  timer.timerEndedCallback = function ()
+    overlayBg:setBlackFade(0)
+    self:offsetByY(PLAYDATE_H)
+    self.select:menuCloseEndCallback()
+
+    utils:nextTick(function ()
+      spritelib.setAlwaysRedraw(false)
+    end)
+
+    utils:nextTick(function ()
+      sounds:releaseSfxGroup('select:menu')
+      -- remove from display list, sttop transition and reinstate prev input
+      self:remove()
+      self.isOpen = false
+      self.openTransitionActive = false
+      self.removeRepeaters()
+      playdate.inputHandlers.pop()
+    end)
+  end
+end
+
+function SelectMenu:setValueByIndex(index, animate)
   -- don't update if menu is transitioning to another item
   if self.menuScrollTransitionActive then return end
   -- ignore out of bounds option indecies
@@ -97,10 +272,12 @@ function Select:setValueByIndex(index, animate)
     local timer = playdate.timer.new(MENU_SCROLL_DUR, currScroll, nextScroll, playdate.easingFunctions.outCubic)
     timer.updateCallback = function ()
       self.menuScroll = timer.value
+      self:markDirty()
     end
     timer.timerEndedCallback = function ()
       self.menuScroll = nextScroll
       self.menuScrollTransitionActive = false
+      self:markDirty()
     end
   -- or not
   else
@@ -110,55 +287,30 @@ function Select:setValueByIndex(index, animate)
   self.activeOptionIndex = index
   self.activeOptionValue = self.optionValues[index]
   -- do onChange callback
-  self:onChange(self.activeOptionValue, index)
+  self.select:menuChangeCallback(self.activeOptionValue, index)
 end
 
-function Select:selectNext()
-  self:setValueByIndex(self.activeOptionIndex + 1, true)
-end
-
-function Select:selectPrev()
-  self:setValueByIndex(self.activeOptionIndex - 1, true)
-end
-
-function Select:draw(clipX, clipY, clipW, clipH)
-  Select.super.draw(self, clipX, clipY, clipW, clipH)
-  local w, h = self.width, self.height
-  local currValueLabel = self.optionShortLabels[self.activeOptionIndex]
-  gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  gfx.drawTextInRect(currValueLabel, 0, self.textY, w - 16, h, nil, '...', kTextAlignment.right)
-  gfx.setImageDrawMode(0)
-
-  if self.isOpen then
-    self:drawMenu()
+function SelectMenu:selectNext()
+  local activeOptionIndex = self.activeOptionIndex
+  self:setValueByIndex(activeOptionIndex + 1, true)
+  if activeOptionIndex < self.numOptions then
+    sounds:playSfx('optionMenuChangeSelectionDown')
+  else
+    sounds:playSfx('selectionNotAllowed')
   end
 end
 
-function Select:drawMenu()
-  -- draw select menu ui over everything
-  utils:deferDraw(function ()
-    local oX, oY = gfx.getDrawOffset()
-    gfxUtils:drawBlackFade(self.bgFade)
-    gfx.setDrawOffset(0, self.menuOpenShift)
-    -- draw selection bg
-    local menuX = MENU_X
-    local menuY = MENU_Y - self.menuScroll
-    gfx.setColor(gfx.kColorWhite)
-    gfx.fillRoundRect(MENU_X - 8, MENU_Y - 8, OPTION_WIDTH + 16, OPTION_HEIGHT + 16, (OPTION_HEIGHT + 16) / 2)
-    -- draw option items
-    gfx.setColor(gfx.kColorWhite)
-    for i = 1,self.numOptions do
-      gfx.fillRoundRect(menuX, menuY, OPTION_WIDTH, OPTION_HEIGHT, OPTION_HEIGHT / 2)
-      -- gfx.setFont(font)
-      gfx.drawTextInRect(self.optionLabels[i], menuX + 8, menuY + 10, OPTION_WIDTH - 16, 24, nil, '...', kTextAlignment.center)
-      menuY = menuY + OPTION_HEIGHT + OPTION_GAP
-    end
-    -- draw selection border
-    gfx.setColor(gfx.kColorBlack)
-    gfx.setLineWidth(2)
-    gfx.drawRoundRect(MENU_X - 4, MENU_Y - 4, OPTION_WIDTH + 8, OPTION_HEIGHT + 8, (OPTION_HEIGHT + 8) / 2)
-    gfx.setDrawOffset(oX, oY)
-  end)
+function SelectMenu:selectPrev()
+  local activeOptionIndex = self.activeOptionIndex
+  self:setValueByIndex(activeOptionIndex - 1, true)
+  if activeOptionIndex > 1 then
+    sounds:playSfx('optionMenuChangeSelectionUp')
+  else
+    sounds:playSfx('selectionNotAllowed')
+  end
+end
+
+function SelectMenu:update()
   -- use crank to scroll through options
   local crankChange = playdate.getCrankTicks(6)
   if crankChange ~= 0 then
@@ -166,92 +318,22 @@ function Select:drawMenu()
   end
 end
 
-function Select:openMenu()
-  if self.isOpen or self.openTransitionActive then return end
-
-  local timer = playdate.timer.new(MENU_OPEN_DUR, 0, 1)
-  local startPos = PLAYDATE_H
-
-  self.openTransitionActive = true
-  self.isOpen = true
-  self.menuOpenShift = startPos
-
-  timer.updateCallback = function ()
-    self.bgFade = 0.5 - timer.value * 0.25
-    self.menuOpenShift = startPos - playdate.easingFunctions.outBack(timer.value, 0, startPos, 1)
+function SelectMenu:draw()
+  -- draw selection focus
+  local menuX = MENU_X
+  local menuY = MENU_Y - self.menuScroll
+  gfx.setColor(gfx.kColorWhite)
+  gfx.fillRoundRect(MENU_X - 8, MENU_Y - 8, OPTION_WIDTH + 16, OPTION_HEIGHT + 16, (OPTION_HEIGHT + 16) / 2)
+  -- draw option items
+  gfx.setColor(gfx.kColorWhite)
+  for i = 1,self.numOptions do
+    gfx.fillRoundRect(menuX, menuY, OPTION_WIDTH, OPTION_HEIGHT, OPTION_HEIGHT / 2)
+    -- gfx.setFont(font)
+    gfx.drawTextInRect(self.optionLabels[i], menuX + 8, menuY + 10, OPTION_WIDTH - 16, 24, nil, '...', kTextAlignment.center)
+    menuY = menuY + OPTION_HEIGHT + OPTION_GAP
   end
-
-  timer.timerEndedCallback = function ()
-    self.bgFade = 0.25
-    self.menuOpenShift = 0
-    self.openTransitionActive = false
-  end
-
-  local keyTimer = nil
-
-  playdate.inputHandlers.push({
-    AButtonDown = function()
-      self:closeMenu()
-    end,
-    BButtonDown = function()
-      self:closeMenu()
-    end,
-    upButtonDown = function ()
-      if keyTimer then
-        keyTimer:remove()
-        keyTimer = nil
-      end
-      keyTimer = playdate.timer.keyRepeatTimerWithDelay(350, 50, function ()
-        self:selectPrev()
-      end)
-    end,
-    upButtonUp = function()
-      if keyTimer then
-        keyTimer:remove()
-        keyTimer = nil
-      end
-    end,
-    downButtonDown = function ()
-      if keyTimer then
-        keyTimer:remove()
-        keyTimer = nil
-      end
-      keyTimer = playdate.timer.keyRepeatTimerWithDelay(350, 50, function ()
-        self:selectNext()
-      end)
-    end,
-    downButtonUp = function()
-      if keyTimer then
-        keyTimer:remove()
-        keyTimer = nil
-      end
-    end,
-  }, true)
-end
-
-function Select:closeMenu()
-  if (not self.isOpen) or self.openTransitionActive then return end
-
-  self:onClose(self.activeOptionValue, self.activeOptionIndex)
-
-  self.openTransitionActive = true
-  self.menuOpenShift = 0
-
-  local timer = playdate.timer.new(MENU_OPEN_DUR, 0, 1)
-
-  timer.updateCallback = function ()
-    self.bgFade = 0.5 - (1 - timer.value) * 0.25
-    self.menuOpenShift = playdate.easingFunctions.inBack(timer.value, 0, PLAYDATE_H, 1)
-  end
-
-  timer.timerEndedCallback = function ()
-    self.bgFade = 0.5
-    self.menuOpenShift = PLAYDATE_H
-    self:onCloseEnded(self.activeOptionValue, self.activeOptionIndex)
-    utils:nextTick(function ()
-      self.isOpen = false
-      self.openTransitionActive = false
-      playdate.inputHandlers.pop()
-    end)
-  end
+  -- draw selection border
+  gfx.setColor(gfx.kColorBlack)
+  gfx.setLineWidth(2)
+  gfx.drawRoundRect(MENU_X - 4, MENU_Y - 4, OPTION_WIDTH + 8, OPTION_HEIGHT + 8, (OPTION_HEIGHT + 8) / 2)
 end

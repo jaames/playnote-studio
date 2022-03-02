@@ -17,6 +17,11 @@ function utils:nextTick(callback)
   playdate.frameTimer.new(1, callback)
 end
 
+function utils:markScreenDirty()
+  local x, y = gfx.getDrawOffset()
+  spritelib.addDirtyRect(x, y, PLAYDATE_W, PLAYDATE_H)
+end
+
 -- create a removable button repeater
 function utils:createRepeater(delayAfterInitialFiring, delayAfterSecondFiring, callback)
   local repeatTimer = nil

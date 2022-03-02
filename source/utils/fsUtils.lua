@@ -16,6 +16,8 @@ local INTERNAL_FOLDERS <const> = {
   'data/',
   'fonts/',
   'gfx/',
+  'ui/',
+  'controllers/',
   'sounds/',
   'components/',
   'screens/',

@@ -19,15 +19,17 @@ dialog:add()
 dialog:setZIndex(1200)
 dialog:setVisible(false)
 dialog:setIgnoresDrawOffset(true)
+dialog:setCollisionsEnabled(false)
 dialog:moveTo(DIALOG_X, DIALOG_Y)
 dialog:setSize(DIALOG_W, DIALOG_H)
 dialog:setCenter(0, 0)
 
-dialog.bgFade = 0
 dialog.text = nil
 dialog.textY = 0
 dialog.type = nil
 dialog.textHeight = 0
+dialog.hasNext = false
+dialog.wasAlreadyOpened = false
 
 dialog.isTransitionActive = false
 dialog.transitionTimer = nil
@@ -36,6 +38,13 @@ dialog.handleClose = function (status) end
 dialog.handleCloseEnd = function (status) end
 
 function dialog:init()
+  sounds:prepareSfxGroup('dialog', {
+    'dialogOpen',
+    'dialogDismissPositive',
+    'dialogDismissNegative',
+    'dialogDismissPositiveToOpen',
+  })
+
   local okButton = Button(PLAYDATE_W / 2, 0, 120, 38, locales:getText('DIALOG_OK'))
   okButton.autoWidth = true
   okButton:setIcon('./gfx/icon_button_a')
@@ -92,6 +101,13 @@ end
 
 function dialog:show(text, type)
   if self.isTransitionActive then return end
+
+  if not self.wasAlreadyOpened then
+    sounds:playSfx('dialogOpen')
+    self.wasAlreadyOpened = false
+  end
+
+  self.hasNext = false
   self.type = type
   self.text = text
   -- calc text position
@@ -120,13 +136,13 @@ function dialog:show(text, type)
   -- on timer update
   transitionTimer.updateCallback = function (timer)
     self:offsetBy(PLAYDATE_H - playdate.easingFunctions.outBack(timer.value, 0, PLAYDATE_H, 1))
-    overlayBg:setBlackFade(timer.value * 0.75)
+    overlayBg:setBlackFade(timer.value * 0.5)
   end
   -- page transition is done
   transitionTimer.timerEndedCallback = function ()
     self:offsetBy(0)
     self.isTransitionActive = false
-    overlayBg:setBlackFade(0.75)
+    overlayBg:setBlackFade(0.5)
     playdate.inputHandlers.pop()
     if self.type == dialog.kTypeAlert then
       playdate.inputHandlers.push({
@@ -154,13 +170,20 @@ function dialog:hide(result)
   if self.isTransitionActive then return end
   -- close callback
   dialog.handleClose(result)
+  if self.hasNext and result == dialog.kResultOk then
+    sounds:playSfx('dialogDismissPositiveToOpen')
+  elseif result == dialog.kResultOk then
+    sounds:playSfx('dialogDismissPositive')
+  elseif result == dialog.kResultCancel then
+    sounds:playSfx('dialogDismissNegative')
+  end
   -- setup transition
   self.isTransitionActive = true
   local transitionTimer = playdate.timer.new(TRANSITION_DUR, 0, 1)
   -- on timer update
   transitionTimer.updateCallback = function (timer)
     self:offsetBy(playdate.easingFunctions.inBack(timer.value, 0, PLAYDATE_H, 1))
-    overlayBg:setBlackFade((1 - timer.value) * 0.75)
+    overlayBg:setBlackFade((1 - timer.value) * 0.5)
   end
   -- page transition is done
   transitionTimer.timerEndedCallback = function ()
@@ -189,6 +212,9 @@ function dialog:sequence(seq, fn)
       if fn ~= nil then fn() end
       return
     end
+    self.handleClose = function ()
+      self.hasNext = i < #seq
+    end
     self.handleCloseEnd = function (status)
       if status == dialog.kResultOk then
         i = i + 1
@@ -200,6 +226,7 @@ function dialog:sequence(seq, fn)
         end)
       end
     end
+    self.wasAlreadyOpened = i > 1
     self:show(item.message, item.type)
   end
   doItem(seq[i])

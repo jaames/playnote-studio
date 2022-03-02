@@ -7,17 +7,14 @@ local HANDLE_R <const> = HANDLE_W / 2
 local HANDLE_PAD <const> = 6
 
 ScrollBar = {}
-class('ScrollBar').extends(playdate.graphics.sprite)
+class('ScrollBar').extends(ComponentBase)
 
 function ScrollBar:init(x, y, h)
+  ScrollBar.super.init(self, x, y, HANDLE_W, h)
   self.progress = 0
   self.trackX = (BAR_W / 2)
   self.trackY = HANDLE_PAD + 2
   self.trackH = h - HANDLE_PAD * 2 - 4
-  self:moveTo(x, y)
-  self:setSize(HANDLE_W, h)
-  self:setCenter(0, 0)
-  self:setZIndex(100)
   self:setIgnoresDrawOffset(true)
 end
 

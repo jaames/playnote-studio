@@ -11,7 +11,24 @@ function ScreenBase:init()
   self.spritesActive = false
   self.spritesVisible = true
   self.selectableSprites = {}
+  self.offsetX = 0
+  self.offsetY = 0
   self.hooks = {}
+end
+
+function ScreenBase:setDrawOffset(x, y)
+  self.offsetX = x
+  self.offsetY = y
+  gfx.setDrawOffset(x, y)
+  spritelib.redrawBackground()
+end
+
+function ScreenBase:getDrawOffset()
+  return self.offsetX, self.offsetY
+end
+
+function ScreenBase:forceDrawOffset()
+  gfx.setDrawOffset(self.offsetX, self.offsetY)
 end
 
 -- called at the very beginning of a transition, where this screen is being transitioned to
@@ -33,7 +50,6 @@ end
 -- called somewhere during a transition, on the first frame that this screen has become visible
 function ScreenBase:enter()
   self.active = true
-  gfx.setDrawOffset(0, 0)
   self:setSpritesVisible(true)
   self:emitHook('enter')
 end

@@ -1,20 +1,12 @@
-local folderGfx <const> = gfx.image.new('./gfx/icon_folder')
-
 FolderSelect = {}
 class('FolderSelect').extends(Select)
 
 function FolderSelect:init(x, y, w, h)
   FolderSelect.super.init(self, x, y, w, h)
-  self:setIcon(folderGfx)
+  self:setIcon('./gfx/icon_folder')
 end
 
-function FolderSelect:drawAt(x, y)
-  Select.super.drawAt(self, x, y)
-  if self.isOpen then
-    self:drawMenu()
-  end
-end
-
-function FolderSelect:onChange(value, index)
-  self:setText(self.optionLabels[index])
+function FolderSelect:draw(clipX, clipY, clipW, clipH)
+  self:setText(self.optionLabels[self.activeOptionIndex])
+  Button.draw(self, clipX, clipY, clipW, clipH)
 end

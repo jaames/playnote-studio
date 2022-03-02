@@ -50,16 +50,14 @@ end
 
 function NoteListScreen:setupSprites()
   -- setup folder select dropdown
-  local folderSelect = FolderSelect(0, 0, 232, 34)
+  local folderSelect = FolderSelect(-5,-5, 238, 44)
   folderSelect.variant = 'folderselect'
-  local s = self
-  function folderSelect:onClose(value, index)
-    s.setCurrentFolder(s, value)
-  end
+  folderSelect:onClose(function (value)
+    self:setCurrentFolder(value)
+  end)
   self.folderSelect = folderSelect
 
   self.focus:setFocus(folderSelect)
-
   return { folderSelect }
 end
 
@@ -98,14 +96,14 @@ end
 
 function NoteListScreen:setCurrentFolder(folder)
   noteFs:setWorkingFolder(folder)
+  self:removeThumbComponents(self.currThumbs)
+  self:removeThumbComponents(self.prevThumbs)
   if noteFs.hasNotes then
     self.hasNoNotes = false
     self.hasPrevPage = false
     self:setCurrentPage(1)
   else
     self.hasNoNotes = true
-    self:removeThumbComponents(self.currThumbs)
-    self:removeThumbComponents(self.prevThumbs)
     self.currThumbs = {}
     self.prevThumbs = {}
     self.notesOnCurrPage = 0
@@ -134,11 +132,11 @@ function NoteListScreen:setCurrentPage(pageIndex)
 
     local transitionTimer = playdate.timer.new(PAGE_TRANSITION_DUR, 0, PLAYDATE_W, playdate.easingFunctions.inQuad)
     local transitionDir = pageIndex < self.currPage and -1 or 1 -- 1 = to left, -1 to right
-    
+
     if transitionDir == -1 then
       self:setThumbComponentsOffset(self.currThumbs, -PLAYDATE_W)
     end
-    -- on timer update
+
     transitionTimer.updateCallback = function (timer)
       local x = timer.value
       if transitionDir == 1 then
@@ -149,7 +147,7 @@ function NoteListScreen:setCurrentPage(pageIndex)
         self:setThumbComponentsOffset(self.currThumbs, -PLAYDATE_W + x)
       end
     end
-    -- page transition is done
+
     transitionTimer.timerEndedCallback = function ()
       self:setThumbComponentsOffset(self.currThumbs, 0)
       self:removeThumbComponents(self.prevThumbs)

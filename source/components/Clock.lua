@@ -2,17 +2,14 @@ local font <const> = gfx.font.new('./fonts/UgoNumber_8')
 local clockGfx <const> = gfx.image.new('./gfx/icon_clock')
 
 Clock = {}
-class('Clock').extends(playdate.graphics.sprite)
+class('Clock').extends(ComponentBase)
 
 function Clock:init(x, y, w, h)
-  self:moveTo(x-1, y-1)
-  self:setSize(w, h)
-  self:setCenter(0, 0)
-  self:setZIndex(100)
+  Clock.super.init(self, x-1, y-1, w, h)
   self.blinkOn = false
   self.dateString = ''
   self.timeString = ''
-  self:tick()
+  self.isRunning = true
 end
 
 function Clock:tick()
@@ -26,7 +23,18 @@ function Clock:tick()
   self.dateString = dateStr
   self.timeString = timeStr
   self:markDirty()
-  playdate.timer.performAfterDelay(1000, self.tick, self)
+  if self.isRunning then
+    playdate.timer.performAfterDelay(1000, self.tick, self)
+  end
+end
+
+function Clock:addedToScreen()
+  self.isRunning = true
+  self:tick()
+end
+
+function Clock:removedFromScreen()
+  self.isRunning = false
 end
 
 function Clock:draw()
@@ -35,9 +43,9 @@ function Clock:draw()
   gfx.setFontTracking(1)
   gfx.setColor(gfx.kColorWhite)
   gfx.fillRect(0, 0, w, h)
-  font:drawText(self.dateString, 10, 8)
-  clockGfx:draw(92, 6)
-  font:drawText(self.timeString, 108, 8)
+  font:drawText(self.dateString, 10, 10)
+  clockGfx:draw(92, 8)
+  font:drawText(self.timeString, 108, 10)
   gfx.setColor(gfx.kColorBlack)
   gfx.setLineWidth(1)
   gfx.drawRect(1, 1, w-1, h-1)

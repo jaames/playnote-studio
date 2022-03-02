@@ -14,8 +14,8 @@ local transitionHistory = {}
 local menu = playdate.getSystemMenu()
 local menuItems = {}
 
-local isShakeActive = false
-local shakeOrigin = {0,0}
+local isEffectActive = false
+local drawOffset = {0,0}
 local moveX = 0
 local moveY = 0
 
@@ -23,6 +23,12 @@ spritelib.setAlwaysRedraw(false)
 spritelib.setBackgroundDrawingCallback(function (x, y, w, h)
   screens:drawBg(x, y, w, h)
 end)
+
+sounds:prepareSfxGroup('screen', {
+  'navigationForward',
+  'navigationBackward',
+  'navigationNotAllowed',
+})
 
 function screens:register(id, screenInst)
   SCREENS[id] = screenInst
@@ -76,6 +82,9 @@ function screens:setScreen(id, transitionFn, ...)
     end
   end
   activeScreen:beforeEnter(...)
+  -- TODO: something is wrong with changing draw offset mid-transition, this is the best i could do,,,
+  -- disable and file a bug with panic sometime
+  activeScreen:forceDrawOffset()
 
   menuItems = activeScreen:setupMenuItems(menu)
 
@@ -98,11 +107,11 @@ function screens:reloadCurrent(transitionFn)
 end
 
 function screens:shakeX()
-  if isShakeActive then return end
+  if isEffectActive then return end
 
   local timer = playdate.timer.new(200, 0, 1)
-  shakeOrigin[1], shakeOrigin[2] = gfx.getDrawOffset()
-  isShakeActive = true
+  drawOffset[1], drawOffset[2] = gfx.getDrawOffset()
+  isEffectActive = true
   moveX = 0
   moveY = 0
   spritelib.setAlwaysRedraw(true)
@@ -113,10 +122,51 @@ function screens:shakeX()
   timer.timerEndedCallback = function ()
     moveX = 0
     utils:nextTick(function ()
-      isShakeActive = false
+      isEffectActive = false
       spritelib.setAlwaysRedraw(false)
     end)
   end
+end
+
+function screens:doBounce(updateCallback)
+  if isEffectActive then return end
+
+  local timer = playdate.timer.new(80, 0, 1, playdate.easingFunctions.inOutSine)
+  timer.reverses = true
+
+  drawOffset[1], drawOffset[2] = gfx.getDrawOffset()
+  isEffectActive = true
+  moveX = 0
+  moveY = 0
+  spritelib.setAlwaysRedraw(true)
+
+  timer.updateCallback = function (t)
+    updateCallback(t.value)
+  end
+  timer.timerEndedCallback = function (t)
+    moveX = 0
+    moveY = 0
+    utils:nextTick(function ()
+      isEffectActive = false
+      spritelib.setAlwaysRedraw(false)
+    end)
+  end
+end
+
+function screens:bounceLeft()
+  self:doBounce(function (value) moveX = value * 5 end)
+end
+
+function screens:bounceRight()
+  self:doBounce(function (value) moveX = value * -5 end)
+end
+
+function screens:bounceUp()
+  self:doBounce(function (value) moveY = value * 5 end)
+end
+
+function screens:bounceDown()
+  self:doBounce(function (value) moveY = value * -5 end)
 end
 
 function screens:drawBg(x, y, w, h)
@@ -125,15 +175,15 @@ function screens:drawBg(x, y, w, h)
   else
     activeScreen:drawBg(x, y, w, h)
   end
+  if debugOverlay.active then
+    debugOverlay:updatePaintRect(x, y, w, h)
+  end
 end
 
 function screens:update()
-  if isTransitionActive then
-    self:drawBg()
-  end
   if not isTransitionActive then
-    if isShakeActive then
-      gfx.setDrawOffset(shakeOrigin[1] + moveX, shakeOrigin[2] + moveY)
+    if isEffectActive then
+      gfx.setDrawOffset(drawOffset[1] + moveX, drawOffset[2] + moveY)
     end
     activeScreen:update()
   end

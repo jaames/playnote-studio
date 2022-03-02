@@ -18,24 +18,16 @@ local buttonGfx = {
   -- },
 }
 
-local align <const> = {
-  left = 0,
-  top = 0,
-  center = 0.5,
-  right = 1,
-  bottom = 1
-}
-
 Button = {}
-class('Button').extends(playdate.graphics.sprite)
+class('Button').extends(ComponentBase)
 
 function Button:init(x, y, w, h, text)
+  Button.super.init(self, x, y, w, h)
   self.selectable = true
 
   self.variant = 'default'
   self.state = 'base'
-  self.isSelected = false
-  
+
   self.padLeft = 16
   self.padRight = 16
   self.padTop = 6
@@ -55,76 +47,19 @@ function Button:init(x, y, w, h, text)
   self.iconH = 0
   self.iconPadRight = 12
 
-  self.tx = 0
-  self.ty = 0
-
-  self.clickCallback = function (btn) end
-
-  self:moveTo(x, y)
-  self:setSize(w, h)
-  self:setCenter(0, 0)
-  self:setZIndex(100)
   if text then
     self:setText(text)
   end
 end
 
-function Button:moveTo(x, y)
-  Button.super.moveTo(self, x + self.tx, y + self.ty)
-  self.bx = x
-  self.by = y
-end
-
-function Button:moveToX(x)
-  self:moveTo(x, self.y)
-end
-
-function Button:moveToY(y)
-  self:moveTo(self.x, y)
-end
-
-function Button:offsetBy(x, y)
-  Button.super.moveTo(self, self.bx + x, self.by + y)
-  self.tx = x
-  self.ty = y
-end
-
 function Button:focus()
   self.state = 'select'
-  self.isSelected = true
-  self:markDirty()
+  Button.super.focus(self)
 end
 
 function Button:unfocus()
   self.state = 'base'
-  self.isSelected = false
-  self:markDirty()
-end
-
-function Button:select()
-  print('old select called')
-end
-function Button:onSelect()
-  print('old onselect called')
-end
-
-function Button:onClick(fn)
-  assert(type(fn) == 'function', 'callback must be a function')
-  self.clickCallback = fn
-end
-
-function Button:click()
-  self.clickCallback(self)
-end
-
-function Button:setAnchor(x, y)
-  if type(x) == 'string' then
-    x = align[x]
-  end
-  if type(y) == 'string' then
-    y = align[y]
-  end
-  self:setCenter(x, y)
+  Button.super.unfocus(self)
 end
 
 function Button:setText(text)

@@ -5,6 +5,8 @@ ScrollController.kModeKeepOnScreen = 1
 ScrollController.kModeKeepCenter = 2
 
 function ScrollController:init(screen)
+  self.screen = screen
+
   self.start = 0
   self.offset = 0
   self.height = 0
@@ -45,8 +47,7 @@ function ScrollController:setOffset(o)
   self.progress = -self.offset / self.range
   self.updateCallback(self)
   if self.controlDrawOffset then
-    gfx.setDrawOffset(0, self.offset)
-    spritelib.redrawBackground()
+    self.screen:setDrawOffset(0, self.offset)
   end
   if self.scrollBar ~= nil then
     self.scrollBar:setProgress(self.progress)
@@ -91,7 +92,12 @@ function ScrollController:scrollToSelection(rect)
 end
 
 function ScrollController:resetOffset()
-  self:setOffset(self.start)
+  self.offset = self.start
+  self.progress = -self.offset / self.range
+  self.screen.offsetY = self.offset
+  if self.scrollBar ~= nil then
+    self.scrollBar:setProgress(self.progress)
+  end
 end
 
 function ScrollController:clampOffset(o)

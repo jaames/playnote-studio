@@ -6,27 +6,12 @@ local THUMB_W <const> = THUMB_IMG_W + (THUMB_IMG_PADX * 2)
 local THUMB_H <const> = THUMB_IMG_H + (THUMB_IMG_PADY * 2)
 
 Thumbnail = {}
-class('Thumbnail').extends(playdate.graphics.sprite)
+class('Thumbnail').extends(ComponentBase)
 
 function Thumbnail:init(x, y, tmb)
+  Thumbnail.super.init(self, x - THUMB_IMG_PADX, y - THUMB_IMG_PADY, THUMB_W, THUMB_H)
   self.selectable = true
-  self.isSelected = false
-
   self.tmb = tmb
-
-  self.tx = 0
-  self.ty = 0
-
-  self:moveTo(x - THUMB_IMG_PADX, y - THUMB_IMG_PADY)
-  self:setSize(THUMB_W, THUMB_H)
-  self:setCenter(0, 0)
-  self:setZIndex(100)
-end
-
-function Thumbnail:moveTo(x, y)
-  Thumbnail.super.moveTo(self, x + self.tx, y + self.ty)
-  self.bx = x
-  self.by = y
 end
 
 function Thumbnail:moveToX(x)
@@ -35,22 +20,6 @@ end
 
 function Thumbnail:moveToY(y)
   self:moveTo(self.x, y)
-end
-
-function Thumbnail:offsetBy(x, y)
-  Thumbnail.super.moveTo(self, self.bx + x, self.by + y)
-  self.tx = x
-  self.ty = y
-end
-
-function Thumbnail:focus()
-  self.isSelected = true
-  self:markDirty()
-end
-
-function Thumbnail:unfocus()
-  self.isSelected = false
-  self:markDirty()
 end
 
 function Thumbnail:click()

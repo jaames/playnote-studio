@@ -1,23 +1,31 @@
 local logoGfx <const> = gfx.imagetable.new('./gfx/gfx_logo_anim')
 
 HomeLogo = {}
-class('HomeLogo').extends(playdate.graphics.sprite)
+class('HomeLogo').extends(ComponentBase)
 
 function HomeLogo:init(x, y)
   local img = logoGfx:getImage(1)
   local w, h = img:getSize()
-  self:moveTo(x, y)
-  self:setSize(w, h)
-  self:setCenter(0, 0)
-  self:setZIndex(100)
+  HomeLogo.super.init(self, x, y, w, h)
   self.framerate = 1000 / 4
   self.anim = gfx.animation.loop.new(self.framerate, logoGfx)
-  self:tick()
+  self.isRunning = true
 end
 
 function HomeLogo:tick()
   self:markDirty()
-  playdate.timer.performAfterDelay(self.framerate, self.tick, self)
+  if self.isRunning then
+    playdate.timer.performAfterDelay(self.framerate, self.tick, self)
+  end
+end
+
+function HomeLogo:addedToScreen()
+  self.isRunning = true
+  self:tick()
+end
+
+function HomeLogo:removedFromScreen()
+  self.isRunning = false
 end
 
 function HomeLogo:draw()

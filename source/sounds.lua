@@ -43,6 +43,7 @@ end
 
 -- prepare a list of sound effects, and group them together to they can be released at once later one
 function sounds:prepareSfxGroup(groupId, sampleNames)
+  print('preping sfx group', groupId)
   sfxGroups[groupId] = sampleNames
   self:prepareSfx(sampleNames)
 end
@@ -92,4 +93,13 @@ end
 function sounds:stopMusic()
   currMusic:stop()
   currMusic = nil
+end
+
+function sounds:debug()
+  print('---sfx loaded---')
+  printTable(sfx)
+  print('---sfx groups loaded---')
+  printTable(sfxGroups)
+  print('---sfx ref counts---')
+  printTable(refCounts)
 end
