@@ -176,8 +176,8 @@ function screens:drawBg(x, y, w, h)
   else
     activeScreen:drawBg(x, y, w, h)
   end
-  if debugOverlay.active then
-    debugOverlay:updatePaintRect(x, y, w, h)
+  if pdbug.active then
+    pdbug:updatePaintRect(x, y, w, h)
   end
 end
 

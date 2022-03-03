@@ -1,15 +1,8 @@
-local gfx <const> = playdate.graphics
-
-local PLAYDATE_W <const> = 400
-local logoGfx <const> = gfx.image.new('./gfx/gfx_logo_credits')
-
 CreditsScreen = {}
 class('CreditsScreen').extends(ScreenBase)
 
 function CreditsScreen:init()
   CreditsScreen.super.init(self)
-  self.creditsTexture = nil
-
   self.scroll = ScrollController(self)
   self.scroll:setStart(200)
 end
@@ -39,32 +32,22 @@ function CreditsScreen:getCreditsText()
   return text
 end
 
+function CreditsScreen:setupSprites()
+  local logo = Image(PLAYDATE_W / 2, 0, './gfx/gfx_logo_credits')
+  logo:setAnchor('center', 'top')
+
+  local textView = TextView(0, logo.height + 12, PLAYDATE_W)
+  textView:setText(self:getCreditsText())
+
+  self.scroll:setHeight(logo.height + 12 + textView.height)
+
+  return { logo, textView }
+end
+
 function CreditsScreen:beforeEnter()
   CreditsScreen.super.beforeEnter(self)
-  gfx.setFontFamily({
-    [gfx.font.kVariantNormal] = MAIN_FONT,
-    [gfx.font.kVariantBold] = gfx.font.new('./fonts/Asheville-Rounded-24-px'),
-    [gfx.font.kVariantItalic] = gfx.getSystemFont(gfx.font.kVariantNormal)
-  })
-  local text = self:getCreditsText()
-  local _, height = gfx.getTextSize(text)
-  local cache = gfx.image.new(PLAYDATE_W, height, gfx.kColorClear)
-  local rect = playdate.geometry.rect.new(10, 0, PLAYDATE_W - 20, height)
-  gfx.pushContext(cache)
-  gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  gfx.drawTextInRect(text, rect, nil, nil, kTextAlignment.center)
-  gfx.setImageDrawMode(0)
-  gfx.popContext()
-  gfx.setFontFamily({
-    [gfx.font.kVariantNormal] = MAIN_FONT,
-    [gfx.font.kVariantBold] = MAIN_FONT,
-    [gfx.font.kVariantItalic] = MAIN_FONT
-  })
-  text = nil
   self.scroll.autoScroll = false
-  -- self.scroll:resetOffset()
-  self.scroll:setHeight(height)
-  self.creditsTexture = cache
+  self.scroll:resetOffset()
 end
 
 function CreditsScreen:afterEnter()
@@ -73,19 +56,12 @@ function CreditsScreen:afterEnter()
   self.scroll.autoScroll = true
 end
 
-function CreditsScreen:afterLeave()
-  CreditsScreen.super.afterLeave(self)
-  self.creditsTexture = nil
-end
-
 function CreditsScreen:drawBg()
+  gfx.setColor(gfx.kColorBlack)
+  gfx.fillRect(0, 0, PLAYDATE_W, PLAYDATE_H)
 end
 
 function CreditsScreen:update()
   -- auto scroll
   self.scroll:update()
-  gfx.setBackgroundColor(gfx.kColorBlack)
-  gfx.clear()
-  logoGfx:drawCentered(200, -30)
-  self.creditsTexture:draw(0, 0)
 end

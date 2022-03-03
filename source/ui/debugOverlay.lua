@@ -1,24 +1,25 @@
-debugOverlay = {}
+pdbug = {}
 
-debugOverlay.active = false
+pdbug.active = false
 
-debugOverlay.showFPS = true
+pdbug.showFPS = true
 
-debugOverlay.showPaintFlashing = true
-debugOverlay.paintFlashLineWidth = 2
-debugOverlay.paintFlashFrameDelay = 15
+pdbug.showPaintFlashing = true
+pdbug.paintFlashLineWidth = 2
+pdbug.paintFlashFrameDelay = 15
 
 local rectlib <const> = playdate.geometry.rect
+local isSim = playdate.isSimulator
 
 local origDbgDraw = playdate.debugDraw
-local origSpriteBg = playdate.debugDraw
 
 local paintRects = {}
 local paintRectFrames = {}
 
-function debugOverlay:start()
+function pdbug:start()
+  if not isSim then return end
   origDbgDraw = playdate.debugDraw
-  debugOverlay.active = true
+  pdbug.active = true
 
   playdate.setDebugDrawColor(255, 0, 40, 0.75)
   playdate.debugDraw = function()
@@ -41,18 +42,21 @@ function debugOverlay:start()
       end
     end
   end
+  origDbgDraw()
 end
 
-function debugOverlay:stop()
+function pdbug:stop()
   playdate.debugDraw = origDbgDraw
-  debugOverlay.active = false
+  pdbug.active = false
 end
 
-function debugOverlay:updatePaintRect(x, y, w, h)
-  local rect = rectlib.new(x, y, w, h)
-  local i = #paintRects + 1
-  paintRects[i] = rect
-  paintRectFrames[i] = 0
+function pdbug:updatePaintRect(x, y, w, h)
+  if isSim then
+    local rect = rectlib.new(x, y, w, h)
+    local i = #paintRects + 1
+    paintRects[i] = rect
+    paintRectFrames[i] = 0
+  end
 end
 
 
