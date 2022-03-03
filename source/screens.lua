@@ -95,7 +95,7 @@ function screens:setScreen(id, transitionFn, ...)
   end)
 end
 
-function screens:reloadCurrent(transitionFn)
+function screens:reloadCurrent(transitionFn, callbackFn)
   isTransitionActive = true
 
   activeScreen:afterLeave()
@@ -103,6 +103,7 @@ function screens:reloadCurrent(transitionFn)
 
   drawTransition = transitionFn(activeScreen, activeScreen, function()
     isTransitionActive = false
+    callbackFn()
   end)
 end
 

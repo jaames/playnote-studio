@@ -131,9 +131,16 @@ function Select:draw(clipX, clipY, clipW, clipH)
   Select.super.draw(self, clipX, clipY, clipW, clipH)
   local w, h = self.width, self.height
   local currValueLabel = self.optionShortLabels[self.activeOptionIndex]
-  gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  gfx.drawTextInRect(currValueLabel, 0, self.textY, w - 16, h, nil, '...', kTextAlignment.right)
-  gfx.setImageDrawMode(0)
+  gfx.setFontTracking(2)
+  local labelW, labelH = gfx.getTextSize(currValueLabel)
+  local boxPad = 10
+  local boxW = labelW + boxPad * 2
+  local boxH = labelH + 4
+  gfx.setColor(gfx.kColorWhite)
+  gfx.fillRoundRect(w - self.padRight - boxW, self.textY - 2, boxW, boxH, boxH / 2)
+  -- gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+  gfx.drawTextInRect(currValueLabel, 0, self.textY, w - self.padRight - boxPad, h, nil, '...', kTextAlignment.right)
+  -- gfx.setImageDrawMode(0)
 end
 
 SelectMenu = {}
@@ -156,6 +163,7 @@ function SelectMenu:init(selectComponent)
   self.menuHeight = 0
   self.menuScroll = 0
   self.menuScrollTransitionActive = false
+  self.silenceNotAllowedSfx = false
 end
 
 function SelectMenu:open()
@@ -307,21 +315,39 @@ end
 
 function SelectMenu:selectNext()
   local activeOptionIndex = self.activeOptionIndex
-  self:setValueByIndex(activeOptionIndex + 1, true)
   if activeOptionIndex < self.numOptions then
+    self:setValueByIndex(activeOptionIndex + 1, true)
     sounds:playSfx('optionMenuChangeSelectionDown')
   else
-    sounds:playSfx('selectionNotAllowed')
+    self:selectionNotAllowed(1)
   end
 end
 
 function SelectMenu:selectPrev()
   local activeOptionIndex = self.activeOptionIndex
-  self:setValueByIndex(activeOptionIndex - 1, true)
   if activeOptionIndex > 1 then
+    self:setValueByIndex(activeOptionIndex - 1, true)
     sounds:playSfx('optionMenuChangeSelectionUp')
   else
+    self:selectionNotAllowed(-1)
+  end
+end
+
+function SelectMenu:selectionNotAllowed(dir)
+  if not self.silenceNotAllowedSfx then
     sounds:playSfx('selectionNotAllowed')
+    local currScroll = self.ty
+    local bumpScroll = self.ty - 8 * dir
+
+    local timer = playdate.timer.new(90, currScroll, bumpScroll, playdate.easingFunctions.inOutSine)
+    timer.reverses = true
+
+    timer.updateCallback = function (t)
+      self:offsetByY(t.value)
+    end
+    timer.timerEndedCallback = function (t)
+      self:offsetByY(t.value)
+    end
   end
 end
 

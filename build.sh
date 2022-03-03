@@ -2,9 +2,11 @@
 #!/bin/bash
 # this is just here for my convenience, because I am an idiot
 
-CMD=$1
+# REPLACE WITH THE NAME OF YOUR PLAYDATE GAME PDX
+GAME="Playnote.pdx"
+# SDK installer writes the install location to ~/.Playdate/config
 SDK=$(egrep '^\s*SDKRoot' ~/.Playdate/config | head -n 1 | cut -c9-)
-PRODUCT="Playnote.pdx"
+CMD=$1
 
 if [ -z $CMD ]; then
   echo "No command provided"
@@ -29,7 +31,7 @@ if [ $CMD == "dev" ]; then
   cd ..
   make pdc
   # copy to Playdate Simulator disk location
-  cp -a ./${PRODUCT} ${SDK}/Disk/Games/${PRODUCT}
+  cp -a ./${GAME} ${SDK}/Disk/Games/${GAME}
 fi
 
 if [ $CMD == "build" ]; then
@@ -40,15 +42,18 @@ if [ $CMD == "build" ]; then
   make
   cd ..
   # compile lua and assets, tell pdc to compile lua without debug symbols
-  pdc -s Source ${PRODUCT}
+  pdc -s Source ${GAME}
+  # assumes that you import all the files your game uses into main.lua
   # strip unused .pdz files and macOS C binaries
-  find ./${PRODUCT} -name "*.pdz" -type f -depth 2 -delete
-  find ./${PRODUCT} -name "*.pdz" -not -name "main.pdz" -type f -delete
-  find ./${PRODUCT} -name "*.dylib" -type f -delete
-  find ./${PRODUCT} -name "*.dll" -type f -delete
-  find ./${PRODUCT} -empty -type d -delete
+  find ./${GAME} -name "*.pdz" -type f -depth 2 -delete
+  find ./${GAME} -name "*.pdz" -not -name "main.pdz" -type f -delete
+  # remove stuff that's not needed for a device-only build
+  find ./${GAME} -name "*.dylib" -type f -delete
+  find ./${GAME} -name "*.dll" -type f -delete
+  # cleapup empty directories
+  find ./${GAME} -empty -type d -delete
   # zip result, skipping pesky DS_Store files
-  zip -vr ./${PRODUCT}.zip ./${PRODUCT}/ -x "*.DS_Store"
+  zip -vr ./${GAME}.zip ./${GAME}/ -x "*.DS_Store"
 fi
 
 if [ $CMD == "lua" ]; then
@@ -72,9 +77,9 @@ if [ $CMD == "release" ]; then
     exit 1
   fi
   ./build.sh build
-  zip -r ./${PRODUCT}.zip ./${PRODUCT}
-  gh release create v${2} --draft "./${PRODUCT}.zip#Device Build"
-  rm ./{PRODUCT}.zip
+  zip -r ./${GAME}.zip ./${GAME}
+  gh release create v${2} --draft "./${GAME}.zip#Device Build"
+  rm ./{GAME}.zip
 fi
 
 exit 0

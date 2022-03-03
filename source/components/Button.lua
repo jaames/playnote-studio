@@ -37,7 +37,7 @@ function Button:init(x, y, w, h, text)
 
   self.prelocaleText = ''
   self.localisedText = nil
-  self.textAlign = kTextAlignment.center
+  self.textAlign = kTextAlignment.left
   self.textY = 0
   self.textW = 0
   self.textH = 0
@@ -74,6 +74,11 @@ function Button:setText(prelocaleText)
   self:updateLayout()
 end
 
+function Button:setTextAlign(align)
+  self.textAlign = align
+  self:updateLayout()
+end
+
 function Button:addedToScreen()
   -- update text when added to screen
   self:setText(self.prelocaleText)
@@ -89,6 +94,19 @@ function Button:setIcon(imgPath)
   self.icon = icon
   self.iconW = iconW
   self.iconH = iconH
+  self:updateLayout()
+end
+
+function Button:setPaddingStyle(style)
+  if style == 'wide' then
+    self.padLeft = 20
+    self.padRight = 20
+    self.iconPadRight = 16
+  else
+    self.padLeft = 16
+    self.padRight = 16
+    self.iconPadRight = 12
+  end
   self:updateLayout()
 end
 

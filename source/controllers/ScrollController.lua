@@ -20,7 +20,7 @@ function ScrollController:init(screen)
 
   self.selectionMode = ScrollController.kModeKeepOnScreen
   self.selectionAnimation = true
-  self.selectionAnimationDuration = 200
+  self.selectionAnimationDuration = 150
   self.selectionAnimationEasing = playdate.easingFunctions.inCubic
 
   self.scrollAnimationActive = false

@@ -27,6 +27,7 @@ function SettingsScreen:setupSprites()
 
   -- about button
   local about = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, '%SETTINGS_ABOUT%')
+  about:setPaddingStyle('wide')
   about:setIcon('./gfx/icon_about')
   about:onClick(function ()
     dialog:alert(''
@@ -41,6 +42,7 @@ function SettingsScreen:setupSprites()
 
   -- credits button
   local credits = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, '%SETTINGS_CREDITS%')
+  credits:setPaddingStyle('wide')
   credits:setIcon('./gfx/icon_credits')
   credits:onClick(function ()
     screens:push('credits', screens.kTransitionFade)
@@ -49,25 +51,23 @@ function SettingsScreen:setupSprites()
 
   -- language select
   local language = Select(0, 0, ITEM_WIDTH, ITEM_HEIGHT, '%SETTINGS_LANGUAGE%')
+  language:setPaddingStyle('wide')
   language:setIcon('./gfx/icon_lang')
   for _, lang in pairs(locales:getAvailableLanguages()) do
-    language:addOption(lang.key, lang.name, string.upper(lang.key))
+    language:addOption(lang.key, lang.name, lang.key)
   end
   language:setValue(locales:getLanguage())
   language:onCloseEnded(function(value)
     locales:setLanguage(value)
     noteFs:refreshFolderNames()
-    -- refresh sprites to force components to take new locale
-    self:performOnAllSprites(function (sprite)
-      sprite:remove()
-      sprite:add()
-    end)
+    self:reloadSprites()
   end)
   layout:add(language)
   self.languageSelect = language
 
   -- dithering button
   local dithering = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, '%SETTINGS_DITHERING%')
+  dithering:setPaddingStyle('wide')
   dithering:setIcon('./gfx/icon_dither')
   dithering:onClick(function ()
     screens:push('dithering', screens.kTransitionFade, nil, config.dithering)
@@ -76,6 +76,7 @@ function SettingsScreen:setupSprites()
 
   -- sound select
   local sound = Select(0, 0, ITEM_WIDTH, ITEM_HEIGHT, '%SETTINGS_SOUND%')
+  sound:setPaddingStyle('wide')
   sound:setIcon('./gfx/icon_sound')
   sound:addOption(true,  '%SETTINGS_SOUND_ON%',  '%SETTINGS_ON%')
   sound:addOption(false, '%SETTINGS_SOUND_OFF%', '%SETTINGS_OFF%')
@@ -87,16 +88,17 @@ function SettingsScreen:setupSprites()
 
   -- reset button
   local reset = Button(0, 0, ITEM_WIDTH, ITEM_HEIGHT, '%SETTINGS_RESET%')
+  reset:setPaddingStyle('wide')
   reset:setIcon('./gfx/icon_reset')
   reset:onClick(function ()
     dialog:sequence({
-      {type = dialog.kTypeConfirm, message = '%SETTINGS_RESET_CONFIRM%', callback = function ()
-        -- s:scrollToItemByIndex(1, true)
+      {type = dialog.kTypeConfirm, message = locales:getText('SETTINGS_RESET_CONFIRM'), callback = function ()
         config:reset()
         locales:setLanguage(config.lang)
-        screens:reloadCurrent(screens.kTransitionNone)
+        self:reloadSprites()
+        self.focus:setFocus(about)
       end},
-      {type = dialog.kTypeAlert, message = '%SETTINGS_RESET_DONE%'}
+      {type = dialog.kTypeAlert, message = locales:getText('SETTINGS_RESET_DONE')}
     })
   end)
   layout:add(reset)

@@ -89,6 +89,14 @@ function ScreenBase:setupSprites()
   return {}
 end
 
+-- override to draw a custom background for this screen
+function ScreenBase:drawBg(x, y, w, h)
+end
+
+-- override to do something on every frame for this screen while it is active
+function ScreenBase:update()
+end
+
 -- add a sprite to this screen
 function ScreenBase:addSprite(sprite)
   table.insert(self.sprites, sprite)
@@ -125,20 +133,23 @@ end
 
 -- force all of this screen's sprites to be updated
 function ScreenBase:forceSpriteUpdate()
-  for i = 1, #self.sprites do
-    self.sprites[i]:markDirty()
-    self.sprites[i]:update()
+  if self.spritesActive then
+    for i = 1, #self.sprites do
+      self.sprites[i]:markDirty()
+      self.sprites[i]:update()
+    end
   end
 end
 
--- override to draw a custom background for this screen
-function ScreenBase:drawBg(x, y, w, h)
+-- reload all the sprites in the screen
+function ScreenBase:reloadSprites()
+  if self.spritesActive then
+    for i = 1, #self.sprites do
+      self.sprites[i]:remove()
+      self.sprites[i]:add()
+    end
+  end
 end
-
--- override to do something on every frame for this screen while it is active
-function ScreenBase:update()
-end
-
 -- returns the number of sprites in this screen
 -- equiv to playdate.graphics.sprite.spriteCount()
 function ScreenBase:spriteCount()

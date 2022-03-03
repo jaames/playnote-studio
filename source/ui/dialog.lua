@@ -45,7 +45,7 @@ function dialog:init()
     'dialogDismissPositiveToOpen',
   })
 
-  local okButton = Button(PLAYDATE_W / 2, 0, 120, 38, locales:getText('DIALOG_OK'))
+  local okButton = Button(PLAYDATE_W / 2, 0, 120, 38, '%DIALOG_OK%')
   okButton.autoWidth = true
   okButton:setIcon('./gfx/icon_button_a')
   okButton:setIgnoresDrawOffset(true)
@@ -56,7 +56,7 @@ function dialog:init()
     self:hide(dialog.kResultOk)
   end)
 
-  local confirmButton = Button(PLAYDATE_W / 2 + 8, 0, 130, 38, locales:getText('DIALOG_CONFIRM'))
+  local confirmButton = Button(PLAYDATE_W / 2 + 8, 0, 130, 38, '%DIALOG_CONFIRM%')
   confirmButton:setIcon('./gfx/icon_button_a')
   confirmButton:setIgnoresDrawOffset(true)
   confirmButton:setAnchor('left', 'top')
@@ -66,7 +66,7 @@ function dialog:init()
     self:hide(dialog.kResultOk)
   end)
 
-  local cancelButton = Button(PLAYDATE_W / 2 - 8, 0, 130, 38, locales:getText('DIALOG_CANCEL'))
+  local cancelButton = Button(PLAYDATE_W / 2 - 8, 0, 130, 38, '%DIALOG_CANCEL%')
   cancelButton:setIcon('./gfx/icon_button_b')
   cancelButton:setIgnoresDrawOffset(true)
   cancelButton:setAnchor('right', 'top')
