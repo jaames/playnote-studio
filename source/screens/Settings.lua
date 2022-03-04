@@ -2,11 +2,8 @@ local bgGfx <const> = gfx.image.new('./gfx/gfx_bg_settings')
 
 local ITEM_WIDTH <const> = 300
 local ITEM_HEIGHT <const> = 54
-local MENU_X <const> = (PLAYDATE_W / 2) - (ITEM_WIDTH / 2)
 local MENU_GAP_TOP <const> = 24
 local MENU_GAP_BOTTOM <const> = 24
-local MENU_MID <const> = (PLAYDATE_H / 2) - ITEM_HEIGHT
-local MENU_SCROLL_DUR = 200
 
 SettingsScreen = {}
 class('SettingsScreen').extends(ScreenBase)
@@ -126,11 +123,4 @@ end
 function SettingsScreen:drawBg(x, y, w, h)
   grid:drawWithOffset(x, y, w, h, self.scroll.offset)
   bgGfx:draw(0, 0)
-end
-
-function SettingsScreen:update()
-  -- local crankChange = playdate.getCrankTicks(6)
-  -- if crankChange ~= 0 then
-  --   self:scrollToItemByIndex(self.activeItemIndex - crankChange, true)
-  -- end
 end

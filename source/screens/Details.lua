@@ -1,7 +1,3 @@
-local gfx <const> = playdate.graphics
-
-local PLAYDATE_W <const> = 400
-local PLAYDATE_H <const> = 240
 local BOX_W <const> = 344
 local BOX_X <const> = 16
 local BOX_Y <const> = 24

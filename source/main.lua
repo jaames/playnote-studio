@@ -23,7 +23,7 @@ import './screens'
 import './ui/grid'
 import './ui/overlayBg'
 import './ui/dialog'
-import './ui/debugOverlay'
+import './ui/pdbug'
 
 import './controllers/ScrollController'
 import './controllers/FocusController'
@@ -36,6 +36,8 @@ import './components/Select'
 import './components/Clock'
 import './components/HomeLogo'
 import './components/FolderSelect'
+import './components/Counter'
+import './components/NoNoteDialog'
 import './components/Thumbnail'
 import './components/Timeline'
 import './components/DitherSwatch'
@@ -58,7 +60,7 @@ MAIN_FONT = playdate.graphics.font.new('./fonts/WhalesharkSans')
 playdate.graphics.setFont(MAIN_FONT)
 playdate.display.setRefreshRate(50)
 
--- debugOverlay:start()
+-- pdbug:setEnabled(true)
 
 config:init()
 locales:init()

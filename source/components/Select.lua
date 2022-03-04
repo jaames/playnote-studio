@@ -1,5 +1,5 @@
 local OPTION_GAP <const> = 12
-local OPTION_WIDTH <const> = 304
+local OPTION_WIDTH <const> = 314
 local OPTION_HEIGHT <const> = 40
 local MENU_X <const> = (PLAYDATE_W / 2) - (OPTION_WIDTH / 2)
 local MENU_Y <const> = (PLAYDATE_H / 2) - (OPTION_HEIGHT / 2)

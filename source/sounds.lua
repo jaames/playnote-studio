@@ -19,7 +19,7 @@ function sounds:prepareSfx(sampleNames)
       local path = SOUND_ROOT .. sampleName
       local pathWithExt = path .. '.pda'
       assert(fs.exists(pathWithExt), 'Missing sfx file ' .. pathWithExt)
-      -- print('Loading SFX: ' .. sampleName)
+      print('Loading SFX: ' .. sampleName)
       sfx[sampleName] = snd.sampleplayer.new(path)
       refCounts[sampleName] = 1
     else
@@ -35,7 +35,7 @@ function sounds:releaseSfx(sampleNames)
     refCounts[sampleName] -= 1
     -- free sounds effect once there's nothing else using it
     if refCounts[sampleName] == 0 then
-      -- print('Freeing SFX: ' .. sampleName)
+      print('Freeing SFX: ' .. sampleName)
       sfx[sampleName] = nil
     end
   end
@@ -43,7 +43,7 @@ end
 
 -- prepare a list of sound effects, and group them together to they can be released at once later one
 function sounds:prepareSfxGroup(groupId, sampleNames)
-  print('preping sfx group', groupId)
+  -- print('preping sfx group', groupId)
   sfxGroups[groupId] = sampleNames
   self:prepareSfx(sampleNames)
 end

@@ -40,9 +40,6 @@ dialog.handleCloseEnd = function (status) end
 function dialog:init()
   sounds:prepareSfxGroup('dialog', {
     'dialogOpen',
-    'dialogDismissPositive',
-    'dialogDismissNegative',
-    'dialogDismissPositiveToOpen',
   })
 
   local okButton = Button(PLAYDATE_W / 2, 0, 120, 38, '%DIALOG_OK%')
@@ -104,8 +101,13 @@ function dialog:show(text, type)
 
   if not self.wasAlreadyOpened then
     sounds:playSfx('dialogOpen')
-    self.wasAlreadyOpened = false
+    sounds:prepareSfxGroup('dialog:close', {
+      'dialogDismissPositive',
+      'dialogDismissNegative',
+      'dialogDismissPositiveToOpen',
+    })
   end
+  self.wasAlreadyOpened = false
 
   self.hasNext = false
   self.type = type
@@ -174,8 +176,10 @@ function dialog:hide(result)
     sounds:playSfx('dialogDismissPositiveToOpen')
   elseif result == dialog.kResultOk then
     sounds:playSfx('dialogDismissPositive')
+    sounds:releaseSfxGroup('dialog:close')
   elseif result == dialog.kResultCancel then
     sounds:playSfx('dialogDismissNegative')
+    sounds:releaseSfxGroup('dialog:close')
   end
   -- setup transition
   self.isTransitionActive = true

@@ -25,7 +25,6 @@ end
 
 function ScrollBar:draw()
   local w, h = self.width, self.height
-  -- gfx.setClipRect(-4, -4, w + 8, h + 8)
   shape_scrollBar:drawInRect(1, 1, BAR_W, h - 2)
   ui_scrollHandle:draw(self.trackX - HANDLE_R + 1, (self.trackY + self.progress * self.trackH) - HANDLE_R)
 end

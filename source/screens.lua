@@ -176,9 +176,6 @@ function screens:drawBg(x, y, w, h)
   else
     activeScreen:drawBg(x, y, w, h)
   end
-  if pdbug.active then
-    pdbug:updatePaintRect(x, y, w, h)
-  end
 end
 
 function screens:update()
@@ -247,7 +244,7 @@ screens.kTransitionStartup = screens:newTransition(320, nil,
       if not b.active then
         b:enter()
       end
-      b:drawBg()
+      b:drawBg(0, 0, PLAYDATE_W, PLAYDATE_H)
       overlayBg:setWhiteFade(1 - t)
     end
   end
@@ -255,7 +252,7 @@ screens.kTransitionStartup = screens:newTransition(320, nil,
 
 screens.kTransitionFade = screens:newInOutTransition(300, {nextIn = false},
   function (t, a, b, state)
-    a:drawBg()
+    a:drawBg(0, 0, PLAYDATE_W, PLAYDATE_H)
     overlayBg:setWhiteFade(t)
   end,
   function (t, a, b, state)
@@ -264,7 +261,7 @@ screens.kTransitionFade = screens:newInOutTransition(300, {nextIn = false},
       b:enter()
       state.nextIn = true
     end
-    b:drawBg()
+    b:drawBg(0, 0, PLAYDATE_W, PLAYDATE_H)
     overlayBg:setWhiteFade(1 - t)
   end
 )

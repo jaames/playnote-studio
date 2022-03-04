@@ -1,8 +1,4 @@
-local pageCounterFont <const> = gfx.font.new('./fonts/WhalesharkCounter')
-
 local bgGfx <const> = gfx.image.new('./gfx/gfx_bg_notelist')
-local helpQrGfx <const> = gfx.image.new('./gfx/qr_filehelp')
-local boxGfx <const> = gfx.nineSlice.new('./gfx/shape_box', 5, 5, 2, 2)
 
 local PAGE_TRANSITION_DUR <const> = 250
 local THUMB_W <const> = 64
@@ -50,15 +46,21 @@ end
 
 function NoteListScreen:setupSprites()
   -- setup folder select dropdown
-  local folderSelect = FolderSelect(-5,-5, 238, 44)
+  local folderSelect = FolderSelect(-5,-5, 260, 44)
   folderSelect.variant = 'folderselect'
   folderSelect:onClose(function (value)
     self:setCurrentFolder(value)
   end)
   self.folderSelect = folderSelect
 
+  local counter = Counter(PLAYDATE_W - 6, 6)
+  counter:setAnchor('right', 'top')
+  self.counter = counter
+
+  self.noNoteDialog = NoNoteDialog(20, 52, PLAYDATE_W - 38, PLAYDATE_H - 72)
+
   self.focus:setFocus(folderSelect)
-  return { folderSelect }
+  return { folderSelect, counter, self.noNoteDialog }
 end
 
 function NoteListScreen:setupMenuItems(menu)
@@ -75,6 +77,7 @@ function NoteListScreen:beforeEnter()
   self:setCurrentPage(self.currPage)
   -- update folderselect
   local folderSelect = self.folderSelect
+  local counter = self.counter
   folderSelect:clearOptions()
   for _, folderItem in pairs(noteFs.folderList) do
     folderSelect:addOption(folderItem.path, folderItem.name)
@@ -83,13 +86,18 @@ function NoteListScreen:beforeEnter()
   -- if there's no notes to display, force the folder button to be selected
   if self.notesOnCurrPage == 0 then
     self.hasNoNotes = true
+    self.noNoteDialog.show = true
     self.focus:setFocus(self.folderSelect)
   end
+  -- update counter
+  counter:setTotal(noteFs.numPages)
+  counter:setVisible(not self.hasNoNotes)
 end
 
-function NoteListScreen:afterLeave()
-  NoteListScreen.super.afterLeave(self)
+function NoteListScreen:leave()
+  NoteListScreen.super.leave(self)
   self:removeThumbComponents(self.currThumbs)
+  self.noNoteDialog.show = false
   self.currThumbs = {}
   self.hasPrevPage = false -- prevent initial transition when returning to this page
 end
@@ -102,14 +110,18 @@ function NoteListScreen:setCurrentFolder(folder)
     self.hasNoNotes = false
     self.hasPrevPage = false
     self:setCurrentPage(1)
+    self.noNoteDialog.show = false
   else
     self.hasNoNotes = true
     self.currThumbs = {}
     self.prevThumbs = {}
     self.notesOnCurrPage = 0
     self.currPage = 0
+    self.noNoteDialog.show = true
     self.focus:setFocus(self.folderSelect)
   end
+  self.counter:setVisible(not self.hasNoNotes)
+  self.counter:setTotal(noteFs.numPages)
 end
 
 function NoteListScreen:setCurrentPage(pageIndex)
@@ -162,6 +174,7 @@ function NoteListScreen:setCurrentPage(pageIndex)
     end
   end
   self.currPage = pageIndex
+  self.counter:setValue(pageIndex)
   self.hasPrevPage = true
 end
 
@@ -198,39 +211,5 @@ end
 
 function NoteListScreen:drawBg(x, y, w, h)
   grid:draw(x, y, w, h)
+  bgGfx:draw(0, 0)
 end
-
--- function NoteListScreen:update()
---   gfx.setDrawOffset(0, 0)
---   -- page bg
---   gfxUtils:drawBgGrid()
---   bgGfx:draw(0, 0)
---   -- folder select
---   self.folderSelect:draw()
---   -- show 'no notes available'
---   if self.hasNoNotes then
---     boxGfx:drawInRect(20, 52, PLAYDATE_W - 38, PLAYDATE_H - 72)
---     gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES'), 40, 76, 360, 200, nil, nil)
---     helpQrGfx:draw(PLAYDATE_W - 134, 102)
---     gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES_INFO'), 40, 116, 232, 200, nil, nil)
---     return
---   end
---   -- page counter
---   local counterText = string.format('%d/%d', self.currPage, noteFs.numPages)
---   gfx.setFontTracking(2)
---   local w = pageCounterFont:getTextWidth(counterText)
---   gfx.fillRoundRect(PLAYDATE_W - w - 28, 4, w + 28, 24, 4)
---   pageCounterFont:drawTextAligned(counterText, PLAYDATE_W - 12, 8, kTextAlignment.right)
---   -- grid: right transition
---   if self.isTransitionActive and self.transitionDir == 1 then
---     self:drawGrid(-self.xOffset,             self.prevThumbs)
---     self:drawGrid(PLAYDATE_W - self.xOffset, self.currThumbs)
---   -- grid: left transition 
---   elseif self.isTransitionActive and self.transitionDir == -1 then
---     self:drawGrid(self.xOffset,               self.prevThumbs)
---     self:drawGrid(-PLAYDATE_W + self.xOffset, self.currThumbs)
---   -- grid: rest state
---   else
---     self:drawGrid(0, self.currThumbs)
---   end
--- end

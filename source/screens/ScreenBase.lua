@@ -178,7 +178,9 @@ end
 -- (internal) remove this screen's sprites from the sprite library scenegraph
 function ScreenBase:unregisterSprites()
   if self.spritesActive == true then
-    spritelib.removeSprites(self.sprites)
+    for i = 1, #self.sprites do
+      self.sprites[i]:remove()
+    end
   end
   self.spritesActive = false
   self:emitHook('sprites:unregistered')

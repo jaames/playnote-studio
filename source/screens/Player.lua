@@ -1,8 +1,3 @@
-local PLAYDATE_W <const> = 400
-local PLAYDATE_H <const> = 240
-local gfx <const> = playdate.graphics
-local counterFont <const> = gfx.font.new('./fonts/WhalesharkCounter')
-
 local NOTE_X <const> = 72
 local NOTE_Y <const> = 16
 local NOTE_W <const> = 256
@@ -11,6 +6,8 @@ local NOTE_H <const> = 192
 local DELAY_PAGE_FIRST <const> = 500
 local DELAY_PAGE_REPEAT <const> = 100
 local DELAY_PLAY_UI <const> = 200
+
+local fast_intersection <const> = playdate.geometry.rect.fast_intersection
 
 PlayerScreen = {}
 class('PlayerScreen').extends(ScreenBase)
@@ -70,8 +67,18 @@ function PlayerScreen:init()
       self:togglePlay()
     end
   }
-  -- ui components
-  self.timeline = Timeline((PLAYDATE_W / 2) - 82, PLAYDATE_H - 26, 164, 20)
+end
+
+function PlayerScreen:setupSprites()
+  local counter = Counter(PLAYDATE_W - 4, PLAYDATE_H - 4)
+  counter:setAnchor('right', 'bottom')
+  self.counter = counter
+
+  local timeline = Timeline(PLAYDATE_W / 2, PLAYDATE_H - 6, 166)
+  timeline:setAnchor('center', 'bottom')
+  self.timeline = timeline
+
+  return { timeline, counter }
 end
 
 function PlayerScreen:setupMenuItems(menu)
@@ -104,11 +111,6 @@ function PlayerScreen:beforeEnter()
   self:loadPpm()
 end
 
-function PlayerScreen:afterEnter()
-  PlayerScreen.super.afterEnter(self)
-  -- self:update()
-end
-
 function PlayerScreen:beforeLeave()
   PlayerScreen.super.beforeLeave(self)
   self:pause()
@@ -123,6 +125,7 @@ function PlayerScreen:afterLeave()
 end
 
 function PlayerScreen:loadPpm()
+  -- print(noteFs.currentNote)
   local ppm = PpmParser.new(noteFs.currentNote)
   local ditherSetttings = noteFs:getNoteDitherSettings(noteFs.currentNote)
   for layer = 1,2 do
@@ -134,6 +137,8 @@ function PlayerScreen:loadPpm()
   self.numFrames = ppm.numFrames
   self.loop = ppm.loop
   self.ppm = ppm
+  self.counter:setTotal(self.numFrames)
+  self.counter:setValue(self.currentFrame)
   local animTimer = playdate.timer.new(ppm.duration * 1000, 0, self.numFrames)
   animTimer.repeats = self.loop
   animTimer.discardOnCompletion = false
@@ -160,7 +165,9 @@ function PlayerScreen:setCurrentFrame(i)
   local ppm = self.ppm
   ppm:setCurrentFrame(math.floor(i))
   self.currentFrame = ppm.currentFrame
-  self.timeline.progress = ppm.progress
+  self.timeline:setProgress(ppm.progress)
+  self.counter:setValue(self.currentFrame)
+  spritelib.redrawBackground()
 end
 
 function PlayerScreen:jumpToPrevFrame()
@@ -304,20 +311,18 @@ end
 
 function PlayerScreen:drawBg(x, y, w, h)
   grid:draw(x, y, w, h)
+  local _, _, iw, ih = fast_intersection(NOTE_X, NOTE_Y, NOTE_W, NOTE_H, x, y, w, h)
+  if iw > 0 and ih > 0 then
+    self.ppm:draw(NOTE_X, NOTE_Y)
+  end
 end
 
 function PlayerScreen:update()
---   -- playdate.drawFPS(8, 16)
---   if (not self.isPlaying) then
---     local frameChange = playdate.getCrankTicks(24)
---     self:setCurrentFrame(self.currentFrame + frameChange)
---   end
---   -- this effectively clears the screen
---   -- which is only needed if the ui is moving, everything else is static, so it's faster to not always draw the grid
---   if self.isPlayTransitionActive or self.isFrameTransitionActive then
---     gfxUtils.drawBgGrid()
---   end
---   -- 
+  -- playdate.drawFPS(8, 16)
+  if (not self.isPlaying) then
+    local frameChange = playdate.getCrankTicks(24)
+    self:setCurrentFrame(self.currentFrame + frameChange)
+  end
 --   if self.isFrameTransitionActive then
 --     gfx.setColor(gfx.kColorBlack)
 --     gfx.drawRect(NOTE_X - 2, NOTE_Y - 2, NOTE_W + 4, NOTE_H + 4)
@@ -328,7 +333,7 @@ function PlayerScreen:update()
 --   -- draw the current frame
 --   -- TODO: only if the frame has changed?
 --   else
---     self.ppm:draw(NOTE_X, NOTE_Y)
+      -- self.ppm:draw(NOTE_X, NOTE_Y)
 --   end
 --   -- draw player UI
 --   if self.isUiVisible then
