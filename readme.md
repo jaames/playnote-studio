@@ -5,23 +5,28 @@
 - Audio play/pause
 - Add DSi username chars to font
 - Function to delete sample notes
-- Get audio design in
-- Fix UI for other language strings
-- launchSoundPath in pdxinfo
 - Create a PPM test suite to verify against
 - Website
 
 ## Playnote Studio
 
-Play animations from the DSiWare version of Flipnote Studio on your Playdate!
+Play Flipnote Studio animations on your Playdate!
 
-## Use
+## Features
+
+- Play any Flipnote animation file created with the DSiWare version of Flipnote Studio, just drop the files from your DSi's SD card into your Playdate's storage!
+- Use the Playdate's crank to smoothly scroll through frames!
+- Comes bundled with a bunch of sample Flipnotes kindly provided by from some of the best artists in the Flipnote community, such as [Kéké](twitter.com/Kekeflipnote), [ペキラ (Pekira)](twitter.com/pekira1227), [MrJohn](flipnot.es/9F990EE00074AC4D), [bokeh f/2 (who cares)](www.instagram.com/gsupnet_) and many more!
+- Available in English, Japanese, French, German, Italian, Dutch, Russian, and... Welsh!
+- Pretty UI with thumbnail lists, folder selection, settings screen, etc -- all accompanied by custom-made sound effects!
+
+## Credits
 
 If you wish to use parts of this repo in your own project, please be sure to credit the right people:
 
 - *any lua or web code, UI design elements, image assets or the 3d playdate model* - [James Daniel](https://github.com/jaames)
 - *ppmlib code* - [Simon Aarons](https://github.com/simontime) and [James Daniel](https://github.com/jaames)
-- *sound effects or music* - TODO
+- *sound effects* - TODO
 - *Flipnote Studio screenshots* - [Austin Burk](https://twitter.com/AustinSudomemo)
 
 ## Special Thanks
