@@ -86,7 +86,7 @@ function DitheringScreen:beforeLeave()
 end
 
 function DitheringScreen:drawBg(x, y, w, h)
-  grid:draw(x, w, w, h)
+  grid:draw(x, y, w, h)
 
   gfx.setColor(gfx.kColorBlack)
   gfx.fillRoundRect(RECT_LABELS, 6)

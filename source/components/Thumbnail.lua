@@ -29,6 +29,10 @@ function Thumbnail:click()
   end
 end
 
+function Thumbnail:getPath()
+  return self.tmb.path
+end
+
 function Thumbnail:draw(clipX, clipY, clipW, clipH)
   if self.tmb then
     if self.isSelected then
@@ -42,7 +46,7 @@ function Thumbnail:draw(clipX, clipY, clipW, clipH)
       -- shadow
       gfx.setLineWidth(1)
       gfx.setColor(gfx.kColorBlack)
-      gfx.drawRect(-4, -4, THUMB_W - 7, THUMB_H - 7)
+      gfx.fillRect(6, 6, THUMB_W - 7, THUMB_H - 7)
        -- black outer border
       gfx.drawRect(2, 2, THUMB_W - 4, THUMB_H - 4)
       -- white inner boarder

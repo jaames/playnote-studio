@@ -131,7 +131,7 @@ function Select:draw(clipX, clipY, clipW, clipH)
   Select.super.draw(self, clipX, clipY, clipW, clipH)
   local w, h = self.width, self.height
   local currValueLabel = self.optionShortLabels[self.activeOptionIndex]
-  gfx.setFontTracking(2)
+  gfx.setFontTracking(1)
   local labelW, labelH = gfx.getTextSize(currValueLabel)
   local boxPad = 10
   local boxW = labelW + boxPad * 2

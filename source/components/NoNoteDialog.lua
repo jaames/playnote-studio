@@ -12,6 +12,7 @@ end
 function NoNoteDialog:draw()
   if self.show then
     local w, h = self.width, self.height
+    gfx.setFontTracking(1)
     boxGfx:drawInRect(0, 0, w, h)
     gfx.drawTextInRect(locales:getText('VIEW_NO_FLIPNOTES'), 20, 24, 360, 200, nil, nil)
     helpQrGfx:draw(246, 50)

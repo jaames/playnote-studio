@@ -29,11 +29,13 @@ function NoteListScreen:init()
 
   self.selectedRow = 0
   self.selectedCol = 0
-  self.selectedThumb = nil
 
   self.focus = FocusController(self)
   self.focus.cantMoveCallback = function(dir)
     local i = self.currPage
+    if self.folderSelect.isSelected then
+      return false
+    end
     if dir == FocusController.kDirectionLeft then
       self:setCurrentPage(i - 1)
       return i > 1
@@ -65,8 +67,9 @@ end
 
 function NoteListScreen:setupMenuItems(menu)
   local detailsItem = menu:addMenuItem(locales:getText('VIEW_MENU_DETAILS'), function()
-    if self.selectedThumb then
-      screens:push('details', screens.kTransitionFade, nil, self.selectedThumb.path)
+    local selectedComponent = self.focus.selection
+    if getmetatable(selectedComponent) == Thumbnail then
+      screens:push('details', screens.kTransitionFade, nil, selectedComponent:getPath())
     end
   end)
   return {detailsItem}

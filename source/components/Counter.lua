@@ -13,6 +13,7 @@ function Counter:init(x, y)
 end
 
 function Counter:setWidthForNumDigits(numDigits)
+  gfx.setFontTracking(1)
   local measureStr = string.rep('0', numDigits) .. '/' .. string.rep('0', numDigits)
   local w = gfx.getTextSize(measureStr) + self.padding * 2 + 12
   self:setSize(w, self.height)
@@ -41,7 +42,7 @@ function Counter:draw()
   local textY = (h / 2) - 9
   gfx.setColor(gfx.kColorWhite)
   gfx.fillRoundRect(0, 0, w, h, 4)
-  gfx.setFontTracking(2)
+  gfx.setFontTracking(1)
   counterFont:drawTextAligned('/', mid, textY, kTextAlignment.center)
   counterFont:drawTextAligned(self.value, valueX, textY, kTextAlignment.center)
   counterFont:drawTextAligned(self.total, totalX, textY, kTextAlignment.center)

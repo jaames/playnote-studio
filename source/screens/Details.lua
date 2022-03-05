@@ -1,6 +1,8 @@
 local BOX_W <const> = 344
 local BOX_X <const> = 16
 local BOX_Y <const> = 24
+local MENU_GAP_TOP <const> = 24
+local MENU_GAP_BOTTOM <const> = 24
 
 DetailsScreen = {}
 class('DetailsScreen').extends(ScreenBase)
@@ -9,8 +11,17 @@ function DetailsScreen:init()
   DetailsScreen.super.init(self)
   self.inputHandlers = {}
   self.scroll = ScrollController(self)
-  self.scrollBar = ScrollBar(PLAYDATE_W - 26, BOX_Y, PLAYDATE_H - BOX_Y * 2)
+  self.scroll:useDpad()
+end
+
+function DetailsScreen:setupSprites()
+  -- setup folder select dropdown
+  local scrollBar = ScrollBar(PLAYDATE_W - 26, MENU_GAP_TOP, PLAYDATE_H - MENU_GAP_TOP - MENU_GAP_BOTTOM)
+  self.scroll:connectScrollBar(scrollBar)
+
   self.list = KeyValList(BOX_X, BOX_Y, BOX_W)
+
+  return { self.list, scrollBar  }
 end
 
 function DetailsScreen:renderNoteDetails(ppmPath)
@@ -32,7 +43,7 @@ function DetailsScreen:renderNoteDetails(ppmPath)
   list:addRow(locales:getText('DETAILS_PREV_AUTHOR'), stringUtils:fromWideChars(tmb.previousAuthor))
   list:addRow(locales:getText('DETAILS_ORIG_AUTHOR'), stringUtils:fromWideChars(tmb.originalAuthor))
   -- initial run to measure text height
-  self.scroll:setHeight(self.list.h + BOX_Y * 2)
+  self.scroll:setHeight(self.list.height + BOX_Y * 2)
 end
 
 function DetailsScreen:beforeEnter(ppmPath)
@@ -44,14 +55,9 @@ end
 function DetailsScreen:afterLeave()
   DetailsScreen.super.afterLeave(self)
   self.list:clear()
-  self.list:remove()
   self.scroll:setOffset(0)
 end
 
--- function DetailsScreen:update()
---   gfx.setDrawOffset(0, 0)
---   gfxUtils:drawBgGridWithOffset(self.scroll.offset)
---   self.scrollBar:draw()
---   gfx.setDrawOffset(0, self.scroll.offset)
---   -- self.list:draw(0, 0)
--- end
+function DetailsScreen:drawBg(x, y, w, h)
+  grid:drawWithOffset(x, y, w, h, self.scroll.offset)
+end

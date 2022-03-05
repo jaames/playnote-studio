@@ -5,6 +5,7 @@ function CreditsScreen:init()
   CreditsScreen.super.init(self)
   self.scroll = ScrollController(self)
   self.scroll:setStart(200)
+  self.scroll:useDpad()
 end
 
 function CreditsScreen:getArtistCredits()

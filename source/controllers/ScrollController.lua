@@ -139,6 +139,35 @@ function ScrollController:connectScreen(screen)
   screen.inputHandlers = inputHandlers
 end
 
+function ScrollController:useDpad()
+  local screen = self.screen
+  local inputHandlers = screen.inputHandlers
+
+  local delay = 50
+  local delayRepeat = 1
+  local step = 2
+
+  local downButtonDown, downButtonUp, rmvRepeat1 = utils:createRepeater(delay, delayRepeat, function (isRepeat)
+    self.autoScroll = false
+    self:setOffset(self.offset - step)
+  end)
+  local upButtonDown, upButtonUp, rmvRepeat2 = utils:createRepeater(delay, delayRepeat, function (isRepeat)
+    self.autoScroll = false
+    self:setOffset(self.offset + step)
+  end)
+
+  inputHandlers.downButtonDown = utils:hookFn(inputHandlers.downButtonDown, downButtonDown)
+  inputHandlers.downButtonUp = utils:hookFn(inputHandlers.downButtonUp, downButtonUp)
+
+  inputHandlers.upButtonDown = utils:hookFn(inputHandlers.upButtonDown, upButtonDown)
+  inputHandlers.upButtonUp = utils:hookFn(inputHandlers.upButtonUp, upButtonUp)
+
+  screen:addHook('leave:before', function ()
+    rmvRepeat1()
+    rmvRepeat2()
+  end)
+end
+
 function ScrollController:connectScrollBar(scrollBar)
   self.scrollBar = scrollBar
   scrollBar:setProgress(self.progress)
