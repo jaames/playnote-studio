@@ -20,6 +20,12 @@ function FocusController:init(screen)
   self.selectionCenterRect = nil
   self.distanceFn = self:generateDistanceFunction()
 
+  self.blockNavigationInDirection = {
+    [FocusController.kDirectionUp] = false,
+    [FocusController.kDirectionDown] = false,
+    [FocusController.kDirectionLeft] = false,
+    [FocusController.kDirectionRight] = false,
+  }
   self.allowNavigation = true
   self.silenceNotAllowedSfx = false
 
@@ -282,8 +288,24 @@ function FocusController:getPrioritizedRect(priorities)
   return destPriority.group[1]
 end
 
+function FocusController:preventNavigationInDirections(...)
+  for _, direction in pairs({...}) do
+    self.blockNavigationInDirection[direction] = true
+  end
+end
+
+function FocusController:allowNavigationInDirections(...)
+  for _, direction in pairs({...}) do
+    self.blockNavigationInDirection[direction] = false
+  end
+end
+
 function FocusController:navigate(direction)
   assert(direction)
+
+  if self.blockNavigationInDirection[direction] then
+    return
+  end
 
   if not self.allowNavigation then
     return

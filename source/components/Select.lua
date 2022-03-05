@@ -164,6 +164,7 @@ function SelectMenu:init(selectComponent)
   self.menuScroll = 0
   self.menuScrollTransitionActive = false
   self.silenceNotAllowedSfx = false
+  self.bounceEffectActive = false
 end
 
 function SelectMenu:open()
@@ -334,7 +335,8 @@ function SelectMenu:selectPrev()
 end
 
 function SelectMenu:selectionNotAllowed(dir)
-  if not self.silenceNotAllowedSfx then
+  if (not self.silenceNotAllowedSfx) and (not self.bounceEffectActive) then
+    self.bounceEffectActive = true
     sounds:playSfx('selectionNotAllowed')
     local currScroll = self.ty
     local bumpScroll = self.ty - 8 * dir
@@ -347,6 +349,7 @@ function SelectMenu:selectionNotAllowed(dir)
     end
     timer.timerEndedCallback = function (t)
       self:offsetByY(t.value)
+      self.bounceEffectActive = false
     end
   end
 end

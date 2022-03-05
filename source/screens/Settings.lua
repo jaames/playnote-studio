@@ -13,6 +13,7 @@ function SettingsScreen:init()
   self.scroll = ScrollController(self)
   self.scroll.selectionMode = ScrollController.kModeKeepCenter
   self.focus = FocusController(self)
+  self.focus:preventNavigationInDirections(FocusController.kDirectionLeft, FocusController.kDirectionRight)
 end
 
 function SettingsScreen:setupSprites()

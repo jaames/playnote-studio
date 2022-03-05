@@ -30,6 +30,8 @@ sounds:prepareSfxGroup('screen', {
   'navigationNotAllowed',
 })
 
+screens.blockEffects = false
+
 function screens:register(id, screenInst)
   SCREENS[id] = screenInst
   screenInst.id = id
@@ -108,7 +110,7 @@ function screens:reloadCurrent(transitionFn, callbackFn)
 end
 
 function screens:shakeX()
-  if isEffectActive then return end
+  if isEffectActive or self.blockEffects then return end
 
   local timer = playdate.timer.new(200, 0, 1)
   drawOffset[1], drawOffset[2] = gfx.getDrawOffset()
@@ -130,7 +132,7 @@ function screens:shakeX()
 end
 
 function screens:doBounce(updateCallback)
-  if isEffectActive then return end
+  if isEffectActive or self.blockEffects then return end
 
   local timer = playdate.timer.new(80, 0, 1, playdate.easingFunctions.inOutSine)
   timer.reverses = true

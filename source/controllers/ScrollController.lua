@@ -55,8 +55,10 @@ function ScrollController:setOffset(o)
 end
 
 function ScrollController:animateToOffset(offset, duration, easing)
-  -- if self.scrollAnimationActive then return end
+  if self.scrollAnimationActive then return end
   self.scrollAnimationActive = true
+  -- prevent screen shake/bounce to prevent them messing up scroll position
+  screens.blockEffects = true
   local endOffset = self:clampOffset(offset)
   local timer = playdate.timer.new(duration, self.offset, endOffset, easing)
   timer.updateCallback = function ()
@@ -65,6 +67,7 @@ function ScrollController:animateToOffset(offset, duration, easing)
   timer.timerEndedCallback = function ()
     self:setOffset(endOffset)
     self.scrollAnimationActive = false
+    screens.blockEffects = false
   end
 end
 

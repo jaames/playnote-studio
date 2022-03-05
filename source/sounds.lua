@@ -41,7 +41,7 @@ function sounds:releaseSfx(sampleNames)
   end
 end
 
--- prepare a list of sound effects, and group them together to they can be released at once later one
+-- prepare a list of sound effects, and group them together to they can be released at once later on
 function sounds:prepareSfxGroup(groupId, sampleNames)
   -- print('preping sfx group', groupId)
   sfxGroups[groupId] = sampleNames
