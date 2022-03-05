@@ -53,7 +53,6 @@ function Thumbnail:draw(clipX, clipY, clipW, clipH)
   end
 end
 
-function Thumbnail:remove()
+function Thumbnail:removedFromScreen()
   self.tmb = nil
-  Thumbnail.super.remove(self)
 end

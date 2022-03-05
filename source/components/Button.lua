@@ -143,7 +143,6 @@ function Button:draw(clipX, clipY, clipW, clipH)
   end
   -- draw text if present
   if self.localisedText then
-    -- gfx.setFont(fontBold)
     gfx.setFontTracking(2)
     gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
     gfx.drawTextInRect(self.localisedText, textX, self.textY, textW, self.textH, nil, '...', self.textAlign)
