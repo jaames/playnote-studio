@@ -1,0 +1,67 @@
+{
+  "APP_TITLE": "Playnote Studio",
+
+  "FILESIZE_UNITS": ["B", "KB", "MB", "GB"],
+
+  "HOME_VIEW": "Gwylio Flipnotes",
+  "HOME_SETTINGS": "Gosodiadau",
+
+  "CLOCK_DATE_FORMAT": "${DAY}/${MONTH}/${YEAR}",
+
+  "SETTINGS_ABOUT": "Amdanom",
+  "SETTINGS_CREDITS": "Clodrestr",
+  "SETTINGS_DITHERING": "Lliw pylu",
+  "SETTINGS_SOUND": "Effeithiau sain",
+  "SETTINGS_LANGUAGE": "Iaith",
+  "SETTINGS_RESET": "Ailosod gosodiadau",
+  "SETTINGS_ON": "✓",
+  "SETTINGS_OFF": "❌",
+  "SETTINGS_SOUND_ON": "Galluogi effeithiau sain",
+  "SETTINGS_SOUND_OFF": "Analluogi effeithiau sain",
+  "SETTINGS_RESET_CONFIRM": "Bydd gosodiadau’n cael eu dileu",
+  "SETTINGS_RESET_DONE": "Mae gosodiadau wedi’u dileu",
+
+  "ABOUT_VERSION": "Fersiwn %d",
+  "ABOUT_BUILT_BY": "Gwnaed gan %s",
+
+  "CREDITS_HEADER_JAMES": "Dylunio rhyngwyneb a rhaglennu",
+  "CREDITS_HEADER_PARSER": "Datgodiwr ffeiliau Flipnote",
+  "CREDITS_HEADER_SOUND": "Cynllunio sain",
+  "CREDITS_HEADER_TRANSLATION": "Cyfieithiad",
+  "CREDITS_HEADER_THANKS": "Cydnabyddiaeth arbennig",
+  "CREDITS_HEADER_ARTISTS": "*Artistiaid Flipnote*",
+  "CREDITS_HEADER_RESEARCH": "*Ymchwil Flipnote*",
+  "CREDITS_HEADER_UGOCREW": "Ymchwilwyr Flipnote Japaneiadd",
+  "CREDITS_HEADER_AUDIO": "Sain",
+  "CREDITS_HEADER_DOCS": "Dogfennaeth",
+  "CREDITS_HEADER_PACKETS": "Dadansoddi protocolau rhyngrwyd",
+  "CREDITS_HEADER_MISC": "Amrywiol",
+  "CREDITS_LEGAL": "Mae Flipnote Studio yn hawlfraint i Nintendo.\nNid yw’r project hwn yn gysylltiedig â nhw o gwbl",
+  "CREDITS_END": "Y Broga Oren ddyry gychwyn! ",
+
+  "VIEW_NO_FLIPNOTES": "Does ddim Flipnotes yma",
+  "VIEW_NO_FLIPNOTES_INFO": "Ewch i playnote.studio/filehelp i ddysgu sut i lwytho Flipnotes",
+  "VIEW_MENU_DETAILS": "Manylion",
+
+  "PLAY_MENU_DETAILS": "Manylion",
+  "PLAY_MENU_DITHERING": "Lliw pylu",
+
+  "DETAILS_AUTHOR": "Crewr",
+  "DETAILS_AUTHOR_ID": "ID Crewr",
+  "DETAILS_LINKS": "Cysylltau",
+  "DETAILS_LAST_EDIT": "Golygwyd ddiwethaf",
+  "DETAILS_DATE_FORMAT": "${DAY}/${MONTH}/${YEAR}",
+  "DETAILS_FRAME_COUNT": "Cyfrif ffram",
+  "DETAILS_FILE_SIZE": "Maint ffeil",
+  "DETAILS_FILE_PATH": "Llwybr ffeil",
+  "DETAILS_PREV_AUTHOR": "Crewr Blaenorol",
+  "DETAILS_ORIG_AUTHOR": "Crewr Gwreiddiol",
+
+  "DITHER_COLOUR_BLACK": "Du",
+  "DITHER_COLOUR_RED": "Coch",
+  "DITHER_COLOUR_BLUE": "Las",
+
+  "DIALOG_CONFIRM": "Iawn",
+  "DIALOG_OK": "Cadarnhau",
+  "DIALOG_CANCEL": "Canslo"
+}

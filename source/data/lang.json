@@ -26,5 +26,9 @@
   {
     "key": "ru",
     "name": "Русский"
+  },
+  {
+    "key": "cy",
+    "name": "Cymraeg"
   }
 ]
