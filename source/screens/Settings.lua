@@ -1,6 +1,6 @@
 local bgGfx <const> = gfx.image.new('./gfx/gfx_bg_settings')
 
-local ITEM_WIDTH <const> = 300
+local ITEM_WIDTH <const> = 304
 local ITEM_HEIGHT <const> = 54
 local MENU_GAP_TOP <const> = 24
 local MENU_GAP_BOTTOM <const> = 24

@@ -1,6 +1,3 @@
-local font <const> = gfx.font.new('./fonts/UgoNumber_8')
-local clockGfx <const> = gfx.image.new('./gfx/icon_clock')
-
 Clock = {}
 class('Clock').extends(ComponentBase)
 
@@ -10,6 +7,8 @@ function Clock:init(x, y, w, h)
   self.dateString = ''
   self.timeString = ''
   self.isRunning = true
+  self.font = nil
+  self.clockGfx = nil
 end
 
 function Clock:tick()
@@ -30,11 +29,15 @@ end
 
 function Clock:addedToScreen()
   self.isRunning = true
+  self.font = gfx.font.new('./fonts/UgoNumber_8')
+  self.clockGfx = gfx.image.new('./gfx/icon_clock')
   self:tick()
 end
 
 function Clock:removedFromScreen()
   self.isRunning = false
+  self.font = nil
+  self.clockGfx = nil
 end
 
 function Clock:draw()
@@ -43,9 +46,9 @@ function Clock:draw()
   gfx.setFontTracking(1)
   gfx.setColor(gfx.kColorWhite)
   gfx.fillRect(0, 0, w, h)
-  font:drawText(self.dateString, 10, 10)
-  clockGfx:draw(92, 8)
-  font:drawText(self.timeString, 108, 10)
+  self.font:drawText(self.dateString, 10, 10)
+  self.clockGfx:draw(92, 8)
+  self.font:drawText(self.timeString, 108, 10)
   gfx.setColor(gfx.kColorBlack)
   gfx.setLineWidth(1)
   gfx.drawRect(1, 1, w-1, h-1)

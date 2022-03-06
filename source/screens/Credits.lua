@@ -53,8 +53,12 @@ end
 
 function CreditsScreen:afterEnter()
   CreditsScreen.super.afterEnter(self)
-  -- begin scrolling after enter transition
   self.scroll.autoScroll = true
+end
+
+function CreditsScreen:afterLeave()
+  CreditsScreen.super.afterLeave(self)
+  self:destroySprites()
 end
 
 function CreditsScreen:drawBg()

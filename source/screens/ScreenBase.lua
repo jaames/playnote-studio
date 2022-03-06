@@ -186,6 +186,18 @@ function ScreenBase:unregisterSprites()
   self:emitHook('sprites:unregistered')
 end
 
+-- destroy sprites (optional, but might save memory if used in afterLeave)
+function ScreenBase:destroySprites()
+  for i = 1, #self.sprites do
+    self.sprites[i]:remove()
+    self.sprites[i] = nil
+  end
+  self.sprites = {}
+  self.selectableSprites = {}
+  self.spritesActive = false
+  self.spritesSetup = false
+end
+
 function ScreenBase:addHook(hook, fn)
   assert(type(hook) == 'string')
   assert(type(fn) == 'function')

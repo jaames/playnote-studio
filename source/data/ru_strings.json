@@ -57,9 +57,9 @@
   "DETAILS_PREV_AUTHOR": "Предыдущий создатель",
   "DETAILS_ORIG_AUTHOR": "Первый создатель",
 
-  "DITHER_COLOUR_BLACK": "Black",
-  "DITHER_COLOUR_RED": "Red",
-  "DITHER_COLOUR_BLUE": "Blue",
+  "DITHER_COLOUR_BLACK": "Чёрный",
+  "DITHER_COLOUR_RED": "Красный",
+  "DITHER_COLOUR_BLUE": "Синий",
 
   "DIALOG_CONFIRM": "ОК",
   "DIALOG_OK": "OK",

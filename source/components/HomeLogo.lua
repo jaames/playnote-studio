@@ -9,7 +9,7 @@ function HomeLogo:init(x, y)
   HomeLogo.super.init(self, x, y, w, h)
   self.framerate = 1000 / 4
   self.anim = gfx.animation.loop.new(self.framerate, logoGfx)
-  self.isRunning = true
+  self.isRunning = false
 end
 
 function HomeLogo:tick()
