@@ -9,6 +9,7 @@ function Clock:init(x, y, w, h)
   self.isRunning = true
   self.font = nil
   self.clockGfx = nil
+  self:setOpaque(true)
 end
 
 function Clock:tick()
@@ -47,7 +48,7 @@ function Clock:draw()
   gfx.setColor(gfx.kColorWhite)
   gfx.fillRect(0, 0, w, h)
   self.font:drawText(self.dateString, 10, 10)
-  self.clockGfx:draw(92, 8)
+  self.clockGfx:draw(92, 7)
   self.font:drawText(self.timeString, 108, 10)
   gfx.setColor(gfx.kColorBlack)
   gfx.setLineWidth(1)

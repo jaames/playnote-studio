@@ -1,6 +1,6 @@
 local newNineSlice = gfx.nineSlice.new
 
-local buttonGfx = {
+local buttonGfx <const> = {
   default = {
     base =   newNineSlice('./gfx/shape_button_default', 8, 8, 2, 2),
     select = newNineSlice('./gfx/shape_button_default_selected', 8, 8, 2, 2),
@@ -27,7 +27,7 @@ function Button:init(x, y, w, h, text)
 
   self.variant = 'default'
   self.state = 'base'
-
+  
   self.padLeft = 16
   self.padRight = 16
   self.padTop = 6

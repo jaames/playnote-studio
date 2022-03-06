@@ -21,8 +21,8 @@
   "SETTINGS_RESET_CONFIRM": "All settings will be cleared",
   "SETTINGS_RESET_DONE": "Settings cleared",
 
-  "ABOUT_VERSION": "Version %d",
-  "ABOUT_BUILT_BY": "Built by %s",
+  "ABOUT_VERSION": "Wersja %d",
+  "ABOUT_BUILT_BY": "Autor: %s",
 
   "CREDITS_HEADER_JAMES": "Programming and UI Design",
   "CREDITS_HEADER_PARSER": "Flipnote Decoder",

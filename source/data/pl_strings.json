@@ -1,0 +1,67 @@
+{
+  "APP_TITLE": "Playnote Studio",
+
+  "FILESIZE_UNITS": ["B", "KB", "MB", "GB"],
+
+  "HOME_VIEW": "Zobacz Flipnotki",
+  "HOME_SETTINGS": "Ustawienia",
+
+  "CLOCK_DATE_FORMAT": "${DAY}/${MONTH}/${YEAR}",
+
+  "SETTINGS_ABOUT": "O Programie",
+  "SETTINGS_CREDITS": "Autorzy",
+  "SETTINGS_DITHERING": "Ziarnistość",
+  "SETTINGS_SOUND": "Efekty Dźwiękowe",
+  "SETTINGS_LANGUAGE": "Język",
+  "SETTINGS_RESET": "Przywróć Ustawienia",
+  "SETTINGS_ON": "✓",
+  "SETTINGS_OFF": "❌",
+  "SETTINGS_SOUND_ON": "Efekty Dźwiękowe wł",
+  "SETTINGS_SOUND_OFF": "Efekty Dźwiękowe wył",
+  "SETTINGS_RESET_CONFIRM": "Wszystkie ustawienia zostaną usunięte",
+  "SETTINGS_RESET_DONE": "Ustawienia zostały usunięte",
+
+  "ABOUT_VERSION": "Wersja %d",
+  "ABOUT_BUILT_BY": "Autor: %s",
+
+  "CREDITS_HEADER_JAMES": "Programowanie i Projekt UI",
+  "CREDITS_HEADER_PARSER": "Konwerter Formatu Flipnote",
+  "CREDITS_HEADER_SOUND": "Udźwiękowienie",
+  "CREDITS_HEADER_TRANSLATION": "Tłumaczenie",
+  "CREDITS_HEADER_THANKS": "Podziękowania",
+  "CREDITS_HEADER_ARTISTS": "Flipnotkowi Artyści",
+  "CREDITS_HEADER_RESEARCH": "Flipnote Reverse Engineering",
+  "CREDITS_HEADER_UGOCREW": "Japanese Reverse Engineers",
+  "CREDITS_HEADER_AUDIO": "Dane Audio",
+  "CREDITS_HEADER_DOCS": "Dokumentacja",
+  "CREDITS_HEADER_PACKETS": "Przechwytywanie Pakietów",
+  "CREDITS_HEADER_MISC": "Różne",
+  "CREDITS_LEGAL": "Flipnote Studio © Nintendo.\nTen projekt nie jest w żaden sposób związany ani wspierany przez Nintendo.",
+  "CREDITS_END": "Niech Flipnotki będą z wami! ",
+
+  "VIEW_NO_FLIPNOTES": "Nie ma tutaj żadnych Flipnotek",
+  "VIEW_NO_FLIPNOTES_INFO": "Aby dodać Flipnotki przejdź do strony playnote.studio/filehelp",
+  "VIEW_MENU_DETAILS": "Details",
+
+  "PLAY_MENU_DETAILS": "Details",
+  "PLAY_MENU_DITHERING": "Dithering",
+
+  "DETAILS_AUTHOR": "Autor",
+  "DETAILS_AUTHOR_ID": "ID Autora",
+  "DETAILS_LINKS": "Linki",
+  "DETAILS_LAST_EDIT": "Ostatnio edytowane",
+  "DETAILS_DATE_FORMAT": "${DAY}/${MONTH}/${YEAR}",
+  "DETAILS_FRAME_COUNT": "Liczba klatek",
+  "DETAILS_FILE_SIZE": "Rozmiar pliku",
+  "DETAILS_FILE_PATH": "Ścieżka pliku",
+  "DETAILS_PREV_AUTHOR": "Poprzedni Autor",
+  "DETAILS_ORIG_AUTHOR": "Oryginalny Autor",
+
+  "DITHER_COLOUR_BLACK": "Czarny",
+  "DITHER_COLOUR_RED": "Czerwony",
+  "DITHER_COLOUR_BLUE": "Niebieski",
+
+  "DIALOG_CONFIRM": "OK",
+  "DIALOG_OK": "OK",
+  "DIALOG_CANCEL": "Anuluj"
+}

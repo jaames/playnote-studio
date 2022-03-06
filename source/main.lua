@@ -54,12 +54,11 @@ import './screens/Settings'
 import './screens/Dithering'
 import './screens/Credits'
 
-debug = nil -- disallow debugging
-
 MAIN_FONT = playdate.graphics.font.new('./fonts/WhalesharkSans')
 playdate.graphics.setFont(MAIN_FONT)
 playdate.display.setRefreshRate(50)
 
+debug = nil -- disallow debugging
 -- pdbug:setEnabled(true)
 
 config:init()
@@ -82,6 +81,7 @@ function playdate.update()
   playdate.graphics.sprite.update()
   playdate.timer.updateTimers()
   playdate.frameTimer.updateTimers()
+  gfx.animation.blinker.updateAll()
   -- playdate.drawFPS(8, PLAYDATE_H - 20)
 end
 
