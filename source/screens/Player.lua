@@ -3,11 +3,14 @@ local NOTE_Y <const> = 16
 local NOTE_W <const> = 256
 local NOTE_H <const> = 192
 
-local DELAY_PAGE_FIRST <const> = 500
+local DELAY_PAGE_FIRST <const> = 350
 local DELAY_PAGE_REPEAT <const> = 100
 local DELAY_PLAY_UI <const> = 200
 
 local fast_intersection <const> = playdate.geometry.rect.fast_intersection
+
+local kTransitionDirAdvance <const> = 1
+local kTransitionDirRetreat <const> = -1
 
 PlayerScreen = {}
 class('PlayerScreen').extends(ScreenBase)
@@ -24,37 +27,21 @@ function PlayerScreen:init()
   -- player ui transition stuff
   self.isPlayTransitionActive = false
   self.isUiVisible = true
-  self.playTransitionVal = 0
-  -- frame transition stuff
+  -- frame transition components
   self.isFrameTransitionActive = false
-  self.frameTransitionStaticBitmap = gfx.image.new(NOTE_W, NOTE_H)
-  self.frameTransitionBitmap = gfx.image.new(NOTE_W, NOTE_H)
-  self.frameTransitionPos = nil
+  self.frameTransitionBottomSlide = Image(NOTE_X, NOTE_Y, NOTE_W, NOTE_H)
+  self.frameTransitionTopSlide = Image(NOTE_X, NOTE_Y, NOTE_W, NOTE_H)
+  self.frameTransitionTopSlide:setZIndex(self.frameTransitionBottomSlide:getZIndex() + 10)
   -- input stuff
-  local pageNextStart, pageNextEnd, removePageNextTimer = utils:createRepeater(DELAY_PAGE_FIRST, DELAY_PAGE_REPEAT, function (isRepeat)
-    if self.isPlaying then
-      return
-    end
-    self.removePagePrevTimer()
-    if isRepeat then
-      self:jumpToNextFrame()
-    else
-      self:jumpToNextFrameWithTransition()
-    end
+  local pageNextStart, pageNextEnd, rmvTimer1 = utils:createRepeater(DELAY_PAGE_FIRST, DELAY_PAGE_REPEAT, function (isRepeat)
+    if self.isPlaying then return end
+    self:jumpToNextFrame(not isRepeat)
   end)
-  local pagePrevStart, pagePrevEnd, removePagePrevTimer = utils:createRepeater(DELAY_PAGE_FIRST, DELAY_PAGE_REPEAT, function (isRepeat)
-    if self.isPlaying then
-      return
-    end
-    self.removePageNextTimer()
-    if isRepeat then
-      self:jumpToPrevFrame()
-    else
-      self:jumpToPrevFrameWithTransition()
-    end
+  local pagePrevStart, pagePrevEnd, rmvTimer2 = utils:createRepeater(DELAY_PAGE_FIRST, DELAY_PAGE_REPEAT, function (isRepeat)
+    if self.isPlaying then return end
+    self:jumpToPrevFrame(not isRepeat)
   end)
-  self.removePageNextTimer = removePageNextTimer
-  self.removePagePrevTimer = removePagePrevTimer
+
   self.inputHandlers = {
     leftButtonDown = pagePrevStart,
     leftButtonUp = pagePrevEnd,
@@ -67,6 +54,10 @@ function PlayerScreen:init()
       self:togglePlay()
     end
   }
+  self.removeTimers = function ()
+    rmvTimer1()
+    rmvTimer2()
+  end
 end
 
 function PlayerScreen:setupSprites()
@@ -83,9 +74,11 @@ end
 
 function PlayerScreen:setupMenuItems(menu)
   local currNote = noteFs.currentNote
+
   local detailsItem = menu:addMenuItem(locales:getText('PLAY_MENU_DETAILS'), function()
     screens:push('details', screens.kTransitionFade, nil, currNote)
   end)
+
   local ditherItem = menu:addMenuItem(locales:getText('PLAY_MENU_DITHERING'), function()
     local ditherSettings = noteFs:getNoteDitherSettings(currNote)
     local function updateDither(newSettings)
@@ -93,6 +86,7 @@ function PlayerScreen:setupMenuItems(menu)
     end
     screens:push('dithering', screens.kTransitionFade, nil, ditherSettings, updateDither)
   end)
+
   return {detailsItem, ditherItem}
 end
 
@@ -114,8 +108,7 @@ end
 function PlayerScreen:beforeLeave()
   PlayerScreen.super.beforeLeave(self)
   self:pause()
-  self.removePageNextTimer()
-  self.removePagePrevTimer()
+  self.removeTimers()
 end
 
 function PlayerScreen:afterLeave()
@@ -163,80 +156,81 @@ end
 
 function PlayerScreen:setCurrentFrame(i)
   local ppm = self.ppm
-  ppm:setCurrentFrame(math.floor(i))
-  self.currentFrame = ppm.currentFrame
-  self.timeline:setProgress(ppm.progress)
-  self.counter:setValue(self.currentFrame)
-  spritelib.redrawBackground()
+  if i ~= self.currentFrame then
+    ppm:setCurrentFrame(math.floor(i))
+    self.currentFrame = ppm.currentFrame
+    self.timeline:setProgress(ppm.progress)
+    self.counter:setValue(self.currentFrame)
+    spritelib.redrawBackground()
+  end
 end
 
-function PlayerScreen:jumpToPrevFrame()
-  sounds:playSfx('pagePrevFast')
-  self:setCurrentFrame(self.currentFrame - 1)
-end
-
-function PlayerScreen:jumpToPrevFrameWithTransition()
-  if self.isFrameTransitionActive then return end
-  local initPos = NOTE_X
-  local endPos = -NOTE_W
+function PlayerScreen:jumpToPrevFrame(animate)
   local currFrame = self.currentFrame
-  local nextFrame = currFrame == 1 and self.numFrames or currFrame - 1
-
-  self.frameTransitionPos = initPos
-  self.ppm:drawFrameToBitmap(nextFrame, self.frameTransitionStaticBitmap)
-  self.ppm:drawFrameToBitmap(currFrame, self.frameTransitionBitmap)
- 
-  utils:nextTick(function ()
+  if animate then
+    local prevFrame = currFrame == 1 and self.numFrames or currFrame - 1
     sounds:playSfx('pagePrev')
-    self.isFrameTransitionActive = true
-  end)
-
-  local transitionTimer = playdate.timer.new(250, initPos, endPos, playdate.easingFunctions.inCubic)
-  -- on timer update
-  transitionTimer.updateCallback = function (timer)
-    self.frameTransitionPos = timer.value
-  end
-  -- page transition is done
-  transitionTimer.timerEndedCallback = function ()
-    self.frameTransitionPos = endPos
-    self:setCurrentFrame(nextFrame)
-    utils:nextTick(function ()
-      self.isFrameTransitionActive = false
+    self:doFrameTransition(kTransitionDirRetreat, prevFrame, function ()
+      self:setCurrentFrame(prevFrame)
     end)
+  else
+    sounds:playSfx('pagePrevFast')
+    self:setCurrentFrame(currFrame - 1)
   end
 end
 
-function PlayerScreen:jumpToNextFrame()
-  sounds:playSfx('pageNextFast')
-  self:setCurrentFrame(self.currentFrame + 1)
-end
-
-function PlayerScreen:jumpToNextFrameWithTransition()
-  if self.isFrameTransitionActive then return end
-  local initPos = PLAYDATE_W + NOTE_W
-  local endPos = NOTE_X
+function PlayerScreen:jumpToNextFrame(animate)
   local currFrame = self.currentFrame
-  local nextFrame = currFrame == self.numFrames and 1 or currFrame + 1
-
-  self.frameTransitionPos = initPos
-  self.ppm:drawFrameToBitmap(currFrame, self.frameTransitionStaticBitmap)
-  self.ppm:drawFrameToBitmap(nextFrame, self.frameTransitionBitmap)
- 
-  utils:nextTick(function ()
+  if animate then
+    local nextFrame = currFrame == self.numFrames and 1 or currFrame + 1
     sounds:playSfx('pageNext')
-    self.isFrameTransitionActive = true
-  end)
-
-  local transitionTimer = playdate.timer.new(250, initPos, endPos, playdate.easingFunctions.outCubic)
-  -- on timer update
-  transitionTimer.updateCallback = function (timer)
-    self.frameTransitionPos = timer.value
+    self:doFrameTransition(kTransitionDirAdvance, nextFrame, function ()
+      self:setCurrentFrame(nextFrame)
+    end)
+  else
+    sounds:playSfx('pageNextFast')
+    self:setCurrentFrame(currFrame + 1)
   end
-  -- page transition is done
-  transitionTimer.timerEndedCallback = function ()
-    self.frameTransitionPos = endPos
-    self:setCurrentFrame(nextFrame)
+end
+
+function PlayerScreen:doFrameTransition(direction, toFrame, callbackFn)
+  if self.isFrameTransitionActive then return end
+  self.isFrameTransitionActive = true
+  -- shorthands
+  local ppm = self.ppm
+  local topSlide = self.frameTransitionTopSlide
+  local bottomSlide = self.frameTransitionBottomSlide
+
+  local currFrame = self.currentFrame
+  local initPos, endPos, easing
+  if direction == kTransitionDirAdvance then
+    initPos = 0
+    endPos = -NOTE_W
+    easing = playdate.easingFunctions.inQuad
+    ppm:drawFrameToBitmap(currFrame, topSlide.image)
+    ppm:drawFrameToBitmap(toFrame, bottomSlide.image)
+  elseif direction == kTransitionDirRetreat then
+    initPos = -NOTE_W
+    endPos = 0
+    easing = playdate.easingFunctions.outQuad
+    ppm:drawFrameToBitmap(currFrame, bottomSlide.image)
+    ppm:drawFrameToBitmap(toFrame, topSlide.image)
+  end
+  -- draw frames to bitmaps
+  self:addSprite(topSlide)
+  self:addSprite(bottomSlide)
+  topSlide:offsetByX(initPos)
+
+  local transitionTimer = playdate.timer.new(200, initPos, endPos, easing)
+  transitionTimer.updateCallback = function (t)
+    topSlide:offsetByX(t.value)
+  end
+  transitionTimer.timerEndedCallback = function (t)
+    topSlide:offsetByX(t.value)
+    callbackFn()
     utils:nextTick(function ()
+      self:removeSprite(topSlide)
+      self:removeSprite(bottomSlide)
       self.isFrameTransitionActive = false
     end)
   end
@@ -252,7 +246,7 @@ function PlayerScreen:play()
     -- TODO: reenable
     self.ppm:playAudio()
     self.isPlaying = true
-    self:transitionUiControls(false)
+    self:setControlsVisible(false)
     playdate.setAutoLockDisabled(true)
     playdate.display.setRefreshRate(self.ppm.fps)
   end
@@ -270,7 +264,7 @@ function PlayerScreen:pause()
     self.ppm:stopAudio()
     self.animTimer:pause()
     self.isPlaying = false
-    self:transitionUiControls(true)
+    self:setControlsVisible(true)
     playdate.setAutoLockDisabled(false)
     playdate.display.setRefreshRate(30)
     playdate.getCrankTicks(24)
@@ -285,79 +279,52 @@ function PlayerScreen:togglePlay()
   end
 end
 
-function PlayerScreen:transitionUiControls(show)
+function PlayerScreen:setControlsVisible(visible)
   local transitionTimer
-  if show then
+  if visible then
     transitionTimer = playdate.timer.new(DELAY_PLAY_UI, 1, 0, playdate.easingFunctions.outBack)
   else
     transitionTimer = playdate.timer.new(DELAY_PLAY_UI, 0, 1, playdate.easingFunctions.inBack)
   end
-  self.isUiVisible = true
-  self.isPlayTransitionActive = true
-  self.playTransitionVal = show and 1 or 0
-  -- on timer update
-  transitionTimer.updateCallback = function (timer)
-    self.playTransitionVal = timer.value
+
+  transitionTimer.updateCallback = function (t)
+    self:setControlsPos(t.value)
   end
-  -- page transition is done
-  transitionTimer.timerEndedCallback = function ()
-    self.playTransitionVal = show and 0 or 1
-    utils:nextTick(function ()
-      self.isUiVisible = show
-      self.isPlayTransitionActive = false
-    end)
+  transitionTimer.timerEndedCallback = function (t)
+    self:setControlsPos(t.value)
   end
+end
+
+function PlayerScreen:setControlsPos(pos)
+  self.counter:offsetByY(pos * 50)
+  self.timeline:offsetByY(pos * 40)
 end
 
 function PlayerScreen:drawBg(x, y, w, h)
   grid:draw(x, y, w, h)
-  local _, _, iw, ih = fast_intersection(NOTE_X, NOTE_Y, NOTE_W, NOTE_H, x, y, w, h)
-  if iw > 0 and ih > 0 then
-    self.ppm:draw(NOTE_X, NOTE_Y)
+  -- draw frame here only if the transition is active
+  if not self.isFrameTransitionActive then
+    -- only draw frame if clip rect overlaps it
+    local _, _, iw, ih = fast_intersection(NOTE_X, NOTE_Y, NOTE_W, NOTE_H, x, y, w, h)
+    if iw > 0 and ih > 0 then
+      self.ppm:draw(NOTE_X, NOTE_Y)
+    end
+  -- still at least draw frame border if transtion is active
+  else
+    gfx.setColor(gfx.kColorBlack)
+    gfx.drawRect(NOTE_X - 1, NOTE_Y - 1, NOTE_W + 2, NOTE_H + 2)
+    gfx.setColor(gfx.kColorWhite)
+    gfx.drawRect(NOTE_X, NOTE_Y, NOTE_W, NOTE_H)
   end
 end
 
 function PlayerScreen:update()
   -- playdate.drawFPS(8, 16)
-  if (not self.isPlaying) then
+  if not self.isPlaying then
     local frameChange = playdate.getCrankTicks(24)
     self:setCurrentFrame(self.currentFrame + frameChange)
   end
---   if self.isFrameTransitionActive then
---     gfx.setColor(gfx.kColorBlack)
---     gfx.drawRect(NOTE_X - 2, NOTE_Y - 2, NOTE_W + 4, NOTE_H + 4)
---     gfx.setColor(gfx.kColorWhite)
---     gfx.drawRect(NOTE_X - 1, NOTE_Y - 1, NOTE_W + 2, NOTE_H + 2)
---     self.frameTransitionStaticBitmap:draw(NOTE_X, NOTE_Y)
---     self.frameTransitionBitmap:draw(self.frameTransitionPos, 16)
---   -- draw the current frame
---   -- TODO: only if the frame has changed?
---   else
-      -- self.ppm:draw(NOTE_X, NOTE_Y)
---   end
---   -- draw player UI
---   if self.isUiVisible then
---     -- using transition offset
---     gfx.setDrawOffset(0, self.playTransitionVal * 48)
---     -- TODO: make component
---     -- frame counter
---     gfx.setColor(gfx.kColorWhite)
---     gfx.fillRoundRect(PLAYDATE_W - 104, PLAYDATE_H - 26, 100, 22, 4)
---     -- frame counter text
---     counterFont:drawTextAligned(self.currentFrame, PLAYDATE_W - 78, PLAYDATE_H - 24, kTextAlignment.center)
---     counterFont:drawTextAligned('/', PLAYDATE_W - 54, PLAYDATE_H - 24, kTextAlignment.center)
---     counterFont:drawTextAligned(self.numFrames, PLAYDATE_W - 30, PLAYDATE_H - 24, kTextAlignment.center)
---     -- dpad hint (TODO: redraw so it feels less distracting?)
---     -- gfx.setDrawOffset(0, self.playTransitionValue * 64)
---     -- dpadGfx[self.dpadState]:draw(6, PLAYDATE_H - 60)
---     -- frame timeline
---     gfx.setDrawOffset(0, self.playTransitionVal * 32)
---     self.timeline:draw()
---     -- reset offset
---     gfx.setDrawOffset(0, 0)
---   end
---   -- TODO: proper frame timing
---   if self.isPlaying then
---     self:setCurrentFrame(self.currentFrame + 1)
---   end
+  if self.isPlaying then
+    self:setCurrentFrame(self.currentFrame + 1)
+  end
 end
