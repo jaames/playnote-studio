@@ -10,6 +10,7 @@ dialog = spritelib.new()
 
 dialog.kTypeAlert = 1
 dialog.kTypeConfirm = 2
+dialog.kTypeError = 3
 
 dialog.kResultOk = 1
 dialog.kResultCancel = 2
@@ -44,6 +45,7 @@ function dialog:init()
 
   local okButton = Button(PLAYDATE_W / 2, 0, 120, 38, '%DIALOG_OK%')
   okButton.autoWidth = true
+  okButton.textAlign = kTextAlignment.center
   okButton:setIcon('./gfx/icon_button_a')
   okButton:setIgnoresDrawOffset(true)
   okButton:setAnchor('center', 'top')
@@ -53,8 +55,9 @@ function dialog:init()
     self:hide(dialog.kResultOk)
   end)
 
-  local confirmButton = Button(PLAYDATE_W / 2 + 8, 0, 130, 38, '%DIALOG_CONFIRM%')
+  local confirmButton = Button(PLAYDATE_W / 2 + 8, 0, 140, 38, '%DIALOG_CONFIRM%')
   confirmButton:setIcon('./gfx/icon_button_a')
+  confirmButton.textAlign = kTextAlignment.center
   confirmButton:setIgnoresDrawOffset(true)
   confirmButton:setAnchor('left', 'top')
   confirmButton:setZIndex(1300)
@@ -63,8 +66,9 @@ function dialog:init()
     self:hide(dialog.kResultOk)
   end)
 
-  local cancelButton = Button(PLAYDATE_W / 2 - 8, 0, 130, 38, '%DIALOG_CANCEL%')
+  local cancelButton = Button(PLAYDATE_W / 2 - 8, 0, 140, 38, '%DIALOG_CANCEL%')
   cancelButton:setIcon('./gfx/icon_button_b')
+  cancelButton.textAlign = kTextAlignment.center
   cancelButton:setIgnoresDrawOffset(true)
   cancelButton:setAnchor('right', 'top')
   cancelButton:setZIndex(1300)
@@ -81,12 +85,34 @@ function dialog:init()
   self.buttons = {okButton, confirmButton, cancelButton}
 end
 
-function dialog:alert(text)
-  dialog:show(text, dialog.kTypeAlert)
+function dialog:alert(text, delay)
+  if delay ~= nil then
+    playdate.timer.performAfterDelay(delay, function ()
+      dialog:show(text, dialog.kTypeAlert)
+    end)
+  else
+    dialog:show(text, dialog.kTypeAlert)
+  end
 end
 
-function dialog:confirm(text)
-  dialog:show(text, dialog.kTypeConfirm)
+function dialog:confirm(text, delay)
+  if delay ~= nil then
+    playdate.timer.performAfterDelay(delay, function ()
+      dialog:show(text, dialog.kTypeConfirm)
+    end)
+  else
+    dialog:show(text, dialog.kTypeConfirm)
+  end
+end
+
+function dialog:error(text, delay)
+  if delay ~= nil then
+    playdate.timer.performAfterDelay(delay, function ()
+      dialog:show(text, dialog.kTypeError)
+    end)
+  else
+    dialog:show(text, dialog.kTypeError)
+  end
 end
 
 function dialog:offsetBy(y)
@@ -113,8 +139,12 @@ function dialog:show(text, type)
   self.type = type
   self.text = text
   -- calc text position
+  gfx.setFontTracking(1)
   local _, textH = gfx.getTextSizeForMaxWidth(text, self.width - 16, nil)
-  local textSpace = DIALOG_H - 40
+  local textSpace = DIALOG_H
+  if type ~= dialog.kTypeError then
+    textSpace -= 40
+  end
   self.textY = (textSpace / 2) - (textH / 2)
   -- mark dialog as visible
   self:setVisible(true)
@@ -126,7 +156,7 @@ function dialog:show(text, type)
   if type == dialog.kTypeConfirm then
     self.confirmButton:setVisible(true)
     self.cancelButton:setVisible(true)
-  else
+  elseif self.type == dialog.kTypeAlert then
     self.okButton:setVisible(true)
   end
   -- disable ipnut
@@ -164,6 +194,8 @@ function dialog:show(text, type)
           self.cancelButton:click()
         end
       }, true)
+    elseif self.type == dialog.kTypeError then
+      playdate.inputHandlers.push({}, true)
     end
   end
 end
@@ -239,5 +271,6 @@ end
 function dialog:draw()
   local w, h = self.width, self.height
   dialogGfx:drawInRect(0, 0, w, h)
+  gfx.setFontTracking(1)
   gfx.drawTextInRect(self.text, 8, self.textY, w - 16, h - 16, nil, nil, kTextAlignment.center)
 end

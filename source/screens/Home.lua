@@ -34,6 +34,22 @@ function HomeScreen:setupSprites()
   return {viewButton, settingsButton, clock, homeLogo}
 end
 
+function HomeScreen:afterEnter()
+  HomeScreen.super.afterEnter(self)
+  -- check if the C extention has been loaded
+  -- imo it's fine for this message to not be localised, you should only come across it in the simulator
+  if PpmParser == nil then
+    local errMsg = [[
+ Native extension error
+
+Playnote Studio probably hasn't been compiled for this platform, sorry!
+
+If you want to try compiling it yourself, the source code can be found at
+github.com/jaames/playnote-studio]]
+    dialog:error(errMsg, 100)
+  end
+end
+
 function HomeScreen:drawBg(x, y, w, h)
   grid:draw(x, y, w, h)
 end
