@@ -32,7 +32,14 @@ sounds:prepareSfxGroup('screen', {
 
 screens.blockEffects = false
 
-function screens:register(id, screenInst)
+function screens:register(screenTable)
+  for name, Screen in pairs(screenTable) do
+    self:registerScreen(name, Screen)
+  end
+end
+
+function screens:registerScreen(id, Screen)
+  local screenInst = Screen()
   SCREENS[id] = screenInst
   screenInst.id = id
   -- B button should return to the previous screen, globally

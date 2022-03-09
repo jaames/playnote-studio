@@ -328,3 +328,5 @@ function PlayerScreen:update()
     self:setCurrentFrame(self.currentFrame + 1)
   end
 end
+
+return PlayerScreen

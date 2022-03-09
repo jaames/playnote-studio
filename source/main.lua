@@ -46,17 +46,11 @@ import './components/KeyValList'
 import './components/TextView'
 
 import './screens/Screenbase'
-import './screens/Home'
-import './screens/NoteList'
-import './screens/Details'
-import './screens/Player'
-import './screens/Settings'
-import './screens/Dithering'
-import './screens/Credits'
 
 MAIN_FONT = playdate.graphics.font.new('./fonts/WhalesharkSans')
 playdate.graphics.setFont(MAIN_FONT)
-playdate.display.setRefreshRate(50)
+-- playdate.display.setRefreshRate(50)
+playdate.display.setRefreshRate(30)
 
 debug = nil -- disallow debugging
 -- pdbug:setEnabled(true)
@@ -66,13 +60,15 @@ locales:init()
 noteFs:init()
 dialog:init()
 
-screens:register('home',      HomeScreen())
-screens:register('notelist',  NoteListScreen())
-screens:register('details',   DetailsScreen())
-screens:register('player',    PlayerScreen())
-screens:register('settings',  SettingsScreen())
-screens:register('dithering', DitheringScreen())
-screens:register('credits',   CreditsScreen())
+screens:register({
+  home = (import './screens/Home'),
+  notelist = (import './screens/NoteList'),
+  details = (import './screens/Details'),
+  player = (import './screens/Player'),
+  settings = (import './screens/Settings'),
+  dithering = (import './screens/Dithering'),
+  credits = (import './screens/Credits'),
+})
 
 screens:push('home', screens.kTransitionStartup, screens.kTransitionFade)
 

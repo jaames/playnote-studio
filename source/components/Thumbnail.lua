@@ -12,7 +12,6 @@ function Thumbnail:init(x, y, tmb)
   Thumbnail.super.init(self, x - THUMB_IMG_PADX, y - THUMB_IMG_PADY, THUMB_W, THUMB_H)
   self.selectable = true
   self.tmb = tmb
-  self:setOpaque(true)
 end
 
 function Thumbnail:moveToX(x)

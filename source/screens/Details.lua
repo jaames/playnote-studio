@@ -61,3 +61,5 @@ end
 function DetailsScreen:drawBg(x, y, w, h)
   grid:drawWithOffset(x, y, w, h, self.scroll.offset)
 end
+
+return DetailsScreen

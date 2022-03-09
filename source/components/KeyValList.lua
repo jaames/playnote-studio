@@ -80,7 +80,7 @@ function KeyValList:draw()
       textRect.y += valueH + textAdv
     -- or draw horizontal line rule
     elseif row == '-' then
-      gfx.fillRect(lineX, textRect.y + lineAdv / 2, lineW, 1)
+      gfx.fillRect(lineX, textRect.y + (lineAdv / 2) - 3, lineW, 1)
       textRect.y += lineAdv
     end
   end

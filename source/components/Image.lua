@@ -42,14 +42,12 @@ end
 
 function Image:addedToScreen()
   if self.path and not self.image then
-    print('add', self.path)
     self.image = gfx.image.new(self.path)
   end
 end
 
 function Image:removedFromScreen()
   if self.path and self.image then
-    print('remove', self.path)
     self.image = nil
   end
 end

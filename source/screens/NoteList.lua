@@ -216,3 +216,5 @@ function NoteListScreen:drawBg(x, y, w, h)
   grid:draw(x, y, w, h)
   bgGfx:draw(0, 0)
 end
+
+return NoteListScreen

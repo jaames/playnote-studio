@@ -27,7 +27,7 @@ function Button:init(x, y, w, h, text)
 
   self.variant = 'default'
   self.state = 'base'
-  
+
   self.padLeft = 16
   self.padRight = 16
   self.padTop = 6
@@ -85,10 +85,7 @@ function Button:addedToScreen()
 end
 
 function Button:setIcon(imgPath)
-  if type(imgPath) ~= 'string' then
-    print('tried to load button icon the old way')
-    return
-  end
+  assert(type(imgPath) == 'string')
   local icon = gfx.image.new(imgPath)
   local iconW, iconH = icon:getSize()
   self.icon = icon

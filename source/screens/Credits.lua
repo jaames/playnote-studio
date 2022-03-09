@@ -70,3 +70,5 @@ function CreditsScreen:update()
   -- auto scroll
   self.scroll:update()
 end
+
+return CreditsScreen

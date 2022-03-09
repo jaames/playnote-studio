@@ -1,7 +1,7 @@
 local COL_ICON <const> = 92
 local COL_BLACK <const> = 136
-local COL_RED <const> = 218
-local COL_BLUE <const> = 300
+local COL_RED <const> = 228
+local COL_BLUE <const> = 320
 
 local ROW_LABELS <const> = 42
 local ROW_LAYER1 <const> = 100
@@ -104,3 +104,5 @@ function DitheringScreen:drawBg(x, y, w, h)
   layer1Icon:drawAnchored(COL_ICON, ROW_LAYER1, 0.80, 0.5)
   layer2Icon:drawAnchored(COL_ICON, ROW_LAYER2, 0.80, 0.5)
 end
+
+return DitheringScreen

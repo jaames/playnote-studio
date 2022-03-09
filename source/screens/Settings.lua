@@ -125,3 +125,5 @@ function SettingsScreen:drawBg(x, y, w, h)
   grid:drawWithOffset(x, y, w, h, self.scroll.offset)
   bgGfx:draw(0, 0)
 end
+
+return SettingsScreen

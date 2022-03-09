@@ -30,7 +30,7 @@ function HomeScreen:setupSprites()
   local homeLogo = HomeLogo(52, 54)
 
   self.focus:setFocus(viewButton)
-  
+
   return {viewButton, settingsButton, clock, homeLogo}
 end
 
@@ -53,3 +53,5 @@ end
 function HomeScreen:drawBg(x, y, w, h)
   grid:draw(x, y, w, h)
 end
+
+return HomeScreen
