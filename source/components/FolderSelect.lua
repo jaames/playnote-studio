@@ -22,7 +22,7 @@ function FolderSelect:addedToScreen()
   })
 end
 
-function FolderSelect:draw(clipX, clipY, clipW, clipH)
+function FolderSelect:draw()
   self:setText(self.optionLabels[self.activeOptionIndex])
-  Button.draw(self, clipX, clipY, clipW, clipH)
+  Button.draw(self)
 end

@@ -13,8 +13,8 @@ function HomeLogo:init(x, y)
 end
 
 function HomeLogo:tick()
-  self:markDirty()
   if self.isRunning then
+    self:markDirty()
     playdate.timer.performAfterDelay(self.framerate, self.tick, self)
   end
 end

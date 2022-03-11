@@ -34,7 +34,7 @@ end
 
 function ScrollController:setStart(s)
   self.start = s
-  -- self:setOffset(s)
+  self:setOffset(s)
 end
 
 function ScrollController:setHeight(h)
@@ -95,12 +95,7 @@ function ScrollController:scrollToSelection(rect)
 end
 
 function ScrollController:resetOffset()
-  self.offset = self.start
-  self.progress = -self.offset / self.range
-  self.screen.offsetY = self.offset
-  if self.scrollBar ~= nil then
-    self.scrollBar:setProgress(self.progress)
-  end
+  self:setOffset(self.start)
 end
 
 function ScrollController:clampOffset(o)
@@ -145,7 +140,7 @@ function ScrollController:useDpad()
 
   local delay = 50
   local delayRepeat = 1
-  local step = 2
+  local step = 3
 
   local downButtonDown, downButtonUp, rmvRepeat1 = utils:createRepeater(delay, delayRepeat, function (isRepeat)
     self.autoScroll = false

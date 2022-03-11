@@ -47,15 +47,11 @@ end
 
 function CreditsScreen:beforeEnter()
   self.scroll.autoScroll = false
-  -- self.scroll:resetOffset()
+  self.scroll:resetOffset()
 end
 
 function CreditsScreen:afterEnter()
   self.scroll.autoScroll = true
-end
-
-function CreditsScreen:afterLeave()
-  self:destroySprites()
 end
 
 function CreditsScreen:drawBg()

@@ -44,6 +44,8 @@ function NoteListScreen:init()
       return i < noteFs.numPages
     end
   end
+
+  self.bgPos = 0
 end
 
 function NoteListScreen:setupSprites()
@@ -93,14 +95,21 @@ function NoteListScreen:beforeEnter()
   end
   -- update counter
   counter:setTotal(noteFs.numPages)
-  counter:setVisible(not self.hasNoNotes)
+  -- counter:setVisible(not self.hasNoNotes)
+end
+
+function NoteListScreen:enter()
+  self.counter:setVisible(not self.hasNoNotes)
 end
 
 function NoteListScreen:leave()
-  self:removeThumbComponents(self.currThumbs)
   self.noNoteDialog.show = false
+  self.hasPrevPage = false -- prevent initial page transition when returning to this screen
+end
+
+function NoteListScreen:afterLeave()
+  self:removeThumbComponents(self.currThumbs)
   self.currThumbs = {}
-  self.hasPrevPage = false -- prevent initial transition when returning to this page
 end
 
 function NoteListScreen:setCurrentFolder(folder)
@@ -210,9 +219,35 @@ function NoteListScreen:setThumbComponentsOffset(list, xOffset)
   end
 end
 
-function NoteListScreen:drawBg(x, y, w, h)
-  grid:draw(x, y, w, h)
-  bgGfx:draw(0, 0)
+function NoteListScreen:drawBg()
+  grid:draw()
+  bgGfx:draw(self.bgPos, 0)
+end
+
+function NoteListScreen:updateTransitionIn(t, fromScreen)
+  self.bgPos = playdate.easingFunctions.outQuad(t, 300, -300, 1)
+  local d = playdate.easingFunctions.outQuad(t, 40, -40, 1)
+  for i, thumb in ipairs(self.currThumbs) do
+    local j = 4 - (i - 1) % 4
+    thumb:offsetByY(d + d * j)
+  end
+  self.folderSelect:offsetByY(playdate.easingFunctions.outQuad(t, -40, 40, 1))
+  self.counter:offsetByX(playdate.easingFunctions.outQuad(t, 50, -50, 1))
+end
+
+function NoteListScreen:updateTransitionOut(t, toScreen)
+  if toScreen.id == 'player' then
+    
+  else
+    self.bgPos = playdate.easingFunctions.inQuad(t, 0, 300, 1)
+    local d = playdate.easingFunctions.inQuad(t, 0, 40, 1)
+    for i, thumb in ipairs(self.currThumbs) do
+      local j = (i - 1) % 4
+      thumb:offsetByY(d + d * j)
+    end
+  end
+  self.folderSelect:offsetByY(playdate.easingFunctions.inQuad(t, 0, -40, 1))
+  self.counter:offsetByX(playdate.easingFunctions.inQuad(t, 0, 50, 1))
 end
 
 return NoteListScreen

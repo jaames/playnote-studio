@@ -9,8 +9,7 @@ extern PlaydateAPI* pd;
 // memory management
 #define pd_alloc(s) pd->system->realloc(NULL, (s))
 #define pd_malloc(s) pd->system->realloc(NULL, (s))
-// NOTE: pd_calloc does not initialise mem to 0, need to use memset() afterwards
-#define pd_calloc(numEls, elSize) pd->system->realloc(NULL, ((numEls) * (elSize)))
+#define pd_calloc(numEls, elSize) memset(pd->system->realloc(NULL, ((numEls) * (elSize))), 0, ((numEls) * (elSize)))
 #define pd_realloc pd->system->realloc
 #define pd_free(ptr) pd->system->realloc((ptr), 0)
 

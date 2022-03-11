@@ -13,17 +13,17 @@ function Clock:init(x, y, w, h)
 end
 
 function Clock:tick()
-  local currTime = playdate.getCurrentTimeMilliseconds()
-  local time = playdate.getTime()
-  local dateFormat = locales:getText('CLOCK_DATE_FORMAT')
-  local timeFormat = self.blinkOn and '${HOUR}:${MINUTE}' or '${HOUR} ${MINUTE}'
-  local dateStr, timeStr = stringUtils:formatTimeMultiple(time, dateFormat, timeFormat)
-  self.lastTickTime = currTime
-  self.blinkOn = not self.blinkOn
-  self.dateString = dateStr
-  self.timeString = timeStr
-  self:markDirty()
   if self.isRunning then
+    local currTime = playdate.getCurrentTimeMilliseconds()
+    local time = playdate.getTime()
+    local dateFormat = locales:getText('CLOCK_DATE_FORMAT')
+    local timeFormat = self.blinkOn and '${HOUR}:${MINUTE}' or '${HOUR} ${MINUTE}'
+    local dateStr, timeStr = stringUtils:formatTimeMultiple(time, dateFormat, timeFormat)
+    self.lastTickTime = currTime
+    self.blinkOn = not self.blinkOn
+    self.dateString = dateStr
+    self.timeString = timeStr
+    self:markDirty()
     playdate.timer.performAfterDelay(1000, self.tick, self)
   end
 end
@@ -48,7 +48,7 @@ function Clock:draw()
   gfx.setColor(gfx.kColorWhite)
   gfx.fillRect(0, 0, w, h)
   self.font:drawText(self.dateString, 10, 10)
-  self.clockGfx:draw(92, 7)
+  self.clockGfx:draw(90, 7)
   self.font:drawText(self.timeString, 108, 10)
   gfx.setColor(gfx.kColorBlack)
   gfx.setLineWidth(1)

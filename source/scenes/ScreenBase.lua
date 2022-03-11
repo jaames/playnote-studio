@@ -44,6 +44,16 @@ end
 function ScreenBase:update()
 end
 
+-- override to do something on every frame for this screen while it is being transitioned in
+-- t is the transition progress from 0 to 1
+function ScreenBase:updateTransitionIn(t)
+end
+
+-- override to do something on every frame for this screen while it is being transitioned out
+-- t is the transition progress from 0 to 1
+function ScreenBase:updateTransitionOut(t)
+end
+
 -- override to draw a custom background for this screen
 function ScreenBase:drawBg(x, y, w, h)
 end

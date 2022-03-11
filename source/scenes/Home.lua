@@ -25,13 +25,13 @@ function HomeScreen:setupSprites()
   end)
   self.settingsButton = settingsButton
 
-  local clock = Clock(8, 10, 152, 28)
+  self.clock = Clock(8, 10, 152, 28)
 
-  local homeLogo = HomeLogo(52, 54)
+  self.homeLogo = HomeLogo(52, 54)
 
   self.focus:setFocus(viewButton)
 
-  return {viewButton, settingsButton, clock, homeLogo}
+  return {viewButton, settingsButton, self.clock, self.homeLogo}
 end
 
 function HomeScreen:afterEnter()
@@ -51,6 +51,29 @@ end
 
 function HomeScreen:drawBg(x, y, w, h)
   grid:draw(x, y, w, h)
+end
+
+function HomeScreen:updateTransitionIn(t, fromScreen)
+  if fromScreen == nil then
+    local p = playdate.easingFunctions.outBack(t - 0.5, -70, 70, 0.5)
+    local l = playdate.easingFunctions.outBack(t, 50, -50, 1)
+    self.clock:offsetByY(p)
+    self.settingsButton:offsetByY(p)
+    self.viewButton:offsetByY(0 - p)
+    self.homeLogo:offsetByY(l)
+  else
+    local p = playdate.easingFunctions.outQuad(t, -60, 60, 1)
+    self.clock:offsetByY(p)
+    self.settingsButton:offsetByY(p)
+    self.viewButton:offsetByY(0 - p)
+  end
+end
+
+function HomeScreen:updateTransitionOut(t, toScreen)
+  local p = playdate.easingFunctions.inQuad(t, 0, -60, 1)
+  self.clock:offsetByY(p)
+  self.settingsButton:offsetByY(p)
+  self.viewButton:offsetByY(-p)
 end
 
 return HomeScreen

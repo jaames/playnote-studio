@@ -60,4 +60,14 @@ function DetailsScreen:drawBg(x, y, w, h)
   grid:drawWithOffset(x, y, w, h, self.scroll.offset)
 end
 
+function DetailsScreen:updateTransitionIn(t, fromScreen)
+  local p = playdate.easingFunctions.outQuad(t, -60, 60, 1)
+  self.list:offsetByY(p)
+end
+
+function DetailsScreen:updateTransitionOut(t, toScreen)
+  local p = playdate.easingFunctions.inQuad(t, 0, -60, 1)
+  self.list:offsetByY(p)
+end
+
 return DetailsScreen

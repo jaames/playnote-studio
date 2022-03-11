@@ -104,4 +104,22 @@ function DitheringScreen:drawBg(x, y, w, h)
   layer2Icon:drawAnchored(COL_ICON, ROW_LAYER2, 0.80, 0.5)
 end
 
+function DitheringScreen:updateTransitionIn(t)
+  local d = playdate.easingFunctions.outQuad(t, 40, -40, 1)
+  for i, row in ipairs(self.swatches) do
+    for j, swatch in ipairs(row) do
+      swatch:offsetByX((j - 1) * d)
+    end
+  end
+end
+
+function DitheringScreen:updateTransitionOut(t)
+  local d = playdate.easingFunctions.inQuad(t, 0, 40, 1)
+  for i, row in ipairs(self.swatches) do
+    for j, swatch in ipairs(row) do
+      swatch:offsetByX((j - 1) * d)
+    end
+  end
+end
+
 return DitheringScreen

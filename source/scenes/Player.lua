@@ -325,4 +325,15 @@ function PlayerScreen:update()
   end
 end
 
+function PlayerScreen:updateTransitionIn(t, fromScreen)
+  self.counter:offsetByX(playdate.easingFunctions.outQuad(t, 100, -100, 1))
+  self.timeline:offsetByY(playdate.easingFunctions.outQuad(t, 60, -60, 1))
+end
+
+function PlayerScreen:updateTransitionOut(t, toScreen)
+  self.counter:offsetByX(playdate.easingFunctions.inQuad(t, 0, 100, 1))
+  self.timeline:offsetByY(playdate.easingFunctions.inQuad(t, 0, 60, 1))
+end
+
+
 return PlayerScreen

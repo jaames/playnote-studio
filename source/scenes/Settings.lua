@@ -14,6 +14,7 @@ function SettingsScreen:init()
   self.scroll.selectionMode = ScrollController.kModeKeepCenter
   self.focus = FocusController(self)
   self.focus:preventNavigationInDirections(FocusController.kDirectionLeft, FocusController.kDirectionRight)
+  self.bgPos = 0
 end
 
 function SettingsScreen:setupSprites()
@@ -105,17 +106,16 @@ function SettingsScreen:setupSprites()
   self.focus:setFocus(about)
   self.firstItem = about
 
+  self.buttons = { about, credits, language, dithering, sound, reset }
   return { scrollBar, about, credits, language, dithering, sound, reset }
 end
 
 function SettingsScreen:beforeEnter()
-  -- SettingsScreen.super.beforeEnter(self)
   self.languageSelect:setValue(locales:getLanguage())
   self.soundSelect:setValue(config.enableSoundEffects)
 end
 
 function SettingsScreen:afterLeave()
-  -- SettingsScreen.super.afterLeave(self)
   config:save()
   -- self.focus:setFocusPure(self.firstItem)
   -- self.scroll:resetOffset()
@@ -123,7 +123,23 @@ end
 
 function SettingsScreen:drawBg(x, y, w, h)
   grid:drawWithOffset(x, y, w, h, self.scroll.offset)
-  bgGfx:draw(0, 0)
+  bgGfx:draw(self.bgPos, 0)
+end
+
+function SettingsScreen:updateTransitionIn(t)
+  self.bgPos = playdate.easingFunctions.outQuad(t, -200, 200, 1)
+  local d = playdate.easingFunctions.outQuad(t, 50, -50, 1)
+  for i, el in ipairs(self.buttons) do
+    el:offsetByY((i - 1) * d)
+  end
+end
+
+function SettingsScreen:updateTransitionOut(t)
+  self.bgPos = playdate.easingFunctions.inQuad(t, 0, -200, 1)
+  local d = playdate.easingFunctions.inQuad(t, 0, 50, 1)
+  for i, el in ipairs(self.buttons) do
+    el:offsetByY((i - 1) * d)
+  end
 end
 
 return SettingsScreen

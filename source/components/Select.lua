@@ -3,7 +3,7 @@ local OPTION_WIDTH <const> = 314
 local OPTION_HEIGHT <const> = 40
 local MENU_X <const> = (PLAYDATE_W / 2) - (OPTION_WIDTH / 2)
 local MENU_Y <const> = (PLAYDATE_H / 2) - (OPTION_HEIGHT / 2)
-local MENU_OPEN_DUR = 250
+local MENU_OPEN_DUR = 300
 local MENU_SCROLL_DUR = 100
 
 Select = {}

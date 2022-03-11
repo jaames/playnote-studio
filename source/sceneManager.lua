@@ -4,7 +4,7 @@ local registeredScenes = {}
 
 local activeScene = nil
 
-local isScreneTransitionActive = false
+local isSceneTransitionActive = false
 local transitionDrawFn = nil
 
 local sceneHistory = {}
@@ -49,7 +49,7 @@ function sceneManager:registerScene(id, SceneClass)
 end
 
 function sceneManager:push(id, transitionFn, backTransitionFn, ...)
-  if not isScreneTransitionActive then
+  if not isSceneTransitionActive then
     local nextScene = registeredScenes[id]
     self:_switchScene(nextScene, transitionFn, ...)
     if #sceneHistory > 0 then
@@ -61,7 +61,7 @@ function sceneManager:push(id, transitionFn, backTransitionFn, ...)
 end
 
 function sceneManager:pop()
-  if not isScreneTransitionActive and #sceneHistory > 1 then
+  if not isSceneTransitionActive and #sceneHistory > 1 then
     table.remove(sceneHistory)
     table.remove(transitionHistory)
     local lastScene = sceneHistory[#sceneHistory]
@@ -75,7 +75,7 @@ function sceneManager:pop()
 end
 
 function sceneManager:_switchScene(nextScene, transitionFn, ...)
-  isScreneTransitionActive = true
+  isSceneTransitionActive = true
 
   local prevScene = activeScene
 
@@ -85,7 +85,7 @@ function sceneManager:_switchScene(nextScene, transitionFn, ...)
   transitionDrawFn = transitionFn(prevScene, nextScene, function()
     self:_sceneAfterLeave(prevScene)
     self:_sceneAfterEnter(nextScene)
-    isScreneTransitionActive = false
+    isSceneTransitionActive = false
   end)
 end
 
@@ -150,13 +150,13 @@ function sceneManager:_sceneAfterLeave(scene)
 end
 
 function sceneManager:reloadCurrent(transitionFn, callbackFn)
-  isScreneTransitionActive = true
+  isSceneTransitionActive = true
 
   self:_sceneAfterLeave(activeScene)
   self:_sceneBeforeEnter(activeScene)
 
   transitionDrawFn = transitionFn(activeScene, activeScene, function()
-    isScreneTransitionActive = false
+    isSceneTransitionActive = false
     callbackFn()
   end)
 end
@@ -229,7 +229,7 @@ function sceneManager:drawBg(x, y, w, h)
 end
 
 function sceneManager:update()
-  if isScreneTransitionActive then
+  if isSceneTransitionActive then
     transitionDrawFn()
   else
     if isScreenEffectActive then
@@ -258,16 +258,18 @@ function sceneManager:_makeTransition(duration, initialState, transitionFn)
 
     timer.updateCallback = function ()
       value = timer.value
+      if a then a:updateTransitionOut(value, b) end
+      b:updateTransitionIn(value, a)
     end
 
     timer.timerEndedCallback = function ()
       value = 1
-      -- sometimes (depends on easing and frame timing) transition values don't reach 1 before isTransitionActive is set to false, 
-      -- leaving thigns hanging on the last frame. doing tthe completed callback on the next frame seems to fix this
-      utils:nextTick(function ()
-        value = 1
-        completedCallback()
-      end)
+      if a then a:updateTransitionOut(value, b) end
+      b:updateTransitionIn(value, a)
+      -- sometimes (depends on easing and frame timing) transition values don't reach 1 before isTransitionActive is set to false,
+      -- calling drawFn once more seems to fix this
+      drawFn()
+      completedCallback()
     end
 
     return drawFn
@@ -286,7 +288,7 @@ end
 
 sceneManager.kTransitionNone = sceneManager:_makeTransition(0, nil, function () end)
 
-sceneManager.kTransitionStartup = sceneManager:_makeTransition(320, nil,
+sceneManager.kTransitionStartup = sceneManager:_makeTransition(400, nil,
   function (t, a, b, state)
     if not b.active then
       sceneManager:_screenEnter(b)
@@ -295,7 +297,7 @@ sceneManager.kTransitionStartup = sceneManager:_makeTransition(320, nil,
   end
 )
 
-sceneManager.kTransitionFade = sceneManager:_makeInOutTransition(300, {nextIn = false},
+sceneManager.kTransitionFade = sceneManager:_makeInOutTransition(350, {nextIn = false},
   function (t, a, b, state)
     overlay:setWhiteFade(t)
   end,
