@@ -66,7 +66,6 @@ function DitheringScreen:setupSprites()
 end
 
 function DitheringScreen:beforeEnter(ditherConf, callback)
-  DitheringScreen.super.beforeEnter(self)
   assert(ditherConf ~= nil, 'No dither config, uh oh')
   for i, row in ipairs(self.swatches) do
     for j, swatch in ipairs(row) do

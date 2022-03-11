@@ -168,13 +168,13 @@ function dialog:show(text, type)
   -- on timer update
   transitionTimer.updateCallback = function (timer)
     self:offsetBy(PLAYDATE_H - playdate.easingFunctions.outBack(timer.value, 0, PLAYDATE_H, 1))
-    overlayBg:setBlackFade(timer.value * 0.5)
+    overlay:setBlackFade(timer.value * 0.5)
   end
   -- page transition is done
   transitionTimer.timerEndedCallback = function ()
     self:offsetBy(0)
     self.isTransitionActive = false
-    overlayBg:setBlackFade(0.5)
+    overlay:setBlackFade(0.5)
     playdate.inputHandlers.pop()
     if self.type == dialog.kTypeAlert then
       playdate.inputHandlers.push({
@@ -219,11 +219,11 @@ function dialog:hide(result)
   -- on timer update
   transitionTimer.updateCallback = function (timer)
     self:offsetBy(playdate.easingFunctions.inBack(timer.value, 0, PLAYDATE_H, 1))
-    overlayBg:setBlackFade((1 - timer.value) * 0.5)
+    overlay:setBlackFade((1 - timer.value) * 0.5)
   end
   -- page transition is done
   transitionTimer.timerEndedCallback = function ()
-    overlayBg:setBlackFade(0)
+    overlay:setBlackFade(0)
     -- set final dialog position and mark invisible
     self:offsetBy(PLAYDATE_H)
     self:setVisible(false)

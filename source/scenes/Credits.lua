@@ -46,18 +46,15 @@ function CreditsScreen:setupSprites()
 end
 
 function CreditsScreen:beforeEnter()
-  CreditsScreen.super.beforeEnter(self)
   self.scroll.autoScroll = false
-  self.scroll:resetOffset()
+  -- self.scroll:resetOffset()
 end
 
 function CreditsScreen:afterEnter()
-  CreditsScreen.super.afterEnter(self)
   self.scroll.autoScroll = true
 end
 
 function CreditsScreen:afterLeave()
-  CreditsScreen.super.afterLeave(self)
   self:destroySprites()
 end
 

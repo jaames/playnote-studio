@@ -25,7 +25,7 @@ end
 function Thumbnail:click()
   if self.tmb then
     noteFs:setCurrentNote(self.tmb.path)
-    screens:push('player', screens.kTransitionFade)
+    sceneManager:push('player', sceneManager.kTransitionFade)
   end
 end
 

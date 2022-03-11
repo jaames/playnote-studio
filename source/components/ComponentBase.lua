@@ -12,6 +12,7 @@ class('ComponentBase').extends(playdate.graphics.sprite)
 function ComponentBase:init(x, y, w, h)
   self.selectable = false
   self.isSelected = false
+  self.ignoresDrawOffset = false
 
   self.tx = 0
   self.ty = 0
@@ -27,6 +28,21 @@ function ComponentBase:init(x, y, w, h)
   end
   if w ~= nil or h ~= nil then
     self:setSize(w, h)
+  end
+end
+
+-- 
+function ComponentBase:setIgnoresDrawOffset(flag)
+  ComponentBase.super.setIgnoresDrawOffset(self, flag)
+  self.ignoresDrawOffset = flag
+end
+function ComponentBase:markDirty()
+  if self.ignoresDrawOffset then
+    ComponentBase.super.markDirty(self)
+  else
+    local ox, oy = gfx.getDrawOffset()
+    local bx, by, bw, bh = self:getBounds()
+    spritelib.addDirtyRect(bx + ox, by + oy, bw, bh)
   end
 end
 

@@ -76,7 +76,7 @@ function PlayerScreen:setupMenuItems(menu)
   local currNote = noteFs.currentNote
 
   local detailsItem = menu:addMenuItem(locales:getText('PLAY_MENU_DETAILS'), function()
-    screens:push('details', screens.kTransitionFade, nil, currNote)
+    sceneManager:push('details', sceneManager.kTransitionFade, nil, currNote)
   end)
 
   local ditherItem = menu:addMenuItem(locales:getText('PLAY_MENU_DITHERING'), function()
@@ -84,14 +84,13 @@ function PlayerScreen:setupMenuItems(menu)
     local function updateDither(newSettings)
       noteFs:updateNoteDitherSettings(currNote, newSettings)
     end
-    screens:push('dithering', screens.kTransitionFade, nil, ditherSettings, updateDither)
+    sceneManager:push('dithering', sceneManager.kTransitionFade, nil, ditherSettings, updateDither)
   end)
 
   return {detailsItem, ditherItem}
 end
 
 function PlayerScreen:beforeEnter()
-  PlayerScreen.super.beforeEnter(self)
   sounds:prepareSfxGroup('player', {
     'pageNext',
     'pagePrev',
@@ -106,19 +105,16 @@ function PlayerScreen:beforeEnter()
 end
 
 function PlayerScreen:beforeLeave()
-  PlayerScreen.super.beforeLeave(self)
   self:pause()
   self.removeTimers()
 end
 
 function PlayerScreen:afterLeave()
-  PlayerScreen.super.afterLeave(self)
   sounds:releaseSfxGroup('player')
   self:unloadPpm()
 end
 
 function PlayerScreen:loadPpm()
-  -- print(noteFs.currentNote)
   local ppm = PpmParser.new(noteFs.currentNote)
   local ditherSetttings = noteFs:getNoteDitherSettings(noteFs.currentNote)
   for layer = 1,2 do

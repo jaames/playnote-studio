@@ -195,13 +195,13 @@ function SelectMenu:open()
   spritelib.setAlwaysRedraw(true)
 
   timer.updateCallback = function ()
-    overlayBg:setBlackFade(timer.value * 0.5)
+    overlay:setBlackFade(timer.value * 0.5)
     self:offsetByY(startPos - playdate.easingFunctions.outBack(timer.value, 0, startPos, 1))
   end
 
   timer.timerEndedCallback = function ()
     self.openTransitionActive = false
-    overlayBg:setBlackFade(0.5)
+    overlay:setBlackFade(0.5)
     self:offsetByY(0)
 
     utils:nextTick(function ()
@@ -254,12 +254,12 @@ function SelectMenu:close()
   spritelib.setAlwaysRedraw(true)
 
   timer.updateCallback = function ()
-    overlayBg:setBlackFade((1 - timer.value) * 0.5)
+    overlay:setBlackFade((1 - timer.value) * 0.5)
     self:offsetByY(playdate.easingFunctions.inBack(timer.value, 0, PLAYDATE_H, 1))
   end
 
   timer.timerEndedCallback = function ()
-    overlayBg:setBlackFade(0)
+    overlay:setBlackFade(0)
     self:offsetByY(PLAYDATE_H)
     self.select:menuCloseEndCallback()
 

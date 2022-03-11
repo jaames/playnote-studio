@@ -78,13 +78,13 @@ function FocusController:cantMove(direction)
   local override = self.cantMoveCallback(direction)
   if (not override == true) and (not self.silenceNotAllowedSfx) then
     if direction == FocusController.kDirectionLeft then
-      screens:bounceLeft()
+      sceneManager:bounceLeft()
     elseif direction == FocusController.kDirectionRight then
-      screens:bounceRight()
+      sceneManager:bounceRight()
     elseif direction == FocusController.kDirectionUp then
-      screens:bounceUp()
+      sceneManager:bounceUp()
     elseif direction == FocusController.kDirectionDown then
-      screens:bounceDown()
+      sceneManager:bounceDown()
     end
     sounds:playSfx('selectionNotAllowed')
   end

@@ -47,13 +47,11 @@ function DetailsScreen:renderNoteDetails(ppmPath)
 end
 
 function DetailsScreen:beforeEnter(ppmPath)
-  DetailsScreen.super.beforeEnter(self)
   self:renderNoteDetails(ppmPath)
   self.list:add()
 end
 
 function DetailsScreen:afterLeave()
-  DetailsScreen.super.afterLeave(self)
   self.list:clear()
   self.scroll:setOffset(0)
 end

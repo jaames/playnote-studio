@@ -12,7 +12,7 @@ function HomeScreen:setupSprites()
   viewButton:setIcon('./gfx/icon_view')
   viewButton:setAnchor('center', 'top')
   viewButton:onClick(function ()
-    screens:push('notelist', screens.kTransitionFade)
+    sceneManager:push('notelist', sceneManager.kTransitionFade)
   end)
   self.viewButton = viewButton
 
@@ -21,7 +21,7 @@ function HomeScreen:setupSprites()
   settingsButton:setIcon('./gfx/icon_settings')
   settingsButton:setAnchor('right', 'top')
   settingsButton:onClick(function ()
-    screens:push('settings', screens.kTransitionFade)
+    sceneManager:push('settings', sceneManager.kTransitionFade)
   end)
   self.settingsButton = settingsButton
 
@@ -35,7 +35,6 @@ function HomeScreen:setupSprites()
 end
 
 function HomeScreen:afterEnter()
-  HomeScreen.super.afterEnter(self)
   -- check if the C extention has been loaded
   -- imo it's fine for this message to not be localised, you should only come across it in the simulator
   if PpmParser == nil then

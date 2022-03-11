@@ -43,7 +43,7 @@ function SettingsScreen:setupSprites()
   credits:setPaddingStyle('wide')
   credits:setIcon('./gfx/icon_credits')
   credits:onClick(function ()
-    screens:push('credits', screens.kTransitionFade)
+    sceneManager:push('credits', sceneManager.kTransitionFade)
   end)
   layout:add(credits)
 
@@ -68,7 +68,7 @@ function SettingsScreen:setupSprites()
   dithering:setPaddingStyle('wide')
   dithering:setIcon('./gfx/icon_dither')
   dithering:onClick(function ()
-    screens:push('dithering', screens.kTransitionFade, nil, config.dithering)
+    sceneManager:push('dithering', sceneManager.kTransitionFade, nil, config.dithering)
   end)
   layout:add(dithering)
 
@@ -109,16 +109,16 @@ function SettingsScreen:setupSprites()
 end
 
 function SettingsScreen:beforeEnter()
-  SettingsScreen.super.beforeEnter(self)
+  -- SettingsScreen.super.beforeEnter(self)
   self.languageSelect:setValue(locales:getLanguage())
   self.soundSelect:setValue(config.enableSoundEffects)
 end
 
 function SettingsScreen:afterLeave()
-  SettingsScreen.super.afterLeave(self)
+  -- SettingsScreen.super.afterLeave(self)
   config:save()
-  self.focus:setFocusPure(self.firstItem)
-  self.scroll:resetOffset()
+  -- self.focus:setFocusPure(self.firstItem)
+  -- self.scroll:resetOffset()
 end
 
 function SettingsScreen:drawBg(x, y, w, h)

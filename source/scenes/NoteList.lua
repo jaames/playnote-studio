@@ -69,14 +69,13 @@ function NoteListScreen:setupMenuItems(menu)
   local detailsItem = menu:addMenuItem(locales:getText('VIEW_MENU_DETAILS'), function()
     local selectedComponent = self.focus.selection
     if getmetatable(selectedComponent) == Thumbnail then
-      screens:push('details', screens.kTransitionFade, nil, selectedComponent:getPath())
+      sceneManager:push('details', sceneManager.kTransitionFade, nil, selectedComponent:getPath())
     end
   end)
   return {detailsItem}
 end
 
 function NoteListScreen:beforeEnter()
-  NoteListScreen.super.beforeEnter(self)
   self:setCurrentPage(self.currPage)
   -- update folderselect
   local folderSelect = self.folderSelect
@@ -98,7 +97,6 @@ function NoteListScreen:beforeEnter()
 end
 
 function NoteListScreen:leave()
-  NoteListScreen.super.leave(self)
   self:removeThumbComponents(self.currThumbs)
   self.noNoteDialog.show = false
   self.currThumbs = {}

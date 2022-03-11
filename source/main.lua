@@ -18,10 +18,10 @@ import './config'
 import './locales'
 import './noteFs'
 import './sounds'
-import './screens'
+import './sceneManager'
 
 import './ui/grid'
-import './ui/overlayBg'
+import './ui/overlay'
 import './ui/dialog'
 import './ui/pdbug'
 
@@ -45,12 +45,12 @@ import './components/ScrollBar'
 import './components/KeyValList'
 import './components/TextView'
 
-import './screens/Screenbase'
+import './scenes/Screenbase'
 
 MAIN_FONT = playdate.graphics.font.new('./fonts/WhalesharkSans')
 playdate.graphics.setFont(MAIN_FONT)
--- playdate.display.setRefreshRate(50)
-playdate.display.setRefreshRate(30)
+playdate.display.setRefreshRate(50)
+-- playdate.display.setRefreshRate(30)
 
 debug = nil -- disallow debugging
 -- pdbug:setEnabled(true)
@@ -60,20 +60,20 @@ locales:init()
 noteFs:init()
 dialog:init()
 
-screens:register({
-  home = (import './screens/Home'),
-  notelist = (import './screens/NoteList'),
-  details = (import './screens/Details'),
-  player = (import './screens/Player'),
-  settings = (import './screens/Settings'),
-  dithering = (import './screens/Dithering'),
-  credits = (import './screens/Credits'),
+sceneManager:register({
+  home = (import './scenes/Home'),
+  notelist = (import './scenes/NoteList'),
+  details = (import './scenes/Details'),
+  player = (import './scenes/Player'),
+  settings = (import './scenes/Settings'),
+  dithering = (import './scenes/Dithering'),
+  credits = (import './scenes/Credits'),
 })
 
-screens:push('home', screens.kTransitionStartup, screens.kTransitionFade)
+sceneManager:push('home', sceneManager.kTransitionStartup, sceneManager.kTransitionFade)
 
 function playdate.update()
-  screens:update()
+  sceneManager:update()
   playdate.graphics.sprite.update()
   playdate.timer.updateTimers()
   playdate.frameTimer.updateTimers()

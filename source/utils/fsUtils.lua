@@ -20,7 +20,7 @@ local INTERNAL_FOLDERS <const> = {
   'controllers/',
   'sounds/',
   'components/',
-  'screens/',
+  'scenes/',
   'services/',
   'utils/',
 }

@@ -1,28 +1,28 @@
-overlayBg = spritelib.new()
+overlay = spritelib.new()
 
-overlayBg:setSize(PLAYDATE_W, PLAYDATE_H)
-overlayBg:add()
-overlayBg:setZIndex(900)
-overlayBg:setIgnoresDrawOffset(true)
-overlayBg:setCollisionsEnabled(false)
-overlayBg:setCenter(0, 0)
+overlay:setSize(PLAYDATE_W, PLAYDATE_H)
+overlay:add()
+overlay:setZIndex(900)
+overlay:setIgnoresDrawOffset(true)
+overlay:setCollisionsEnabled(false)
+overlay:setCenter(0, 0)
 
-overlayBg.whiteLevel = 0
-overlayBg.blackLevel = 0
+overlay.whiteLevel = 0
+overlay.blackLevel = 0
 
-function overlayBg:setWhiteFade(white)
+function overlay:setWhiteFade(white)
   self.whiteLevel = white
   self.blackLevel = 0
   self:markDirty()
 end
 
-function overlayBg:setBlackFade(black)
+function overlay:setBlackFade(black)
   self.blackLevel = black
   self.whiteLevel = 0
   self:markDirty()
 end
 
-function overlayBg:draw(x, y, w, h)
+function overlay:draw(x, y, w, h)
   if self.whiteLevel ~= 0 then
     gfx.setColor(gfx.kColorWhite)
     gfx.setDitherPattern(1- self.whiteLevel, gfx.image.kDitherTypeBayer8x8)
