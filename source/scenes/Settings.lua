@@ -103,7 +103,7 @@ function SettingsScreen:setupSprites()
   layout:add(reset)
 
   self.scroll:setHeight(layout.height)
-  self.focus:setFocus(about)
+  self.focus:setFocus(about, true)
   self.firstItem = about
 
   self.buttons = { about, credits, language, dithering, sound, reset }

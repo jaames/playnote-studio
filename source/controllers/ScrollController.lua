@@ -114,7 +114,7 @@ function ScrollController:update()
 end
 
 function ScrollController:crankHandler(change, acceleratedChange)
-  self:setOffset(self.offset + math.floor(change)) -- math.floor important for avoiding rounding issues when drawing bg grid
+  self:setOffset(self.offset - math.floor(change)) -- math.floor important for avoiding rounding issues when drawing bg grid
   self.autoScroll = false
 end
 
@@ -140,7 +140,7 @@ function ScrollController:useDpad()
 
   local delay = 50
   local delayRepeat = 1
-  local step = 3
+  local step = 4
 
   local downButtonDown, downButtonUp, rmvRepeat1 = utils:createRepeater(delay, delayRepeat, function (isRepeat)
     self.autoScroll = false

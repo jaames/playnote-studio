@@ -44,6 +44,13 @@ function NoteListScreen:init()
       return i < noteFs.numPages
     end
   end
+  self.focus.focusMoveCallback = function(sprite)
+    if getmetatable(sprite) == Thumbnail then
+      local index = table.indexOfElement(self.currThumbs, sprite) - 1
+      self.selectedRow = math.floor(index / GRID_COLS)
+      self.selectedCol = index % 4
+    end
+  end
 
   self.bgPos = 0
 end
@@ -63,7 +70,7 @@ function NoteListScreen:setupSprites()
 
   self.noNoteDialog = NoNoteDialog(20, 52, PLAYDATE_W - 38, PLAYDATE_H - 72)
 
-  self.focus:setFocus(folderSelect)
+  self.focus:setFocus(folderSelect, true)
   return { folderSelect, counter, self.noNoteDialog }
 end
 
@@ -93,9 +100,11 @@ function NoteListScreen:beforeEnter()
     self.noNoteDialog.show = true
     self.focus:setFocus(self.folderSelect)
   end
+  if not folderSelect.isSelected then
+    self:selectThumbAt(self.selectedCol, self.selectedRow)
+  end
   -- update counter
   counter:setTotal(noteFs.numPages)
-  -- counter:setVisible(not self.hasNoNotes)
 end
 
 function NoteListScreen:enter()
@@ -150,7 +159,7 @@ function NoteListScreen:setCurrentPage(pageIndex)
   if self.hasPrevPage then
     self.isTransitionActive = true
     self.focus.allowNavigation = false
-    self.focus:setFocus(nil)
+    -- self.focus:setFocus(nil)
 
     local transitionTimer = playdate.timer.new(PAGE_TRANSITION_DUR, 0, PLAYDATE_W, playdate.easingFunctions.inQuad)
     local transitionDir = pageIndex < self.currPage and -1 or 1 -- 1 = to left, -1 to right
@@ -173,12 +182,8 @@ function NoteListScreen:setCurrentPage(pageIndex)
     transitionTimer.timerEndedCallback = function ()
       self:setThumbComponentsOffset(self.currThumbs, 0)
       self:removeThumbComponents(self.prevThumbs)
-      -- update selection
-      if transitionDir == -1 then
-        self.focus:setFocus(self.currThumbs[#self.currThumbs])
-      else
-        self.focus:setFocus(self.currThumbs[1])
-      end
+      -- update selection, trying to keep it in the same row
+      self:selectThumbAt(transitionDir == -1 and 3 or 0, self.selectedRow)
       self.isTransitionActive = false
       self.focus.allowNavigation = true
     end
@@ -217,6 +222,13 @@ function NoteListScreen:setThumbComponentsOffset(list, xOffset)
   for _, tmb in pairs(list) do
     tmb:offsetBy(xOffset, 0)
   end
+end
+
+function NoteListScreen:selectThumbAt(column, row)
+  column = math.max(0, math.min(GRID_COLS - 1, column))
+  row = math.max(0, math.min(GRID_ROWS - 1, row))
+  local index = math.min((row * 4 + column) + 1, self.notesOnCurrPage)
+  self.focus:setFocus(self.currThumbs[index])
 end
 
 function NoteListScreen:drawBg()

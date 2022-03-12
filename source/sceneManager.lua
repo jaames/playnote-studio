@@ -288,7 +288,7 @@ end
 
 sceneManager.kTransitionNone = sceneManager:_makeTransition(0, nil, function () end)
 
-sceneManager.kTransitionStartup = sceneManager:_makeTransition(400, nil,
+sceneManager.kTransitionStartup = sceneManager:_makeTransition(500, nil,
   function (t, a, b, state)
     if not b.active then
       sceneManager:_screenEnter(b)
@@ -297,7 +297,7 @@ sceneManager.kTransitionStartup = sceneManager:_makeTransition(400, nil,
   end
 )
 
-sceneManager.kTransitionFade = sceneManager:_makeInOutTransition(350, {nextIn = false},
+sceneManager.kTransitionFade = sceneManager:_makeInOutTransition(420, {nextIn = false},
   function (t, a, b, state)
     overlay:setWhiteFade(t)
   end,

@@ -60,7 +60,7 @@ function DitheringScreen:setupSprites()
       end)
     end
   end
-  self.focus:setFocus(swatches[1][1])
+  self.focus:setFocus(swatches[1][1], true)
   self.swatches = swatches
   return { swatch1, swatch2, swatch3, swatch4, swatch5, swatch6 }
 end
@@ -108,7 +108,7 @@ function DitheringScreen:updateTransitionIn(t)
   local d = playdate.easingFunctions.outQuad(t, 40, -40, 1)
   for i, row in ipairs(self.swatches) do
     for j, swatch in ipairs(row) do
-      swatch:offsetByX((j - 1) * d)
+      swatch:offsetByX(j * d)
     end
   end
 end
@@ -117,7 +117,7 @@ function DitheringScreen:updateTransitionOut(t)
   local d = playdate.easingFunctions.inQuad(t, 0, 40, 1)
   for i, row in ipairs(self.swatches) do
     for j, swatch in ipairs(row) do
-      swatch:offsetByX((j - 1) * d)
+      swatch:offsetByX(j * d)
     end
   end
 end

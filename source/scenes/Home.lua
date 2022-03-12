@@ -29,7 +29,7 @@ function HomeScreen:setupSprites()
 
   self.homeLogo = HomeLogo(52, 54)
 
-  self.focus:setFocus(viewButton)
+  self.focus:setFocus(viewButton, true)
 
   return {viewButton, settingsButton, self.clock, self.homeLogo}
 end

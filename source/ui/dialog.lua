@@ -1,4 +1,4 @@
-local TRANSITION_DUR <const> = 250
+local TRANSITION_DUR <const> = 350
 local DIALOG_W <const> = PLAYDATE_W - 48
 local DIALOG_H <const> = PLAYDATE_H - 48
 local DIALOG_X <const> = (PLAYDATE_W - DIALOG_W) / 2
