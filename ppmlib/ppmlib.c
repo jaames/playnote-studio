@@ -197,7 +197,7 @@ void ppm_blitFrame(ppmlib_ctx* ctx, u16 frameIndex, void* frameBufferBase, u16 f
 {
 	void* frameBuffer;
 
-	ppmVideoDecodeFrame(ctx->ppm, frameIndex);
+	ppmVideoDecodeFrame(ctx->ppm, frameIndex, 0);
 
 	u8* layerA = ctx->ppm->layers[0];
 	u8* layerB = ctx->ppm->layers[1];

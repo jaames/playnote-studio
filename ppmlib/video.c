@@ -12,7 +12,7 @@ static void setChunks(void* ptr, u32 c, size_t n)
 	}
 }
 
-void ppmVideoDecodeFrame(ppm_ctx_t* ctx, u16 frame)
+void ppmVideoDecodeFrame(ppm_ctx_t* ctx, u16 frame, int preventDecodingPrev)
 {
 	u8* data;
 	s8 moveByX, moveByY;
@@ -23,19 +23,31 @@ void ppmVideoDecodeFrame(ppm_ctx_t* ctx, u16 frame)
 	if (ctx->prevFrame == frame)
 		return;
 
-	/* If seeking backwards, decode previous frames until a keyframe is reached. */
-	if (frame && ctx->prevFrame != frame - 1 &&
-		!(*(ppm_frame_header_t*)&ctx->videoData[ctx->videoOffsets[frame]]).isKeyFrame)
-		ppmVideoDecodeFrame(ctx, frame - 1);
+	/* 
+		If seeking backwards, decode previous frames until a keyframe is reached.
+
+		I would normally do this recursively, but that was causing a stack overflow on the Playdate,
+		doing a loop back to the most recent keyframe and then decoding forward from there seems to work!
+	 */
+	if (preventDecodingPrev == 0 && ctx->prevFrame != frame - 1)
+	{
+		int backFrame = frame;
+		
+		while (frame && !(*(ppm_frame_header_t*)&ctx->videoData[ctx->videoOffsets[backFrame]]).isKeyFrame)
+			backFrame--;
+		
+		for(; backFrame < frame; backFrame++)
+			ppmVideoDecodeFrame(ctx, backFrame, 1);
+	}
 
 	/* Copy the last decoded layer to the last, last decoded one. */
 	for (u8 layer = 0; layer < PPM_LAYERS; layer++)
 	{
-		// swap layer buffer pointers instead of using memcpy
+		/* swap layer buffer pointers instead of using memcpy */
 		u8* tmp = ctx->prevLayers[layer];
 		ctx->prevLayers[layer] = ctx->layers[layer];
 		ctx->layers[layer] = tmp;
-		// zero-fill current layer buffers
+		/* zero-fill current layer buffers */
 		setChunks(ctx->layers[layer], 0, PPM_BUFFER_SIZE);
 	}
 
