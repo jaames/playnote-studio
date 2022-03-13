@@ -61,7 +61,7 @@
   "DITHER_COLOUR_RED": "Красный",
   "DITHER_COLOUR_BLUE": "Синий",
 
-  "DIALOG_CONFIRM": "ОК",
   "DIALOG_OK": "OK",
+  "DIALOG_CONFIRM": "ОК",
   "DIALOG_CANCEL": "Отмена"
 }

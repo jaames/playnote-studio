@@ -61,7 +61,7 @@
   "DITHER_COLOUR_RED": "Rot",
   "DITHER_COLOUR_BLUE": "Blau",
 
-  "DIALOG_CONFIRM": "Bestätigen",
-  "DIALOG_OK": "OK",
-  "DIALOG_CANCEL": "Abbrechen"
+  "DIALOG_OK": "Okay",
+  "DIALOG_CONFIRM": "Ja",
+  "DIALOG_CANCEL": "Nein"
 }

@@ -95,7 +95,9 @@ function SettingsScreen:setupSprites()
         config:reset()
         locales:setLanguage(config.lang)
         self:reloadSprites()
-        self.focus:setFocus(about)
+        self.languageSelect:setValue(locales:getLanguage())
+        self.soundSelect:setValue(config.enableSoundEffects)
+        self.focus:setFocus(about, true)
       end},
       {type = dialog.kTypeAlert, message = locales:getText('SETTINGS_RESET_DONE')}
     })

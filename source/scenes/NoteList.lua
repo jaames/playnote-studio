@@ -45,7 +45,7 @@ function NoteListScreen:init()
     end
   end
   self.focus.focusMoveCallback = function(sprite)
-    if getmetatable(sprite) == Thumbnail then
+    if not self.folderSelect.isSelected then
       local index = table.indexOfElement(self.currThumbs, sprite) - 1
       self.selectedRow = math.floor(index / GRID_COLS)
       self.selectedCol = index % 4

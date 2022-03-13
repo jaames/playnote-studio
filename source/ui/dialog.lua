@@ -43,8 +43,8 @@ function dialog:init()
     'dialogOpen',
   })
 
-  local okButton = Button(PLAYDATE_W / 2, 0, 120, 38, '%DIALOG_OK%')
-  okButton.autoWidth = true
+  local okButton = Button(PLAYDATE_W / 2, 0, 100, 38, '%DIALOG_OK%')
+  -- okButton.autoWidth = true
   okButton.textAlign = kTextAlignment.center
   okButton:setIcon('./gfx/icon_button_a')
   okButton:setIgnoresDrawOffset(true)
@@ -55,7 +55,8 @@ function dialog:init()
     self:hide(dialog.kResultOk)
   end)
 
-  local confirmButton = Button(PLAYDATE_W / 2 + 8, 0, 140, 38, '%DIALOG_CONFIRM%')
+  local confirmButton = Button(PLAYDATE_W / 2 + 8, 0, 120, 38, '%DIALOG_CONFIRM%')
+  confirmButton:setPaddingStyle('narrow')
   confirmButton:setIcon('./gfx/icon_button_a')
   confirmButton.textAlign = kTextAlignment.center
   confirmButton:setIgnoresDrawOffset(true)
@@ -66,7 +67,8 @@ function dialog:init()
     self:hide(dialog.kResultOk)
   end)
 
-  local cancelButton = Button(PLAYDATE_W / 2 - 8, 0, 140, 38, '%DIALOG_CANCEL%')
+  local cancelButton = Button(PLAYDATE_W / 2 - 8, 0, 120, 38, '%DIALOG_CANCEL%')
+  cancelButton:setPaddingStyle('narrow')
   cancelButton:setIcon('./gfx/icon_button_b')
   cancelButton.textAlign = kTextAlignment.center
   cancelButton:setIgnoresDrawOffset(true)
@@ -162,6 +164,7 @@ function dialog:show(text, type)
   -- disable ipnut
   playdate.inputHandlers.push({}, true)
   -- setup transition
+  spritelib.setAlwaysRedraw(true)
   self.isTransitionActive = true
   local transitionTimer = playdate.timer.new(TRANSITION_DUR, 0, 1)
   self:offsetBy(PLAYDATE_H)
@@ -176,6 +179,9 @@ function dialog:show(text, type)
     self.isTransitionActive = false
     overlay:setBlackFade(0.5)
     playdate.inputHandlers.pop()
+    utils:nextTick(function()
+      spritelib.setAlwaysRedraw(false)
+    end)
     if self.type == dialog.kTypeAlert then
       playdate.inputHandlers.push({
         AButtonDown = function ()
@@ -263,7 +269,7 @@ function dialog:sequence(seq, fn)
       end
     end
     self.wasAlreadyOpened = i > 1
-    self:show(item.message, item.type)
+    self:show(locales:replaceKeysInText(item.message), item.type)
   end
   doItem(seq[i])
 end

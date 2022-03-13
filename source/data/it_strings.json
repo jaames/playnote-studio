@@ -61,7 +61,7 @@
   "DITHER_COLOUR_RED": "Rosso",
   "DITHER_COLOUR_BLUE": "Blu",
 
-  "DIALOG_CONFIRM": "Bene",
   "DIALOG_OK": "Bene",
+  "DIALOG_CONFIRM": "Bene",
   "DIALOG_CANCEL": "Annulla"
 }

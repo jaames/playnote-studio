@@ -99,6 +99,10 @@ function Button:setPaddingStyle(style)
     self.padLeft = 20
     self.padRight = 20
     self.iconPadRight = 16
+  elseif style == 'narrow' then
+    self.padLeft = 14
+    self.padRight = 14
+    self.iconPadRight = 6
   else
     self.padLeft = 16
     self.padRight = 16

@@ -3,3 +3,4 @@ build/*
 *.pdx.zip
 *.bin
 *.dylib
+*.dll
