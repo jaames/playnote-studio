@@ -4,7 +4,7 @@ class('CreditsScreen').extends(ScreenBase)
 function CreditsScreen:init()
   CreditsScreen.super.init(self)
   self.scroll = ScrollController(self)
-  self.scroll:setStart(120)
+  self.scroll:setStart(260)
   self.scroll:useDpad()
 end
 
@@ -34,24 +34,33 @@ function CreditsScreen:getCreditsText()
 end
 
 function CreditsScreen:setupSprites()
-  local logo = Image(PLAYDATE_W / 2, 0, './gfx/gfx_logo_credits')
-  logo:setAnchor('center', 'top')
+  self.logo = Image(PLAYDATE_W / 2, 0, './gfx/gfx_logo_credits')
+  self.logo:setAnchor('center', 'top')
 
-  local textView = TextView(0, logo.height + 12, PLAYDATE_W)
-  textView:setText(self:getCreditsText())
+  self.textView = TextView(0, self.logo.height + 12, PLAYDATE_W)
 
-  self.scroll:setHeight(logo.height + 12 + textView.height)
-
-  return { logo, textView }
+  return { self.logo, self.textView }
 end
 
 function CreditsScreen:beforeEnter()
+  self.textView:setText(self:getCreditsText())
+  self.scroll:setHeight(self.logo.height + 12 + self.textView.height)
   self.scroll.autoScroll = false
   self.scroll:resetOffset()
 end
 
 function CreditsScreen:afterEnter()
+  self.scroll.autoScrollStep = -1.6
   self.scroll.autoScroll = true
+  playdate.timer.performAfterDelay(2000, function ()
+    if self.active then -- make sure that user hasn't exited since timer started
+      sounds:playMusic('credits')
+    end
+  end)
+end
+
+function CreditsScreen:beforeLeave()
+  sounds:stopMusic()
 end
 
 function CreditsScreen:drawBg()

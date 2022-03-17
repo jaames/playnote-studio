@@ -119,6 +119,7 @@ end
 
 function SettingsScreen:afterLeave()
   config:save()
+  -- self:destroySprites()
   -- self.focus:setFocusPure(self.firstItem)
   -- self.scroll:resetOffset()
 end

@@ -36,8 +36,8 @@
   "CREDITS_HEADER_DOCS": "Documentation technique",
   "CREDITS_HEADER_PACKETS": "Analyse du protocole Internet",
   "CREDITS_HEADER_MISC": "Autres remerciements",
-  "CREDITS_LEGAL": "Flipnote Studio est la propriété de Nintendo.\nCe projet n’est en aucune manière affilié à, approuvé ou autorisé par Nintendo.",
-  "CREDITS_END": "Vive Flipnote ! \n\n\n",
+  "CREDITS_LEGAL": "Flipnote Studio est la propriété de Nintendo. Ce projet n’est en aucune manière affilié à, approuvé ou autorisé par Nintendo.",
+  "CREDITS_END": "Vive Flipnote ! ",
 
   "VIEW_NO_FLIPNOTES": "Il n’y a aucune Flipnote ici",
   "VIEW_NO_FLIPNOTES_INFO": "Pour savoir comment ajouter des Flipnotes, rendez-vous sur playnote.studio/filehelp",

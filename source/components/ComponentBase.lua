@@ -31,11 +31,7 @@ function ComponentBase:init(x, y, w, h)
   end
 end
 
--- 
-function ComponentBase:setIgnoresDrawOffset(flag)
-  ComponentBase.super.setIgnoresDrawOffset(self, flag)
-  self.ignoresDrawOffset = flag
-end
+-- TEMPFIX: there seems to be an sdk bug(?) where dirty rects don't get transformed with setDrawOffset() sometimes, this fixes that
 function ComponentBase:markDirty()
   if self.ignoresDrawOffset then
     ComponentBase.super.markDirty(self)
@@ -44,6 +40,10 @@ function ComponentBase:markDirty()
     local bx, by, bw, bh = self:getBounds()
     spritelib.addDirtyRect(bx + ox, by + oy, bw, bh)
   end
+end
+function ComponentBase:setIgnoresDrawOffset(flag)
+  ComponentBase.super.setIgnoresDrawOffset(self, flag)
+  self.ignoresDrawOffset = flag
 end
 
 function ComponentBase:addedToScreen()

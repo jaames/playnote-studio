@@ -126,7 +126,7 @@ int ppmInit(ppm_ctx_t* ctx, u8* ppm, int len)
 	return -1;
 }
 
-// char* fsidFromStr(u8 fsid[8])
+// char* ppmFormatId(u8 fsid[8])
 // {
 // 	static char str[32];
 // 	memset(str, 0, 32);

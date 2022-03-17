@@ -33,6 +33,14 @@ function Thumbnail:getPath()
   return self.tmb.path
 end
 
+-- TEMPFIX: i don't totally understand why, but the notelist bg wasn't being redraw correctly when thumbnail selection changed...
+-- this seems to fix for now...
+function Thumbnail:markDirty()
+  local ox, oy = gfx.getDrawOffset()
+  local bx, by = self:getBounds()
+  spritelib.addDirtyRect(bx + ox - 4, by + oy - 4, THUMB_W + 8, THUMB_H + 8)
+end
+
 function Thumbnail:draw(clipX, clipY, clipW, clipH)
   if self.tmb then
     if self.isSelected then

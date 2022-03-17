@@ -111,7 +111,9 @@ static int ppm_index(lua_State* L)
 	const char* key = pd->lua->getArgString(2);
 
 	if (strcmp(key, "currentFrame") == 0)
-		pd->lua->pushInt(ctx->currentFrame + 1); // index startsa at 1 in lua
+		pd->lua->pushInt(ctx->currentFrame + 1); // index starts at 1 in lua
+	else if (strcmp(key, "currentTime") == 0)
+		pd->lua->pushFloat((float)ctx->currentFrame * (1.0 / (float)ctx->ppm->frameRate));
 	else if (strcmp(key, "progress") == 0)
 		pd->lua->pushFloat((float)ctx->currentFrame / ((float)ctx->numFrames - 1.0));
 	else if (strcmp(key, "frameRate") == 0 || strcmp(key, "fps") == 0)
@@ -332,8 +334,9 @@ static int ppm_playAudio(lua_State* L)
 	ppmlib_ctx* ctx = getPpmCtx(1);
 	if (ctx->masterAudio != NULL)
 	{
+		float seconds = pd->lua->getArgFloat(2);
+		pd->sound->sampleplayer->setOffset(ctx->audioPlayer, seconds);
 		pd->sound->sampleplayer->play(ctx->audioPlayer, 1, 1.0);
-		// pd->sound->sampleplayer->setOffset(ctx->audioPlayer, X// TODO);
 	}
   return 0;
 }

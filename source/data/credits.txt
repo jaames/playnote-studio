@@ -1,4 +1,3 @@
-
 _Version ${version}_
 _https://playnote.studio_
 
@@ -22,7 +21,13 @@ _github.com/simontime_
 %CREDITS_HEADER_SOUND%
 
 Talon Stradley
+_instagram.com/talonhasnoidea_
 
+Credits Song
+
+madwurmz
+_madwurmz.com_
+_soundcloud.com/madwurmz_
 
 %CREDITS_HEADER_TRANSLATION%
 
@@ -150,6 +155,8 @@ _github.com/shutterbug2000_
 
 Austin Burk
 _github.com/sudofox_
+
+
 
 
 %CREDITS_LEGAL%

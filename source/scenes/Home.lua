@@ -4,6 +4,8 @@ class('HomeScreen').extends(ScreenBase)
 function HomeScreen:init()
   HomeScreen.super.init(self)
   self.focus = FocusController(self)
+  self.hasPlayedIntro = false
+  sounds:prepareSfx({'intro'})
 end
 
 function HomeScreen:setupSprites()
@@ -32,6 +34,15 @@ function HomeScreen:setupSprites()
   self.focus:setFocus(viewButton, true)
 
   return {viewButton, settingsButton, self.clock, self.homeLogo}
+end
+
+function HomeScreen:enter()
+  if not self.hasPlayedIntro then
+    self.hasPlayedIntro = true
+    playdate.timer.performAfterDelay(200, function ()
+      sounds:playSfxThenRelease('intro')
+    end)
+  end
 end
 
 function HomeScreen:afterEnter()

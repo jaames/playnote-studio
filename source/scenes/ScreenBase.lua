@@ -25,7 +25,7 @@ function ScreenBase:_addToDisplayList()
     end
     self.areSpritesInDisplayList = true
   end
-  self:emitHook('sprites:addToDisplay')
+  self:emitHook('sprites:display:add')
 end
 
 -- (internal) remove this screen's sprites from the sprite library scenegraph
@@ -37,7 +37,7 @@ function ScreenBase:_removeFromDisplayList()
     end
     self.areSpritesInDisplayList = false
   end
-  self:emitHook('sprites:removeFromDisplay')
+  self:emitHook('sprites:display:remove')
 end
 
 -- override to do something on every frame for this screen while it is active
@@ -159,6 +159,7 @@ function ScreenBase:forceSpriteUpdate()
       sprites[i]:update()
     end
   end
+  self:emitHook('sprites:update')
 end
 
 -- reload all the sprites in the screen
@@ -170,6 +171,7 @@ function ScreenBase:reloadSprites()
       sprites[i]:add()
     end
   end
+  self:emitHook('sprites:reload')
 end
 -- returns the number of sprites in this screen
 -- equiv to playdate.graphics.sprite.spriteCount()
@@ -193,11 +195,16 @@ function ScreenBase:destroySprites()
     sprites[i]:remove()
     sprites[i] = nil
   end
+  local sprites = self.selectableSprites
+  for i = 1, #self.sprites do
+    sprites[i] = nil
+  end
   self.sprites = {}
   self.selectableSprites = {}
   self.areSpritesInDisplayList = false
   self.areSpritesSetup = false
   self.areSpritesVisible = false
+  self:emitHook('sprites:destroy')
 end
 
 function ScreenBase:addHook(hook, fn)

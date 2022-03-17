@@ -93,6 +93,7 @@ void ppmVideoDecodeFrame(ppm_ctx_t* ctx, u16 frame, int preventDecodingPrev)
 		{
 			case 2: /* Fill entire line with colour, then decompress as type 1. */
 				setChunks(&layerBuffer[offset], 0xFFFFFFFF, PPM_BUFFER_STRIDE);
+
 			case 1: /* Decompress line. */
 				lineFlags = __builtin_bswap32(*(u32 *)data);
 				data += sizeof(u32);

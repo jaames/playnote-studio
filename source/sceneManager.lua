@@ -288,12 +288,12 @@ end
 
 sceneManager.kTransitionNone = sceneManager:_makeTransition(0, nil, function () end)
 
-sceneManager.kTransitionStartup = sceneManager:_makeTransition(500, nil,
+sceneManager.kTransitionStartup = sceneManager:_makeTransition(650, nil,
   function (t, a, b, state)
     if not b.active then
       sceneManager:_screenEnter(b)
     end
-    overlay:setWhiteFade(1 - t)
+    overlay:setWhiteFade((0.8 - t))
   end
 )
 

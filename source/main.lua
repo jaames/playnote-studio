@@ -11,6 +11,7 @@ import 'CoreLibs/animation'
 import './utils/utils'
 import './utils/stringUtils'
 import './utils/fsUtils'
+import './utils/motionPath'
 
 import './globals'
 

@@ -11,6 +11,7 @@ local fast_intersection <const> = playdate.geometry.rect.fast_intersection
 
 local kTransitionDirAdvance <const> = 1
 local kTransitionDirRetreat <const> = -1
+local transitionCurve = motionPath:newCurve(0, 0, -150, -40, -300, 0)
 
 PlayerScreen = {}
 class('PlayerScreen').extends(ScreenBase)
@@ -128,6 +129,7 @@ function PlayerScreen:loadPpm()
   self.ppm = ppm
   self.counter:setTotal(self.numFrames)
   self.counter:setValue(self.currentFrame)
+  self.timeline:setProgress(0)
   local animTimer = playdate.timer.new(ppm.duration * 1000, 0, self.numFrames)
   animTimer.repeats = self.loop
   animTimer.discardOnCompletion = false
@@ -198,16 +200,16 @@ function PlayerScreen:doFrameTransition(direction, toFrame, callbackFn)
   local bottomSlide = self.frameTransitionBottomSlide
 
   local currFrame = self.currentFrame
-  local initPos, endPos, easing
+  local from, to, easing
   if direction == kTransitionDirAdvance then
-    initPos = 0
-    endPos = -NOTE_W
+    from = 0
+    to = 1
     easing = playdate.easingFunctions.inQuad
     ppm:drawFrameToBitmap(currFrame, topSlide.image)
     ppm:drawFrameToBitmap(toFrame, bottomSlide.image)
   elseif direction == kTransitionDirRetreat then
-    initPos = -NOTE_W
-    endPos = 0
+    from = 1
+    to = 0
     easing = playdate.easingFunctions.outQuad
     ppm:drawFrameToBitmap(currFrame, bottomSlide.image)
     ppm:drawFrameToBitmap(toFrame, topSlide.image)
@@ -215,14 +217,18 @@ function PlayerScreen:doFrameTransition(direction, toFrame, callbackFn)
   -- draw frames to bitmaps
   self:addSprite(topSlide)
   self:addSprite(bottomSlide)
-  topSlide:offsetByX(initPos)
 
-  local transitionTimer = playdate.timer.new(200, initPos, endPos, easing)
-  transitionTimer.updateCallback = function (t)
-    topSlide:offsetByX(t.value)
+  local x, y = transitionCurve(from)
+  topSlide:offsetBy(x, y)
+
+  local timer = playdate.timer.new(250, from, to, easing)
+  timer.updateCallback = function (t)
+    local x, y = transitionCurve(t.value)
+    topSlide:offsetBy(x, y)
   end
-  transitionTimer.timerEndedCallback = function (t)
-    topSlide:offsetByX(t.value)
+  timer.timerEndedCallback = function (t)
+    local x, y = transitionCurve(t.value)
+    topSlide:offsetBy(x, y)
     callbackFn()
     utils:nextTick(function ()
       self:removeSprite(topSlide)
@@ -239,8 +245,7 @@ function PlayerScreen:play()
     -- workaround for timer bug https://devforum.play.date/t/playdate-timer-value-increases-between-calling-pause-and-start/2096
 	  self.animTimer._lastTime = nil
     self.animTimer:start()
-    -- TODO: reenable
-    self.ppm:playAudio()
+    self.ppm:playAudio(self.ppm.currentTime)
     self.isPlaying = true
     self:setControlsVisible(false)
     playdate.setAutoLockDisabled(true)
@@ -307,10 +312,11 @@ function PlayerScreen:drawBg(x, y, w, h)
     end
   -- still at least draw frame border if transtion is active
   else
+    gfx.setLineWidth(1)
     gfx.setColor(gfx.kColorBlack)
-    gfx.drawRect(NOTE_X - 1, NOTE_Y - 1, NOTE_W + 2, NOTE_H + 2)
+    gfx.drawRect(NOTE_X - 2, NOTE_Y - 2, NOTE_W + 4, NOTE_H + 4)
     gfx.setColor(gfx.kColorWhite)
-    gfx.drawRect(NOTE_X, NOTE_Y, NOTE_W, NOTE_H)
+    gfx.drawRect(NOTE_X - 1, NOTE_Y - 1, NOTE_W + 2, NOTE_H + 2)
   end
 end
 
@@ -334,6 +340,5 @@ function PlayerScreen:updateTransitionOut(t, toScreen)
   self.counter:offsetByX(playdate.easingFunctions.inQuad(t, 0, 100, 1))
   self.timeline:offsetByY(playdate.easingFunctions.inQuad(t, 0, 60, 1))
 end
-
 
 return PlayerScreen

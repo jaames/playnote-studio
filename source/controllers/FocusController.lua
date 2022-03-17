@@ -8,6 +8,16 @@ FocusController.kDirectionDown = 2
 FocusController.kDirectionLeft = 3
 FocusController.kDirectionRight = 4
 
+local kPartitionNorthWest <const> = 1
+local kPartitionNorth <const> = 2
+local kPartitionNorthEast <const> = 3
+local kPartitionWest <const> = 4
+local kPartitionInternal <const> = 5
+local kPartitionEast <const> = 6
+local kPartitionSouthWest <const> = 7
+local kPartitionSouth <const> = 8
+local kPartitionSouthEast <const> = 9
+
 function FocusController:init(screen)
   if screen ~= nil then
     self:connectScreen(screen)
@@ -108,6 +118,18 @@ function FocusController:remove(element)
   table.remove(self.elements, table.indexOfElement(self.elements, element))
 end
 
+function FocusController:removeAll()
+  local elements = self.elements
+  for i = 1, #elements do
+    elements[i] = nil
+  end
+  self.elements = {}
+  self.selection = nil
+  self.selectionRect = nil
+  self.selectionCenter = nil
+  self.selectionCenterRect = nil
+end
+
 function FocusController:debugModeEnabled(enabled)
   if enabled then
     function playdate.debugDraw()
@@ -154,37 +176,37 @@ function FocusController:partition(rects, targetRect)
     groupId = (y * 3 + x) + 1
     table.insert(groups[groupId], rect)
 
-    if groupId == 1 or groupId == 3 or groupId == 7 or groupId == 9 then
+    if groupId == kPartitionNorthWest or groupId == kPartitionNorthEast or groupId == kPartitionSouthWest or groupId == kPartitionSouthEast then
 
       if rect.left <= targetRect.right - targetRect.width * threshold then
-        if groupId == 3 then
-          table.insert(groups[2], rect)
-        elseif groupId == 9 then
-          table.insert(groups[8], rect)
+        if groupId == kPartitionNorthEast then
+          table.insert(groups[kPartitionNorth], rect)
+        elseif groupId == kPartitionSouthEast then
+          table.insert(groups[kPartitionSouth], rect)
         end
       end
 
       if rect.right >= targetRect.left + targetRect.width * threshold then
-        if groupId == 1 then
-          table.insert(groups[2], rect)
-        elseif groupId == 7 then
-          table.insert(groups[8], rect)
+        if groupId == kPartitionNorthWest then
+          table.insert(groups[kPartitionNorth], rect)
+        elseif groupId == kPartitionSouthWest then
+          table.insert(groups[kPartitionSouth], rect)
         end
       end
 
       if rect.top <= targetRect.bottom - targetRect.height * threshold then
-        if groupId == 7 then
-          table.insert(groups[4], rect)
-        elseif groupId == 9 then
-          table.insert(groups[6], rect)
+        if groupId == kPartitionSouthWest then
+          table.insert(groups[kPartitionWest], rect)
+        elseif groupId == kPartitionSouthEast then
+          table.insert(groups[kPartitionEast], rect)
         end
       end
 
       if rect.bottom >= targetRect.top + targetRect.height * threshold then
-        if groupId == 1 then
-          table.insert(groups[4], rect)
-        elseif groupId == 3 then
-          table.insert(groups[6], rect)
+        if groupId == kPartitionNorthWest then
+          table.insert(groups[kPartitionWest], rect)
+        elseif groupId == kPartitionNorthEast then
+          table.insert(groups[kPartitionEast], rect)
         end
       end
     end
@@ -326,27 +348,27 @@ function FocusController:navigate(direction)
 
   local distanceFn = self.distanceFn
   local groups = self:partition(rects, self.selectionRect)
-  local internalGroups = self:partition(groups[5], self.selectionCenterRect)
+  local internalGroups = self:partition(groups[kPartitionInternal], self.selectionCenterRect)
 
   local priorities
   if direction == FocusController.kDirectionLeft then
     priorities = {
       {
-        group = table.combine(internalGroups[1], internalGroups[4], internalGroups[7]),
+        group = table.combine(internalGroups[kPartitionNorthWest], internalGroups[kPartitionWest], internalGroups[kPartitionSouthWest]),
         distance = {
           distanceFn.nearPlumbLineIsBetter,
           distanceFn.topIsBetter
         }
       },
       {
-        group = groups[4],
+        group = groups[kPartitionWest],
         distance = {
           distanceFn.nearPlumbLineIsBetter,
           distanceFn.topIsBetter
         }
       },
       {
-        group = table.combine(groups[1], groups[7]),
+        group = table.combine(groups[kPartitionNorthWest], groups[kPartitionSouthWest]),
         distance = {
           distanceFn.nearHorizonIsBetter,
           distanceFn.rightIsBetter,
@@ -357,21 +379,21 @@ function FocusController:navigate(direction)
   elseif direction == FocusController.kDirectionRight then
     priorities = {
       {
-        group = table.combine(internalGroups[3], internalGroups[6], internalGroups[9]),
+        group = table.combine(internalGroups[kPartitionNorthEast], internalGroups[kPartitionEast], internalGroups[kPartitionSouthEast]),
         distance = {
           distanceFn.nearPlumbLineIsBetter,
           distanceFn.topIsBetter
         }
       },
       {
-        group = groups[6],
+        group = groups[kPartitionEast],
         distance = {
           distanceFn.nearPlumbLineIsBetter,
           distanceFn.topIsBetter
         }
       },
       {
-        group = table.combine(groups[3], groups[9]),
+        group = table.combine(groups[kPartitionNorthEast], groups[kPartitionSouthEast]),
         distance = {
           distanceFn.nearHorizonIsBetter,
           distanceFn.leftIsBetter,
@@ -382,21 +404,21 @@ function FocusController:navigate(direction)
   elseif direction == FocusController.kDirectionUp then
     priorities = {
       {
-        group = table.combine(internalGroups[1], internalGroups[2], internalGroups[3]),
+        group = table.combine(internalGroups[kPartitionNorthWest], internalGroups[kPartitionNorth], internalGroups[kPartitionNorthEast]),
         distance = {
           distanceFn.nearHorizonIsBetter,
           distanceFn.leftIsBetter
         }
       },
       {
-        group = groups[2],
+        group = groups[kPartitionNorth],
         distance = {
           distanceFn.nearHorizonIsBetter,
           distanceFn.leftIsBetter
         }
       },
       {
-        group = table.combine(groups[1], groups[3]),
+        group = table.combine(groups[kPartitionNorthWest], groups[kPartitionNorthEast]),
         distance = {
           distanceFn.nearPlumbLineIsBetter,
           distanceFn.bottomIsBetter,
@@ -407,21 +429,21 @@ function FocusController:navigate(direction)
   elseif direction == FocusController.kDirectionDown then
     priorities = {
       {
-        group = table.combine(internalGroups[7], internalGroups[8], internalGroups[9]),
+        group = table.combine(internalGroups[kPartitionSouthWest], internalGroups[kPartitionSouth], internalGroups[kPartitionSouthEast]),
         distance = {
           distanceFn.nearHorizonIsBetter,
           distanceFn.leftIsBetter
         }
       },
       {
-        group = groups[8],
+        group = groups[kPartitionSouth],
         distance = {
           distanceFn.nearHorizonIsBetter,
           distanceFn.leftIsBetter
         }
       },
       {
-        group = table.combine(groups[7], groups[9]),
+        group = table.combine(groups[kPartitionSouthWest], groups[kPartitionSouthEast]),
         distance = {
           distanceFn.nearPlumbLineIsBetter,
           distanceFn.topIsBetter,
@@ -487,6 +509,10 @@ function FocusController:connectScreen(screen)
 
   screen:addHook('sprite:remove', function (sprite)
     self:remove(sprite)
+  end)
+
+  screen:addHook('sprites:destroy', function (sprite)
+    self:removeAll()
   end)
 
   screen:addHook('leave:before', function ()
