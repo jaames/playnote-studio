@@ -82,6 +82,7 @@ function Select:click()
   menu.optionValues = self.optionValues
   menu.activeOptionValue = self.activeOptionValue
   menu.activeOptionIndex = self.activeOptionIndex
+  menu.initialActiveOptionIndex = self.activeOptionIndex
   menu:open()
 end
 
@@ -158,6 +159,7 @@ function SelectMenu:init(selectComponent)
   self.numOptions = 0
   self.optionLabels = {} -- string label per option
   self.optionValues = {} -- values for each option
+  self.initialActiveOptionIndex = 0
   self.activeOptionIndex = 0
   self.activeOptionValue = nil
   self.menuHeight = 0
@@ -180,6 +182,7 @@ function SelectMenu:open()
   -- add self to display list and freeze input during transition
   self:add()
   playdate.inputHandlers.push({}, true)
+  playdate.getCrankTicks(6) -- nullify scroll changes
   -- calculate layout variables
   local numLabels = #self.optionLabels
   self.numOptions = numLabels
@@ -228,10 +231,10 @@ function SelectMenu:open()
     playdate.inputHandlers.pop()
     playdate.inputHandlers.push({
       AButtonDown = function()
-        self:close()
+        self:close(true)
       end,
       BButtonDown = function()
-        self:close()
+        self:close(false)
       end,
       upButtonDown = upButtonDown,
       upButtonUp = upButtonUp,
@@ -241,9 +244,14 @@ function SelectMenu:open()
   end
 end
 
-function SelectMenu:close()
+function SelectMenu:close(updateValue)
   if (not self.isOpen) or self.openTransitionActive then return end
   sounds:playSfx('optionMenuClose')
+
+  if not updateValue then
+    self.select:menuChangeCallback(self.optionValues[self.initialActiveOptionIndex], self.initialActiveOptionIndex)
+  end
+
   self.select:menuCloseCallback()
 
   self.openTransitionActive = true

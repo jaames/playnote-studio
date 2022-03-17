@@ -1,12 +1,18 @@
 ## TODO
 
+- Intro theme
+- sfx: dialog open, crank tick, crank docked/undocked, Flipnote view page not allowed, Note list page slide / page not allowed, Flipnote view crank forward / crank back, Multiple dither swatch sounds
 - Sound effect bug in pekira note
-- Player play/pause with timer
-- Audio play/pause
+- Sound doesn't restart after loop
+- Credits lag when song kicks in
+- Credits autoscroll speed adjust
+- Scrolling on Settings should change selection
+- Buttons should have gfx for when they've been clicked
+- Website
 - Add DSi username chars to font
+- Redraw hiragana and katakana?
 - Function to delete sample notes
 - Create a PPM test suite to verify against
-- Website
 
 ## Playnote Studio
 
