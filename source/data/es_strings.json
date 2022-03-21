@@ -1,0 +1,67 @@
+{
+  "APP_TITLE": "Playnote Studio",
+
+  "FILESIZE_UNITS": ["B", "KB", "MB", "GB"],
+
+  "HOME_VIEW": "Ver Flipnotes",
+  "HOME_SETTINGS": "Configuración",
+
+  "CLOCK_DATE_FORMAT": "${DAY}/${MONTH}/${YEAR}",
+
+  "SETTINGS_ABOUT": "Acerca De",
+  "SETTINGS_CREDITS": "Créditos",
+  "SETTINGS_DITHERING": "Patrón",
+  "SETTINGS_SOUND": "Efectos de Sonido",
+  "SETTINGS_LANGUAGE": "Idioma",
+  "SETTINGS_RESET": "Reiniciar Ajustes",
+  "SETTINGS_ON": "✓",
+  "SETTINGS_OFF": "❌",
+  "SETTINGS_SOUND_ON": "✓",
+  "SETTINGS_SOUND_OFF": "❌",
+  "SETTINGS_RESET_CONFIRM": "Cada ajuste se va a restablecer",
+  "SETTINGS_RESET_DONE": "Se han restablecido los ajustes",
+
+  "ABOUT_VERSION": "Versión %d",
+  "ABOUT_BUILT_BY": "Compilado por %s",
+
+  "CREDITS_HEADER_JAMES": "Programación y Diseño de UI",
+  "CREDITS_HEADER_PARSER": "Decodificador de Flipnote",
+  "CREDITS_HEADER_SOUND": "Diseño de Sonido",
+  "CREDITS_HEADER_TRANSLATION": "Traducción",
+  "CREDITS_HEADER_THANKS": "Agradecimientos Especiales a",
+  "CREDITS_HEADER_ARTISTS": "*Artistas del Flipnotes*",
+  "CREDITS_HEADER_RESEARCH": "*Investigación de Flipnote*",
+  "CREDITS_HEADER_UGOCREW": "Investigadores Japoneses de Flipnote",
+  "CREDITS_HEADER_AUDIO": "Audio",
+  "CREDITS_HEADER_DOCS": "Documentación",
+  "CREDITS_HEADER_PACKETS": "Capturas de Paquetes",
+  "CREDITS_HEADER_MISC": "Misceláneo",
+  "CREDITS_LEGAL": "Flipnote Studio es © Nintendo.\nEste proyecto no está patrocinado ni afiliado con ellos de ninguna manera.",
+  "CREDITS_END": "¡Sigue flipnotizando! ",
+
+  "VIEW_NO_FLIPNOTES": "No hay ningún Flipnote aquí",
+  "VIEW_NO_FLIPNOTES_INFO": "Para aprender a agregar Flipnotes a Playnote Studio, visita playnote.studio/filehelp",
+  "VIEW_MENU_DETAILS": "Detalles",
+
+  "PLAY_MENU_DETAILS": "Detalles",
+  "PLAY_MENU_DITHERING": "Dithering",
+
+  "DETAILS_AUTHOR": "Autor(a)",
+  "DETAILS_AUTHOR_ID": "ID de Autor(a)",
+  "DETAILS_LINKS": "Enlaces",
+  "DETAILS_LAST_EDIT": "Última modificación",
+  "DETAILS_DATE_FORMAT": "${DAY}/${MONTH}/${YEAR}",
+  "DETAILS_FRAME_COUNT": "Recuento de Fotogramas",
+  "DETAILS_FILE_SIZE": "Tamaño del Archivo",
+  "DETAILS_FILE_PATH": "Ruta del Archivo",
+  "DETAILS_PREV_AUTHOR": "Autor(a) Previo",
+  "DETAILS_ORIG_AUTHOR": "Autor(a) Original",
+
+  "DITHER_COLOUR_BLACK": "Negro",
+  "DITHER_COLOUR_RED": "Rojo",
+  "DITHER_COLOUR_BLUE": "Azul",
+
+  "DIALOG_OK": "OK",
+  "DIALOG_CONFIRM": "OK",
+  "DIALOG_CANCEL": "Cancelar"
+}
