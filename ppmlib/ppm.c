@@ -106,10 +106,13 @@ int ppmInit(ppm_ctx_t* ctx, u8* ppm, int len)
 		return 9;
 	}
 
+	ppm += ctx->sndHdr.bgmLength;
+
 	for (u8 i = 0; i < PPM_SE_CHANNELS; i++)
 	{
 		ctx->seData[i] = pd_malloc(ctx->sndHdr.seLength[i]);
 		memcpy(ctx->seData[i], ppm, ctx->sndHdr.seLength[i]);
+		ppm += ctx->sndHdr.seLength[i];
 	}
 
 	for (u8 i = 0; i < PPM_LAYERS; i++)
