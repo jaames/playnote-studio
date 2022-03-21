@@ -12,6 +12,13 @@ function table.combine(...)
   return tbl
 end
 
+-- create a callback function with random name in the global scope, so it can be called from C
+function utils:newCallbackFn(fn)
+  local callbackId = playdate.string.UUID(10)
+  _G[callbackId] = fn
+  return callbackId
+end
+
 -- execute callback function on next frame
 function utils:nextTick(callback)
   playdate.frameTimer.new(1, callback)

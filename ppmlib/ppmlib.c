@@ -10,6 +10,7 @@
 #include "video.h"
 #include "tables.h"
 #include "player.h"
+#include "utils.h"
 
 static const lua_reg libPpm[];
 
@@ -224,6 +225,13 @@ static int ppmlib_pause(lua_State* L)
   return 0;
 }
 
+static int ppmlib_setStoppedCallback(lua_State* L)
+{
+	player_ctx* ctx = getPlayerCtx(1);
+	ctx->stoppedCallback = pd_strdup(pd->lua->getArgString(2));
+  return 0;
+}
+
 static const lua_reg libPpm[] =
 {
 	{ "new",                 ppmlib_new },
@@ -236,5 +244,6 @@ static const lua_reg libPpm[] =
 	{ "play",                ppmlib_play },
 	{ "pause",               ppmlib_pause },
 	{ "update",              ppmlib_update },
+	{ "setStoppedCallback",  ppmlib_setStoppedCallback },
 	{ NULL,                  NULL }
 };

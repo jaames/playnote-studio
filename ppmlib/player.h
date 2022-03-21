@@ -27,6 +27,9 @@ typedef struct player_ctx
 	s16* masterAudio;
 	AudioSample* masterAudioSample;
 	SamplePlayer* audioPlayer;
+	// callback names
+	// playdate SDK makes us call Lua functions by name...
+	char* stoppedCallback;
 } player_ctx;
 
 player_ctx* playerInit(u16 x, u16 y);

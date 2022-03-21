@@ -119,9 +119,11 @@ function PlayerScreen:loadPpm()
     end
   end
   self.ppm = ppm
-  self.counter:setTotal(ppm.numFrames)
-  self.counter:setValue(ppm.currentFrame)
-  self.timeline:setProgress(0)
+  self:refreshControls()
+  local this = self
+  ppm:setStoppedCallback(utils:newCallbackFn(function (a, b)
+    this:pause()
+  end))
 end
 
 function PlayerScreen:unloadPpm()
@@ -135,8 +137,7 @@ function PlayerScreen:setCurrentFrame(i)
   local ppm = self.ppm
   if i ~= self.ppm.currentFrame then
     ppm:setCurrentFrame(math.floor(i))
-    self.timeline:setProgress(ppm.progress)
-    self.counter:setValue(ppm.currentFrame)
+    self:refreshControls()
     spritelib.redrawBackground()
   end
 end
@@ -230,6 +231,7 @@ end
 function PlayerScreen:pause()
   if self.isPlayTransitionActive then return end
   if self.ppm.isPlaying then
+    self:refreshControls()
     sounds:playSfx('pause')
     self.ppm:pause()
     self:setControlsVisible(true)
@@ -245,6 +247,13 @@ function PlayerScreen:togglePlay()
   else
     self:play()
   end
+end
+
+function PlayerScreen:refreshControls()
+  local ppm = self.ppm
+  self.counter:setTotal(ppm.numFrames)
+  self.counter:setValue(ppm.currentFrame)
+  self.timeline:setProgress(ppm.progress)
 end
 
 function PlayerScreen:setControlsVisible(visible)

@@ -2,6 +2,7 @@
 
 #include "pd_api.h"
 
+#include "utils.h"
 #include "player.h"
 #include "platform.h"
 #include "types.h"
@@ -10,6 +11,13 @@
 #include "video.h"
 #include "tables.h"
 #include "player.h"
+
+static void doCallback(char* fnName, int numArgs)
+{
+	const char* err;
+	if (!pd->lua->callFunction(fnName, numArgs, &err))
+    pd_log("Error calling Lua callback: %s", err);
+}
 
 player_ctx* playerInit(u16 x, u16 y)
 {
@@ -49,6 +57,8 @@ int playerLoadPpm(player_ctx* ctx, void* ppmBuffer, size_t ppmSize)
 	ctx->layerPattern[1][0] = LUT_ppmDitherNone;
 	ctx->layerPattern[1][1] = LUT_ppmDitherNone;
 	ctx->layerPattern[1][2] = LUT_ppmDitherNone;
+
+	ctx->stoppedCallback = NULL;
 
 	ctx->masterAudio = NULL;
 	ppm_sound_header_t* ppmSnd = &ctx->ppm->sndHdr;
@@ -102,16 +112,12 @@ void playerSetLayerDithering(player_ctx* ctx, int layer, int colour, int pattern
 	}
 }
 
-
 void playerSetFrame(player_ctx* ctx, int frame)
 {
   if (ctx->loop)
-		ctx->currentFrame = (frame % ctx->numFrames + ctx->numFrames) % ctx->numFrames;
+		ctx->currentFrame = mod(frame, ctx->numFrames);
 	else
-	{
-		ctx->currentFrame = frame;
-		CLAMP(ctx->currentFrame, 0, ctx->numFrames - 1);
-	}
+		ctx->currentFrame = clamp(frame, 0, ctx->numFrames - 1);
 	ctx->currentTime = ctx->currentFrame * (1.0 / (float)ctx->ppm->frameRate);
 }
 
@@ -152,18 +158,25 @@ void playerUpdate(player_ctx* ctx)
   {
     if (ctx->loop && frameIndex >= ctx->numFrames)
     {
-      frameIndex = 0;
 			pd->system->resetElapsedTime();
+			ctx->currentFrame = 0;
       ctx->startTime = 0;
       ctx->currentTime = 0;
 			playerPlayAudio(ctx);
     }
 		else if (frameIndex >= ctx->numFrames)
 		{
-			playerPause(ctx);
+			ctx->currentFrame = 0;
+      ctx->currentTime = 0;
+			if (ctx->stoppedCallback != NULL)
+				doCallback(ctx->stoppedCallback, 1);
+			ctx->isPlaying = 0;
 		}
+		else 
+		{
+			ctx->currentFrame = frameIndex;
+		}	
 		LCDRect dirtyRect = {ctx->x - 4, ctx->x + PPM_SCREEN_WIDTH + 4, ctx->y - 4, ctx->y + PPM_SCREEN_HEIGHT + 4};
 		pd->sprite->addDirtyRect(dirtyRect);
-    ctx->currentFrame = frameIndex;
   }
 }

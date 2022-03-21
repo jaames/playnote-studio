@@ -17,6 +17,7 @@ VPATH += extension
 # List C source files here
 SRC = \
 	extension/main.c \
+	ppmlib/utils.c \
 	ppmlib/player.c \
 	ppmlib/ppmlib.c \
 	ppmlib/tmblib.c \

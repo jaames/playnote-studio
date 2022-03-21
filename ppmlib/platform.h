@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stddef.h>
-#include <string.h>
 #include "pd_api.h"
 
 extern PlaydateAPI* pd;

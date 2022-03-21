@@ -2,6 +2,7 @@
 
 #include "pd_api.h"
 
+#include "utils.h"
 #include "platform.h"
 #include "types.h"
 #include "tmb.h"
@@ -21,14 +22,6 @@ void registerTmblib()
 	}
 }
 
-static char* pd_strdup(const char* str)
-{
-  size_t len = strlen(str);
-  char* s = pd_malloc(len + 1);
-  memcpy(s, str, len);
-  s[len] = '\0';
-  return s;
-}
 
 LCDBitmap* tmbGetPdBitmap(tmblib_ctx* ctx)
 {
