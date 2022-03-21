@@ -102,22 +102,17 @@ void playerSetLayerDithering(player_ctx* ctx, int layer, int colour, int pattern
 	}
 }
 
+
 void playerSetFrame(player_ctx* ctx, int frame)
 {
   if (ctx->loop)
-	{
-		if (frame > ctx->numFrames - 1) 
-			ctx->currentFrame = 0;
-		else if (frame < 0)
-			ctx->currentFrame = ctx->numFrames - 1;
-		else
-			ctx->currentFrame = frame;
-	}
+		ctx->currentFrame = (frame % ctx->numFrames + ctx->numFrames) % ctx->numFrames;
 	else
 	{
 		ctx->currentFrame = frame;
 		CLAMP(ctx->currentFrame, 0, ctx->numFrames - 1);
 	}
+	ctx->currentTime = ctx->currentFrame * (1.0 / (float)ctx->ppm->frameRate);
 }
 
 static void playerPlayAudio(player_ctx* ctx)

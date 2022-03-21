@@ -57,7 +57,7 @@ void ppmAudioProcess(const s16* in, s16* out, u32 samples, u32 srcFreq, int add)
 
 u32 ppmAudioNumSamples(ppm_ctx_t* ctx)
 {
-	return ctx->hdr.numFrames * (u32)round(OUTPUT_SAMPLE_RATE / ctx->frameRate);
+	return ctx->hdr.numFrames * (u32)round(SAMPLE_RATE / ctx->frameRate) * 4;
 }
 
 void ppmAudioRender(ppm_ctx_t* ctx, s16* out, int maxSize)

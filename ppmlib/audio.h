@@ -7,8 +7,7 @@
 #include <string.h>
 
 #define SAMPLE_RATE    8192
-// playdate output rate is 44100, half that means the playdate can avoid interpolation, and we can fit more audio into memory
-#define OUTPUT_SAMPLE_RATE 22050
+#define OUTPUT_SAMPLE_RATE 32768
 
 #define CLAMP(n, l, h) \
 	if (n < l) n = l;  \
