@@ -50,17 +50,25 @@ function CreditsScreen:beforeEnter()
 end
 
 function CreditsScreen:afterEnter()
-  self.scroll.autoScrollStep = -1.6
+  local step = -3
+  local delay = 4000
+  if playdate.isSimulator then
+    step = -2
+    delay = 2500
+  end
+  self.scroll.autoScrollStep = step
   self.scroll.autoScroll = true
-  playdate.timer.performAfterDelay(2000, function ()
+  playdate.timer.performAfterDelay(delay, function ()
     if self.active then -- make sure that user hasn't exited since timer started
       sounds:playMusic('credits')
     end
   end)
+  playdate.display.setRefreshRate(REFRESH_RATE_SLOW )
 end
 
 function CreditsScreen:beforeLeave()
   sounds:stopMusic()
+  playdate.display.setRefreshRate(REFRESH_RATE_GLOBAL)
 end
 
 function CreditsScreen:drawBg()

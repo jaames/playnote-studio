@@ -16,9 +16,9 @@ set(PLAYDATE_GAME_DEVICE Playnote_DEVICE)
 project(${PLAYDATE_GAME_NAME} C ASM)
 
 if (TOOLCHAIN STREQUAL "armgcc")
-	add_executable(${PLAYDATE_GAME_DEVICE} ${SDK}/C_API/buildsupport/setup.c extension/main.c ppmlib/ppm.c ppmlib/tmb.c ppmlib/audio.c ppmlib/video.c ppmlib/ppmlib.c ppmlib/tmblib.c)
+	add_executable(${PLAYDATE_GAME_DEVICE} ${SDK}/C_API/buildsupport/setup.c extension/main.c ppmlib/ppm.c ppmlib/tmb.c ppmlib/audio.c ppmlib/video.c ppmlib/ppmlib.c ppmlib/tmblib.c ppmlib/player.c)
 else()
-	add_library(${PLAYDATE_GAME_NAME} SHARED extension/main.c ppmlib/ppm.c ppmlib/tmb.c ppmlib/audio.c ppmlib/video.c ppmlib/ppmlib.c ppmlib/tmblib.c)
+	add_library(${PLAYDATE_GAME_NAME} SHARED extension/main.c ppmlib/ppm.c ppmlib/tmb.c ppmlib/audio.c ppmlib/video.c ppmlib/ppmlib.c ppmlib/tmblib.c ppmlib/player.c)
 endif()
 
 include(${SDK}/C_API/buildsupport/playdate_game.cmake)

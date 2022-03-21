@@ -37,7 +37,7 @@ void ppmAudioDecodeBuffer(const u8* in, s16* out, u32 length)
 /* Zero-order hold interpolation + volume adjustment. */
 void ppmAudioProcess(const s16* in, s16* out, u32 samples, u32 srcFreq, int add)
 {
-	const u32 adjFreq = (srcFreq << 8) / DS_SAMPLE_RATE;
+	const u32 adjFreq = (srcFreq << 8) / OUTPUT_SAMPLE_RATE;
 
 	for (u32 n = 0; n < samples; n++)
 	{
@@ -57,7 +57,7 @@ void ppmAudioProcess(const s16* in, s16* out, u32 samples, u32 srcFreq, int add)
 
 u32 ppmAudioNumSamples(ppm_ctx_t* ctx)
 {
-	return ctx->hdr.numFrames * (u32)round(SAMPLE_RATE / ctx->frameRate) * 4;
+	return ctx->hdr.numFrames * (u32)round(OUTPUT_SAMPLE_RATE / ctx->frameRate);
 }
 
 void ppmAudioRender(ppm_ctx_t* ctx, s16* out, int maxSize)
@@ -98,10 +98,13 @@ void ppmAudioRender(ppm_ctx_t* ctx, s16* out, int maxSize)
 	if (ctx->sndHdr.bgmLength)
 	{
 		/* TODO: Make this less disgusting. */
-		ppmAudioProcess(bgm, out,
-			min(ppmAudioNumSamples(ctx),
-			(u32)((trackLengths[0] / 2) * ((float)DS_SAMPLE_RATE / (float)bgmSampleRate))),
-			bgmSampleRate, 0);
+		ppmAudioProcess(
+			bgm,
+			out,
+			min(ppmAudioNumSamples(ctx), (u32)((trackLengths[0] / 2) * ((float)OUTPUT_SAMPLE_RATE / (float)bgmSampleRate))),
+			bgmSampleRate,
+			0
+		);
 	}
 
 	/* We don't need this anymore. */
@@ -119,11 +122,13 @@ void ppmAudioRender(ppm_ctx_t* ctx, s16* out, int maxSize)
 		{
 			if ((ctx->audioFrames[frame] >> ch) & 1)
 			{
-				ppmAudioProcess(se[ch],
+				ppmAudioProcess(
+					se[ch],
 					out + soundOffset,
-					min(samplesPerFrame * (ctx->hdr.numFrames - frame) * 4,
-					    (trackLengths[ch + 1] / sizeof(s16)) * 4),
-					SAMPLE_RATE, 1);
+					min(samplesPerFrame * (ctx->hdr.numFrames - frame) * 4, (trackLengths[ch + 1] / sizeof(s16)) * 4),
+					SAMPLE_RATE,
+					1
+				);
 			}
 		}
 	}

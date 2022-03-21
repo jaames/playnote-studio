@@ -48,10 +48,8 @@ import './components/TextView'
 
 import './scenes/Screenbase'
 
-MAIN_FONT = playdate.graphics.font.new('./fonts/WhalesharkSans')
 playdate.graphics.setFont(MAIN_FONT)
-playdate.display.setRefreshRate(50)
--- playdate.display.setRefreshRate(30)
+playdate.display.setRefreshRate(REFRESH_RATE_GLOBAL)
 
 debug = nil -- disallow debugging
 -- pdbug:setEnabled(true)
@@ -79,6 +77,7 @@ function playdate.update()
   playdate.timer.updateTimers()
   playdate.frameTimer.updateTimers()
   gfx.animation.blinker.updateAll()
+  -- playdate.drawFPS(8, 16)
   -- playdate.drawFPS(8, PLAYDATE_H - 20)
 end
 

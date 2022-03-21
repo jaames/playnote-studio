@@ -20,11 +20,6 @@ function PlayerScreen:init()
   PlayerScreen.super.init(self)
   -- ppm playback state stuff
   self.ppm = nil
-  self.currentFrame = 1
-  self.numFrames = 1
-  self.loop = true
-  self.isPlaying = false
-  self.animTimer = nil -- TODO
   -- player ui transition stuff
   self.isPlayTransitionActive = false
   self.isUiVisible = true
@@ -35,11 +30,11 @@ function PlayerScreen:init()
   self.frameTransitionTopSlide:setZIndex(self.frameTransitionBottomSlide:getZIndex() + 10)
   -- input stuff
   local pageNextStart, pageNextEnd, rmvTimer1 = utils:createRepeater(DELAY_PAGE_FIRST, DELAY_PAGE_REPEAT, function (isRepeat)
-    if self.isPlaying then return end
+    if self.ppm.isPlaying then return end
     self:jumpToNextFrame(not isRepeat)
   end)
   local pagePrevStart, pagePrevEnd, rmvTimer2 = utils:createRepeater(DELAY_PAGE_FIRST, DELAY_PAGE_REPEAT, function (isRepeat)
-    if self.isPlaying then return end
+    if self.ppm.isPlaying then return end
     self:jumpToPrevFrame(not isRepeat)
   end)
 
@@ -116,57 +111,40 @@ function PlayerScreen:afterLeave()
 end
 
 function PlayerScreen:loadPpm()
-  local ppm = PpmParser.new(noteFs.currentNote)
+  local ppm = PpmPlayer.new(noteFs.currentNote, NOTE_X, NOTE_Y)
   local ditherSetttings = noteFs:getNoteDitherSettings(noteFs.currentNote)
   for layer = 1,2 do
     for colour = 1,3 do
       ppm:setLayerDither(layer, colour, ditherSetttings[layer][colour])
     end
   end
-  self.currentFrame = 1
-  self.numFrames = ppm.numFrames
-  self.loop = ppm.loop
   self.ppm = ppm
-  self.counter:setTotal(self.numFrames)
-  self.counter:setValue(self.currentFrame)
+  self.counter:setTotal(ppm.numFrames)
+  self.counter:setValue(ppm.currentFrame)
   self.timeline:setProgress(0)
-  local animTimer = playdate.timer.new(ppm.duration * 1000, 0, self.numFrames)
-  animTimer.repeats = self.loop
-  animTimer.discardOnCompletion = false
-  animTimer:pause()
-  animTimer.updateCallback = function ()
-    print('anim timer update v: ', math.floor(animTimer.value) + 1, self.currentFrame)
-  end
-  animTimer.timerEndedCallback = function ()
-    print('anim timer end: ', math.floor(animTimer.value) + 1, self.currentFrame)
-  end
-  self.animTimer = animTimer
 end
 
 function PlayerScreen:unloadPpm()
-  self:pause()
-  self.ppm = nil
-  if self.animTimer then
-    self.animTimer:remove()
-    self.animTimer = nil
+  if self.ppm then
+    self:pause()
+    self.ppm = nil
   end
 end
 
 function PlayerScreen:setCurrentFrame(i)
   local ppm = self.ppm
-  if i ~= self.currentFrame then
+  if i ~= self.ppm.currentFrame then
     ppm:setCurrentFrame(math.floor(i))
-    self.currentFrame = ppm.currentFrame
     self.timeline:setProgress(ppm.progress)
-    self.counter:setValue(self.currentFrame)
+    self.counter:setValue(ppm.currentFrame)
     spritelib.redrawBackground()
   end
 end
 
 function PlayerScreen:jumpToPrevFrame(animate)
-  local currFrame = self.currentFrame
+  local currFrame = self.ppm.currentFrame
   if animate then
-    local prevFrame = currFrame == 1 and self.numFrames or currFrame - 1
+    local prevFrame = currFrame == 1 and self.ppm.numFrames or currFrame - 1
     sounds:playSfx('pagePrev')
     self:doFrameTransition(kTransitionDirRetreat, prevFrame, function ()
       self:setCurrentFrame(prevFrame)
@@ -178,9 +156,9 @@ function PlayerScreen:jumpToPrevFrame(animate)
 end
 
 function PlayerScreen:jumpToNextFrame(animate)
-  local currFrame = self.currentFrame
+  local currFrame = self.ppm.currentFrame
   if animate then
-    local nextFrame = currFrame == self.numFrames and 1 or currFrame + 1
+    local nextFrame = currFrame == self.ppm.numFrames and 1 or currFrame + 1
     sounds:playSfx('pageNext')
     self:doFrameTransition(kTransitionDirAdvance, nextFrame, function ()
       self:setCurrentFrame(nextFrame)
@@ -199,7 +177,7 @@ function PlayerScreen:doFrameTransition(direction, toFrame, callbackFn)
   local topSlide = self.frameTransitionTopSlide
   local bottomSlide = self.frameTransitionBottomSlide
 
-  local currFrame = self.currentFrame
+  local currFrame = self.ppm.currentFrame
   local from, to, easing
   if direction == kTransitionDirAdvance then
     from = 0
@@ -240,40 +218,29 @@ end
 
 function PlayerScreen:play()
   if self.isPlayTransitionActive then return end
-  if not self.isPlaying then
+  if not self.ppm.isPlaying then
     sounds:playSfx('playMove')
-    -- workaround for timer bug https://devforum.play.date/t/playdate-timer-value-increases-between-calling-pause-and-start/2096
-	  self.animTimer._lastTime = nil
-    self.animTimer:start()
-    self.ppm:playAudio(self.ppm.currentTime)
-    self.isPlaying = true
+    self.ppm:play()
     self:setControlsVisible(false)
     playdate.setAutoLockDisabled(true)
-    playdate.display.setRefreshRate(self.ppm.fps)
+    playdate.display.setRefreshRate(REFRESH_RATE_INSTANT)
   end
 end
 
 function PlayerScreen:pause()
   if self.isPlayTransitionActive then return end
-  if self.isPlaying then
-    if self.keyTimer then
-      self.keyTimer:remove()
-      self.keyTimer = nil
-    end
+  if self.ppm.isPlaying then
     sounds:playSfx('pause')
-    -- TODO: reenable
-    self.ppm:stopAudio()
-    self.animTimer:pause()
-    self.isPlaying = false
+    self.ppm:pause()
     self:setControlsVisible(true)
     playdate.setAutoLockDisabled(false)
-    playdate.display.setRefreshRate(30)
+    playdate.display.setRefreshRate(REFRESH_RATE_GLOBAL)
     playdate.getCrankTicks(24)
   end
 end
 
 function PlayerScreen:togglePlay()
-  if self.isPlaying then
+  if self.ppm.isPlaying then
     self:pause()
   else
     self:play()
@@ -306,9 +273,9 @@ function PlayerScreen:drawBg(x, y, w, h)
   -- draw frame here only if the transition is active
   if not self.isFrameTransitionActive then
     -- only draw frame if clip rect overlaps it
-    local _, _, iw, ih = fast_intersection(NOTE_X, NOTE_Y, NOTE_W, NOTE_H, x, y, w, h)
+    local _, _, iw, ih = fast_intersection(NOTE_X - 4, NOTE_Y - 4, NOTE_W + 8, NOTE_H + 8, x, y, w, h)
     if iw > 0 and ih > 0 then
-      self.ppm:draw(NOTE_X, NOTE_Y)
+      self.ppm:draw()
     end
   -- still at least draw frame border if transtion is active
   else
@@ -321,14 +288,11 @@ function PlayerScreen:drawBg(x, y, w, h)
 end
 
 function PlayerScreen:update()
-  -- playdate.drawFPS(8, 16)
-  if not self.isPlaying then
+  if not self.ppm.isPlaying then
     local frameChange = playdate.getCrankTicks(24)
-    self:setCurrentFrame(self.currentFrame + frameChange)
+    self:setCurrentFrame(self.ppm.currentFrame + frameChange)
   end
-  if self.isPlaying then
-    self:setCurrentFrame(self.currentFrame + 1)
-  end
+  self.ppm:update()
 end
 
 function PlayerScreen:updateTransitionIn(t, fromScreen)

@@ -24,7 +24,15 @@ static const u8 ppmThumbnailPaletteGray[] =
 };
 
 static const u32 ppmPaperPalette[] =
-{ 0xFF0E0E0E, 0xFFFFFFFF };
+{
+	0xFF0E0E0E,
+	0xFFFFFFFF
+};
 
 static const u32 ppmPenPalette[] =
-{ 0, 1, 0xFFFF2A2A, 0xFF0A39FF };
+{
+	0,
+	1,
+	0xFFFF2A2A,
+	0xFF0A39FF
+};

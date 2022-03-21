@@ -48,7 +48,7 @@ end
 function HomeScreen:afterEnter()
   -- check if the C extention has been loaded
   -- imo it's fine for this message to not be localised, you should only come across it in the simulator
-  if PpmParser == nil then
+  if PpmPlayer == nil then
     local errMsg = [[
  Native extension error
 

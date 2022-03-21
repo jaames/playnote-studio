@@ -2,8 +2,6 @@
 
 - Intro theme
 - sfx: dialog open, crank tick, crank docked/undocked, Flipnote view page not allowed, Note list page slide / page not allowed, Flipnote view crank forward / crank back, Multiple dither swatch sounds
-- Sound effect bug in pekira note
-- Sound doesn't restart after loop
 - Credits lag when song kicks in
 - Credits autoscroll speed adjust
 - Scrolling on Settings should change selection
