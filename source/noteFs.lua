@@ -21,11 +21,11 @@ function noteFs:init()
     readme:close()
   end
   -- get list of all files and folders in the root directory,
-  -- filter out files, or folders that are part of the app's internal folder structure
+  -- filter out paths that are part of the app's internal folder structure
   -- then add the path and resolved name to folderList
   local folderList = {}
   for _, path in pairs(fs.listFiles('/')) do
-    if fs.isdir(path) and not fsUtils:isInternalFolder(path) then
+    if fs.isdir(path) and (path == 'samplememo/' or (not fsUtils:pathIsInPdx(path))) then
       table.insert(self.folderPaths, path)
       table.insert(folderList, {
         path = path,

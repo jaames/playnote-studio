@@ -21,6 +21,30 @@ function stringUtils:split(text, delim)
   return table.unpack(ret)
 end
 
+function stringUtils:breakTextForMaxWidth(text, maxWidth, delim, plain)
+  delim = delim or ' '
+  local ret = ''
+  local pos = 1
+  local lineWidth = 0
+  while true do
+    local _, n = string.find(text, delim, pos, plain)
+    local segment = string.sub(text, pos, n)
+    local w = gfx.getTextSize(segment)
+    if lineWidth + w > maxWidth then
+      ret = ret .. '\n' .. segment
+      lineWidth = w
+    else
+      ret = ret .. segment
+      lineWidth += w
+    end
+    if n == nil then
+      break
+    end
+    pos = n + 1
+  end
+  return ret
+end
+
 function stringUtils:fromWideChars(bytes)
   local name = ''
   local chr = 0

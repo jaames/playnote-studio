@@ -18,7 +18,7 @@ function HomeScreen:setupSprites()
   end)
   self.viewButton = viewButton
 
-  local settingsButton = Button(PLAYDATE_W - 8, 4, 128, 36, '%HOME_SETTINGS%')
+  local settingsButton = Button(PLAYDATE_W + 5, -5, 128, 42, '%HOME_SETTINGS%')
   settingsButton.autoWidth = true
   settingsButton:setIcon('./gfx/icon_settings')
   settingsButton:setAnchor('right', 'top')
@@ -27,9 +27,9 @@ function HomeScreen:setupSprites()
   end)
   self.settingsButton = settingsButton
 
-  self.clock = Clock(8, 10, 152, 28)
+  self.clock = Clock(8, 4, 152, 28)
 
-  self.homeLogo = HomeLogo(52, 54)
+  self.homeLogo = HomeLogo(52, 50)
 
   self.focus:setFocus(viewButton, true)
 

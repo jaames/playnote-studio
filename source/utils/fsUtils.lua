@@ -1,18 +1,11 @@
 fsUtils = {}
 
--- read a text file line by line and return it as a single string
-function fsUtils:readText(path)
-  local f = playdate.file.open(path, playdate.file.kFileRead)
-  local size = playdate.file.getSize(path)
-  local text = f:read(size)
-  f:close()
-  return text
-end
-
-local INTERNAL_FOLDERS <const> = {
+local PDX_FILENAME = nil
+local PDX_FOLDERS <const> = {
   -- Playdate data
   'Screenshots/',
-  -- internal contents
+  -- internal folders (MAKE SURE TO UPDATE THIS LIST WHEN ADDING NEW FOLDERS)
+  'samplememo/',
   'data/',
   'fonts/',
   'gfx/',
@@ -25,9 +18,50 @@ local INTERNAL_FOLDERS <const> = {
   'utils/',
 }
 
--- returns true if a given folder is internal
-function fsUtils:isInternalFolder(name)
-  return table.indexOfElement(INTERNAL_FOLDERS, name) ~= nil
+-- read a text file line by line and return it as a single string
+function fsUtils:readText(path)
+  local f = playdate.file.open(path, playdate.file.kFileRead)
+  local size = playdate.file.getSize(path)
+  local text = f:read(size)
+  f:close()
+  return text
+end
+
+function fsUtils:pathGetDirectory(path)
+  if playdate.file.isdir(path) then
+    return path
+  end
+  local filedir, filename = string.match(path, '(.*%S/)(.*%S)$')
+  return filedir
+end
+
+function fsUtils:pathGetRootDirectory(path)
+  return string.match(path, '([.*%S][^/]+)') .. '/'
+end
+
+function fsUtils:pathIsInPdx(path)
+  local rootDir = fsUtils:pathGetRootDirectory(path)
+  return table.indexOfElement(PDX_FOLDERS, rootDir) ~= nil
+end
+
+function fsUtils:getPdxFilename()
+  if PDX_FILENAME then return PDX_FILENAME end
+  if playdate.isSimulator then
+    -- no way to reliably get pdx name in the simulator...
+    PDX_FILENAME = 'Playnote.pdx'
+  else
+    -- on device, the first argument in playdate.argv is always the game path (e.g. "/Games/MyGame.pdx")
+    local arg = playdate.argv[1]
+    PDX_FILENAME = string.sub(arg, string.find(arg, 'Games/') + 6, #arg)
+  end
+  return PDX_FILENAME
+end
+
+function fsUtils:getDiskPath(path)
+  if fsUtils:pathIsInPdx(path) then
+    return '/Games/' .. self:getPdxFilename() .. '/' .. path
+  end
+  return '/Data/' ..  playdate.metadata.bundleID .. '/' .. path
 end
 
 -- return size of file formatted in a human readable way

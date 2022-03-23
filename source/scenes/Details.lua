@@ -38,7 +38,11 @@ function DetailsScreen:renderNoteDetails(ppmPath)
   list:addRow(locales:getText('DETAILS_FRAME_COUNT'), tostring(tmb.numFrames + 1))
   list:addBreak()
   list:addRow(locales:getText('DETAILS_FILE_SIZE'), fsUtils:formatFileSize(tmb.ppmSize))
-  list:addRow(locales:getText('DETAILS_FILE_PATH'), stringUtils:escape(tmb.path))
+  if not fsUtils:pathIsInPdx(tmb.path) then
+    list:addRow(
+      locales:getText('DETAILS_FILE_PATH'),
+      stringUtils:escape(stringUtils:breakTextForMaxWidth(fsUtils:getDiskPath(tmb.path), list.width, '/')))
+  end
   list:addBreak()
   list:addRow(locales:getText('DETAILS_PREV_AUTHOR'), stringUtils:fromWideChars(tmb.previousAuthor))
   list:addRow(locales:getText('DETAILS_ORIG_AUTHOR'), stringUtils:fromWideChars(tmb.originalAuthor))

@@ -68,7 +68,19 @@ end
 
 -- clamp value between lower and upper
 function utils:clamp(val, lower, upper)
-  return math.max(lower, math.min(upper, val))
+  if val < lower then return lower end
+  if val > upper then return upper end
+  return val
+end
+
+-- round x to nearest whole number
+function utils:round(x)
+  return x >= 0 and math.floor(x + 0.5) or math.ceil(x - 0.5)
+end
+
+-- snap x to nearest multiple of n
+function utils:snap(x, n)
+  return utils:round(x / n) * n
 end
 
 -- set all the elements in a table to nil

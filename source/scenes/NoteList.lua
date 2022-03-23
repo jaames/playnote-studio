@@ -225,8 +225,8 @@ function NoteListScreen:setThumbComponentsOffset(list, xOffset)
 end
 
 function NoteListScreen:selectThumbAt(column, row)
-  column = math.max(0, math.min(GRID_COLS - 1, column))
-  row = math.max(0, math.min(GRID_ROWS - 1, row))
+  column = utils:clamp(GRID_COLS - 1, 0, column)
+  row = utils:clamp(GRID_ROWS - 1, 0, row)
   local index = math.min((row * 4 + column) + 1, self.notesOnCurrPage)
   self.focus:setFocus(self.currThumbs[index])
 end
@@ -241,7 +241,8 @@ function NoteListScreen:updateTransitionIn(t, fromScreen)
   local d = playdate.easingFunctions.outQuad(t, 40, -40, 1)
   for i, thumb in ipairs(self.currThumbs) do
     local j = 4 - (i - 1) % 4
-    thumb:offsetByY(d + d * j)
+    -- snap thumb offset to nearest multiple of 2 to avoid dither flashing
+    thumb:offsetByY(utils:snap(d + d * j, 2))
   end
   self.folderSelect:offsetByY(playdate.easingFunctions.outQuad(t, -40, 40, 1))
   self.counter:offsetByX(playdate.easingFunctions.outQuad(t, 50, -50, 1))
@@ -255,7 +256,8 @@ function NoteListScreen:updateTransitionOut(t, toScreen)
     local d = playdate.easingFunctions.inQuad(t, 0, 40, 1)
     for i, thumb in ipairs(self.currThumbs) do
       local j = (i - 1) % 4
-      thumb:offsetByY(d + d * j)
+      -- snap thumb offset to nearest multiple of 2 to avoid dither flashing
+      thumb:offsetByY(utils:snap(d + d * j, 2))
     end
   end
   self.folderSelect:offsetByY(playdate.easingFunctions.inQuad(t, 0, -40, 1))
