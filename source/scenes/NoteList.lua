@@ -184,6 +184,9 @@ function NoteListScreen:setCurrentPage(pageIndex)
       self:removeThumbComponents(self.prevThumbs)
       -- update selection, trying to keep it in the same row
       self:selectThumbAt(transitionDir == -1 and 3 or 0, self.selectedRow)
+      -- BUGFIX: prevent glitches when redrawing the background, because the thumbnails move quickly,
+      -- sometimes patches of the background wouldn't be covered by the thumbnail dirtyrects and will be left undrawn
+      spritelib.addDirtyRect(GRID_X - 6, GRID_Y - 6, (GRID_COLS * (THUMB_W + GRID_GAP)), (GRID_ROWS * (THUMB_H + GRID_GAP)))
       self.isTransitionActive = false
       self.focus.allowNavigation = true
     end

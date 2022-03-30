@@ -27,14 +27,14 @@ local DEFAULT_CONFIG <const> = {
   lastFolder = 'samplememo/',
 }
 
-function saveConfigFile(config)
+local function saveConfigFile(config)
   config.lastSavePdxVersion = playdate.metadata.version
   config.lastSavePdxBuild = playdate.metadata.buildNumber
   config.lastSaveApiVersion = playdate.apiVersion()
   playdate.datastore.write(config, DATASTORE_KEY, true)
 end
 
-function readConfigFile()
+local function readConfigFile()
   return playdate.datastore.read(DATASTORE_KEY)
 end
 

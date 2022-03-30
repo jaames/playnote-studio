@@ -108,7 +108,7 @@ function DitheringScreen:updateTransitionIn(t)
   local d = playdate.easingFunctions.outQuad(t, 40, -40, 1)
   for i, row in ipairs(self.swatches) do
     for j, swatch in ipairs(row) do
-      swatch:offsetByX(j * d)
+      swatch:offsetByX(utils:snap(d * j, 2))
     end
   end
 end
@@ -117,7 +117,7 @@ function DitheringScreen:updateTransitionOut(t)
   local d = playdate.easingFunctions.inQuad(t, 0, 40, 1)
   for i, row in ipairs(self.swatches) do
     for j, swatch in ipairs(row) do
-      swatch:offsetByX(j * d)
+      swatch:offsetByX(utils:snap(d * j, 2))
     end
   end
 end
