@@ -23,6 +23,8 @@ void registerPpmlib()
 		pd_error("%s:%i: registering PPM lib failed, %s", __FILE__, __LINE__, err);
 		return;
 	}
+
+	ppmAudioRegister();
 }
 
 static player_ctx* getPlayerCtx(int n) 
@@ -83,6 +85,13 @@ static int ppmlib_new(lua_State* L)
 	int y = pd->lua->getArgInt(3);
 
 	SDFile* f = pd->file->open(filePath, kFileRead | kFileReadData);
+	if (f == NULL)
+	{
+		const char* err = pd->file->geterr();
+		pd_error("Error opening %s: %s", filePath, err);
+		pd->lua->pushNil();
+		return 1;
+	}
 
 	pd->file->seek(f, 0, SEEK_END);
 	int fsize = pd->file->tell(f);

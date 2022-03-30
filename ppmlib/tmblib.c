@@ -97,6 +97,14 @@ static int tmb_new(lua_State* L)
 	u8* tmb = pd_malloc(fsize);
 
 	SDFile* f = pd->file->open(filePath, kFileRead | kFileReadData);
+	if (f == NULL)
+	{
+		const char* err = pd->file->geterr();
+		pd_error("Error opening %s: %s", filePath, err);
+		pd->lua->pushNil();
+		return 1;
+	}
+	
 	pd->file->read(f, tmb, fsize);
 	pd->file->close(f);
 
@@ -107,7 +115,7 @@ static int tmb_new(lua_State* L)
 
 	if (err != -1)
 	{
-		pd_error("tmbInit error: %d", err);
+		pd_error("tmbInit error %d when trying to read %s", err, filePath);
 		pd->lua->pushNil();
 		return 1;
 	}

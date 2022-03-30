@@ -15,10 +15,10 @@
 
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 
-static const s8 indexTable[] =
+static const s8 indexTable[8] =
 { -1, -1, -1, -1, 2, 4, 6, 8 };
 
-static const s16 stepTable[] =
+static const s16 stepTable[89] =
 {
 	7, 8, 9, 10, 11, 12, 13, 14, 16, 17,
 	19, 21, 23, 25, 28, 31, 34, 37, 41, 45,
@@ -31,8 +31,11 @@ static const s16 stepTable[] =
 	15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767
 };
 
+static int diffTable[89][16];
+
 static s32 predictor;
 static s8  stepIndex;
 
+void ppmAudioRegister();
 u32 ppmAudioNumSamples(ppm_ctx_t* ctx);
 void ppmAudioRender(ppm_ctx_t* ctx, s16* out, int maxSize);

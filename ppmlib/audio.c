@@ -1,18 +1,34 @@
 #include "audio.h"
 #include "platform.h"
 
+/* 
+	Builds diffTable for all possible stepIndex and sample combinations,
+	seems to help improve load times on the Playdate quite a bit!
+	This should only be called when registering the ppm libray
+*/
+void ppmAudioRegister()
+{
+	s16 step;
+	int diff;
+	for (u16 stepIndex = 0; stepIndex < 89; stepIndex++)
+	{
+		step = stepTable[stepIndex];
+		for (u16 sample = 0; sample < 16; sample++)
+		{
+			diff = step >> 3;
+			if (sample & 1) diff += step >> 2;
+			if (sample & 2) diff += step >> 1;
+			if (sample & 4) diff += step;
+			if (sample & 8) diff = -diff;
+			diffTable[stepIndex][sample] = diff;
+		}
+	}
+}
+
 /* Decodes an IMA-ADPCM sample to a PCM-16 one. */
 static s16 ppmAudioDecodeSample(u8 sample)
 {
-	int const step = stepTable[stepIndex];
-	int diff   = step >> 3;
-
-	if (sample & 1) diff += step >> 2;
-	if (sample & 2) diff += step >> 1;
-	if (sample & 4) diff += step;
-	if (sample & 8) diff = -diff;
-
-	predictor += diff;
+	predictor += diffTable[stepIndex][sample];
 	CLAMP(predictor, -32768, 32767);
 
 	stepIndex += indexTable[sample & 7];
