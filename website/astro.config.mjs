@@ -1,6 +1,9 @@
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 
+import preact from '@astrojs/preact';
+import glsl from 'vite-plugin-glsl';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -17,10 +20,11 @@ export default {
     // hostname: 'localhost',  // The hostname to run the dev server on.
     // port: 3000,             // The port to run the dev server on.
   },
-  renderers: [
-    "@astrojs/renderer-preact"
+  integrations: [
+    preact()
   ],
   vite: {
+    plugins: [glsl.default()],
     resolve: {
       alias: {
         '@/': `${path.resolve(__dirname, 'src')}/`

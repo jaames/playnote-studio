@@ -1,8 +1,8 @@
 ---
-// Component Imports
+import '../styles/global.scss';
+
 import Hero from '../components/Hero.astro';
-// You can import components from any supported Framework here!
-import PreactCounter from '../components/PreactCounter.jsx';
+import PreactCounter from '../components/PlaydatePlayer.tsx';
 
 let title = 'Playnote Studio';
 let desc = 'An unofficial Flipnote animation player for the Panic Playdate console!';
@@ -53,12 +53,13 @@ let locale = 'en';
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href={Astro.resolve('../styles/global.scss')}>
+  <!-- <link rel="stylesheet" href={Astro.resolve('../styles/global.scss')}> -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;800&family=Lora&display=swap" rel="stylesheet">
-  <!-- <link rel="stylesheet" href={Astro.resolve('../styles/home.css')}> -->
+  <!-- <link rel="stylesheet" href={Astro.resolve('')}> -->
 </head>
 <body>
   <main class="Content">
+    <PreactCounter client:only/>
     <Hero/>
     <div class="Downloads">
       <div class="DownloadGrid">
@@ -70,8 +71,6 @@ let locale = 'en';
         </div>
       </div>
     </div>
-
-    <PreactCounter client:visible />
   </main>
 </body>
 </html>

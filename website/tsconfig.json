@@ -1,5 +1,11 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "lib": ["ES2021"],
+    "baseUrl": ".",
+    "paths": {
+      "@components/*": ["/src/components/*"],
+      "@assets/*": ["/assets/*"],
+    }
   }
 }

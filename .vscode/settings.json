@@ -1,3 +1,14 @@
 {
-  "cmake.configureOnOpen": false
+  "cmake.configureOnOpen": false,
+  "Lua.diagnostics.globals": ["playdate", "import"],
+  "Lua.runtime.nonstandardSymbol": [
+    "+=",
+    "-=",
+    "*=",
+    "/="
+  ],
+  "Lua.workspace.checkThirdParty": false,
+  "Lua.workspace.library": [
+    "/Users/james1/Developer/PlaydateSDK/"
+  ]
 }
