@@ -1,5 +1,5 @@
 {
-  "name": "@example/starter",
+  "name": "playnote studio website will i ever finish it in time who knows",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -12,11 +12,12 @@
     "@astrojs/preact": "^0.0.2",
     "@types/three": "^0.139.0",
     "astro": "^0.25.4",
+    "astro-icon": "^0.7.1",
     "sass": "^1.49.9",
     "vite-plugin-glsl": "^0.1.2"
   },
   "dependencies": {
-    "flipnote.js": "^5.6.7",
+    "flipnote.js": "^5.7.0",
     "three": "^0.139.2"
   }
 }

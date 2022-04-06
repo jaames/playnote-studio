@@ -9,7 +9,6 @@
 - Website
 - Add DSi username chars to font
 - Redraw hiragana and katakana?
-- Function to delete sample notes
 - Create a PPM test suite to verify against
 
 ## Playnote Studio
@@ -28,10 +27,10 @@ Play Flipnote Studio animations on your Playdate!
 
 If you wish to use parts of this repo in your own project, please be sure to credit the right people:
 
-- *any Lua or web code, UI design elements, image assets or the 3d playdate model* - [James Daniel](https://github.com/jaames)
-- *ppm parser* - [Simon Aarons](https://github.com/simontime) and [James Daniel](https://github.com/jaames)
-- *sound effects* - Talon Stradley
-- *Flipnote Studio screenshots* - [Austin Burk](https://twitter.com/AustinSudomemo)
+- *Lua or web code, UI design elements, image assets or the 3d playdate model* - [James](https://github.com/jaames)
+- *C Flipinote parser* - [Simon](https://github.com/simontime) and [James](https://github.com/jaames)
+- *Sound effects* - Talon Stradley
+- *Flipnote Studio screenshots* - [Austin](https://twitter.com/AustinSudomemo), [Rob]()
 
 ## Special Thanks
 
@@ -60,4 +59,14 @@ For convenience (and because I'm a big dumb-dumb idiot that keeps forgetting thi
 
 ### Notes
 
-- Memory management functions like `alloc`, `malloc`, `realloc`, `free`, etc are not available - instead you will need to include `pd.h` which contains `pd_alloc`, `pd_malloc`, `pd_realloc` and `pd_free`. These all wrap `playdate->system->realloc` and should behave the same as their respective functions.
+#### C
+
+Memory management functions like `alloc`, `malloc`, `realloc`, `free`, etc are not available - instead you will need to include `pd.h` which contains `pd_alloc`, `pd_malloc`, `pd_realloc` and `pd_free`. These all wrap `playdate->system->realloc` and should behave the same as their respective functions.
+
+#### Website
+
+The website interactive demo uses a transparent video. The 3D Playdate model is rendered out as a series of RGBA PNGs for each frame, which needs to be converted to a transparent VP9 webm video. Since the demo sets the video's currentTime manually, for smoothness we set the framerate to 1 FPS and keyframe interval is set to every 2 frames `ffmpeg -framerate 1 -i "./%04d.png" -c:v libvpx-vp9 -g 2 -pix_fmt yuva420p output.webm`.
+
+Because Apple is a very competent browser vendor, we also have to encode a separate alpha HEVC video for Safari...
+- Convert frames to a huge 30mb .mov with `ffmpeg -framerate 1 -i "./%04d.png" -c:v prores_ks -pix_fmt yuva444p10le -profile:v 4444 -alpha_bits 8 output.mov`
+- Right-click the output .mov, go to Services > Encode Selected Video Files. In the modal that opens, the format should be `HEVC 2160p` and `Preserve Transparency` should also be checked. 

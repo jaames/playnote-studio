@@ -1,5 +1,8 @@
 ---
+import { Icon } from 'astro-icon';
+
 import Nav from '../components/Nav.astro';
+import DemoPlayer from '../components/PlaydatePlayer.tsx';
 ---
 <header class="Hero">
   <div class="Hero__head">
@@ -8,12 +11,14 @@ import Nav from '../components/Nav.astro';
   <div class="Hero__body">
     <div class="Hero__wrap">
       <div class="Hero__intro">
-        <h1 class="Hero__title">Playnote Studio</h1>
-        <h2 class="Hero__tagline">An unofficial Flipnote animation player for the Playdate</h2>
+        <!-- <h1 class="Hero__title"> -->
+          <Icon name="logo" />
+        <!-- </h1> -->
+        <h2 class="Hero__tagline">An unofficial Flipnote animation player for the Panic Playdate</h2>
         <button class="Hero__downloadButton Button">Download</button>
       </div>
       <div class="Hero__gfx">
-        <div class="PlaydateMock"></div>
+        <DemoPlayer client:only/>
       </div>
     </div>
   </div>
@@ -33,7 +38,6 @@ import Nav from '../components/Nav.astro';
     min-height: 760px;
     max-height: 1200px;
 
-    /* background-attachment: fixed; */
     background-position: center top;
     background-repeat: repeat;
     background-image: url('data:image/svg+xml;charset=utf8,\
@@ -84,15 +88,5 @@ import Nav from '../components/Nav.astro';
   .Hero__foot {
     margin-top: auto;
     @include wrapper;
-  }
-
-  // TODO: remove
-  .PlaydateMock {
-    background: #FFC430;
-    width: 470px;
-    height: 430px;
-    border-radius: 30px;
-    transform: rotateZ(16deg);
-    box-shadow: 12px 24px 0 0 darken(#FFC430, 12);
   }
 </style>

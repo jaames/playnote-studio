@@ -2,7 +2,6 @@
 import '../styles/global.scss';
 
 import Hero from '../components/Hero.astro';
-import PreactCounter from '../components/PlaydatePlayer.tsx';
 
 let title = 'Playnote Studio';
 let desc = 'An unofficial Flipnote animation player for the Panic Playdate console!';
@@ -59,7 +58,6 @@ let locale = 'en';
 </head>
 <body>
   <main class="Content">
-    <PreactCounter client:only/>
     <Hero/>
     <div class="Downloads">
       <div class="DownloadGrid">
