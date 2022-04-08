@@ -27,7 +27,7 @@ function HomeScreen:setupSprites()
   end)
   self.settingsButton = settingsButton
 
-  self.clock = Clock(8, 4, 152, 28)
+  self.clock = Clock(4, 4, 156, 28)
 
   self.homeLogo = HomeLogo(52, 50)
 

@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@astrojs/preact": "^0.0.2",
+    "@types/node": "^17.0.23",
     "@types/three": "^0.139.0",
     "astro": "^0.25.4",
     "astro-icon": "^0.7.1",

@@ -30,7 +30,9 @@ export class FntRenderer {
   static async fromUrl(url: string) {
     const resp = await fetch(url);
     const data = await resp.arrayBuffer();
-    return new FntRenderer(data);
+    const fnt = new FntRenderer(data);
+    await fnt.init();
+    return fnt;
   }
 
   constructor(fntBuffer: ArrayBuffer) {
@@ -55,7 +57,7 @@ export class FntRenderer {
     this.glyphMap.forEach(({chr, cellId, width}) => {
       const map = new Uint8Array(width * cellHeight);
       const srcX = (cellId % cellsAcross) * cellWidth;
-      const srcY = Math.floor(cellId / cellsDown) * cellHeight;
+      const srcY = Math.floor(cellId / cellsAcross) * cellHeight;
       let srcPtr, dstPtr;
       for (let y = 0; y < cellHeight; y++) {
         srcPtr = (srcY + y) * tableW + srcX;
@@ -79,6 +81,8 @@ export class FntRenderer {
   }
 
   drawText(text: string, dst: Uint32Array, dstX: number, dstY: number, dstStride: number, color: number) {
+    dstX = Math.floor(dstX);
+    dstY = Math.floor(dstY);
     const chars = text.split('');
     chars.map((char) => {
       const { width } = this.glyphMap.get(char);

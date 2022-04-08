@@ -16,6 +16,8 @@ export const makeLine = (x1: number, y1: number, x2: number, y2: number): Line =
 
 export const dist = (x1: number, y1: number, x2: number, y2: number) => Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 
+export const lineDist = ({ x1, y1, x2, y2 }: Line) => dist( x1, y1, x2, y2);
+
 export function distToLine(p: Point, line: Line) {
   const t = pointToLineRatio(p, line);
   const tp = lineRatioToPoint(line, t);

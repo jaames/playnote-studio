@@ -1,0 +1,148 @@
+---
+import { Icon } from 'astro-icon';
+
+const size = 590;
+const pxSize = `${size}px`;
+---
+<div class="Demo">
+  <div class="Demo__wrapper">
+    <div class="Demo__crankHint is-hidden">
+      <p class="Demo__crankHintText">Psssst!<br/>Try turning<br/>the crank!</p>
+      <Icon class="Demo__crankHintArrow" name="crankhint_arrow"/>
+    </div>
+    <canvas class="Demo__canvas"></canvas>
+    <video muted playsinline class="Demo__video"></video>
+    <img class="Demo__image" width={size} height={size} srcset="/assets/playdate_1x.png, /assets/playdate_2x.png 2x" src="/assets/playdate_1x.png" alt="">
+  </div>
+  <div class="Demo__controls">
+    <div class="Demo__credit">
+      Flipnote by <a class="Demo__creditLink" href="https://twitter.com/pekira1227">ぺきら</a>
+    </div>
+    <div class="Demo__playToggle">
+      <Icon class="Demo__playToggleIcon Demo__playTogglePlay" name="icon_play"></Icon>
+      <Icon class="Demo__playToggleIcon Demo__playTogglePause" name="icon_pause"></Icon>
+    </div>
+  </div>
+</div>
+
+<script async hoist type="module">
+  import '/src/demo/player.ts';
+</script>
+
+<style lang="scss" define:vars={{ pxSize }}>
+  .Demo {
+    height: var(--pxSize);
+  }
+
+  .Demo__wrapper {
+    touch-action: none;
+    width: var(--pxSize);
+    height: var(--pxSize);
+    position: relative;
+    z-index: 0;
+  }
+
+  .Demo__crankHint {
+    color: $color-text-alt;
+    font-size: 14px;
+    position: absolute;
+    left: 495px;
+    bottom: 400px;
+    opacity: 1;
+    transition: opacity .5s linear;
+
+    &.is-hidden {
+      opacity: 0;
+    }
+
+    .Demo__crankHintText {
+      transform: rotate(-7deg);
+    }
+
+    .Demo__crankHintArrow {
+      transform: translate(30px, -12px);
+      width: 23px;
+      height: 85px;
+    }
+  }
+
+  .Demo__canvas {
+    position: absolute;
+    z-index: 3;
+  }
+
+  .Demo__video {
+    position: absolute;
+    z-index: 2;
+  }
+
+  .Demo__image {
+    position: absolute;
+    z-index: 1;
+    // image fades out when video+webgl loads in to prevent flashing in safari
+    opacity: 1;
+    transition: opacity .5s linear;
+    .Demo--isActive & {
+      opacity: 0;
+    }
+  }
+
+  .Demo__controls {
+    z-index: 10;
+    margin: 0 auto;
+    margin-top: -90px;
+    margin-bottom: -90px;
+    max-width: 400px;
+    font-size: 14px;
+    display: flex;
+  }
+
+  .Demo__credit {
+    z-index: 10;
+    transform: rotate(3deg);
+  }
+
+  .Demo__creditLink {
+    color: black;
+    font-weight: bold;
+    border-bottom: 0.1em solid currentColor;
+  }
+
+  .Demo__playToggle {
+    display: none;
+    z-index: 10;
+    margin-left: auto;
+    margin-right: 30px;
+    margin-top: -50px;
+    cursor: pointer;
+    width: 58px;
+    height: 58px;
+    
+    .Demo:hover & {
+      display: block;
+    }
+
+    .Demo--isInteractionActive & {
+      display: block;
+    }
+  }
+
+  .Demo__playToggleIcon {
+    cursor: pointer;
+    width: 58px;
+    height: 58px;
+  }
+
+  .Demo__playTogglePlay {
+    .Demo--isPlaying & {
+      display: none;
+    }
+  }
+
+  .Demo__playTogglePause {
+    display: none;
+    .Demo--isPlaying & {
+      display: block;
+    }
+  }
+</style>

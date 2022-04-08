@@ -2,23 +2,21 @@
 import { Icon } from 'astro-icon';
 
 import Nav from '../components/Nav.astro';
-import DemoPlayer from '../components/PlaydatePlayer.tsx';
+import Player from '../components/Player.astro';
 ---
 <header class="Hero">
   <div class="Hero__head">
-    <Nav></Nav>
+    <Nav/>
   </div>
   <div class="Hero__body">
     <div class="Hero__wrap">
       <div class="Hero__intro">
-        <!-- <h1 class="Hero__title"> -->
-          <Icon name="logo" />
-        <!-- </h1> -->
+        <Icon name="logo" />
         <h2 class="Hero__tagline">An unofficial Flipnote animation player for the Panic Playdate</h2>
         <button class="Hero__downloadButton Button">Download</button>
       </div>
       <div class="Hero__gfx">
-        <DemoPlayer client:only/>
+        <Player/>
       </div>
     </div>
   </div>

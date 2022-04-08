@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "lib": ["ES2021"],
+    "lib": ["ES2021", "DOM"],
+    "module": "es2022",
+    "target": "es2017",
     "baseUrl": ".",
     "paths": {
       "@components/*": ["/src/components/*"],

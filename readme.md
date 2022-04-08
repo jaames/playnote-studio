@@ -1,7 +1,7 @@
 ## TODO
 
-- Intro theme
-- sfx: dialog open, crank tick, crank docked/undocked, Flipnote view page not allowed, Note list page slide / page not allowed, Flipnote view crank forward / crank back, Multiple dither swatch sounds
+- Finalize sample note set, update samplememo/playnote.json for dither settings
+- sfx: dialog open, Flipnote view page not allowed, Note list page slide / page not allowed, Flipnote view crank forward / crank back, Multiple dither swatch sounds
 - Credits lag when song kicks in
 - Credits autoscroll speed adjust
 - Scrolling on Settings should change selection
@@ -63,10 +63,16 @@ For convenience (and because I'm a big dumb-dumb idiot that keeps forgetting thi
 
 Memory management functions like `alloc`, `malloc`, `realloc`, `free`, etc are not available - instead you will need to include `pd.h` which contains `pd_alloc`, `pd_malloc`, `pd_realloc` and `pd_free`. These all wrap `playdate->system->realloc` and should behave the same as their respective functions.
 
-#### Website
+#### Website Video
 
-The website interactive demo uses a transparent video. The 3D Playdate model is rendered out as a series of RGBA PNGs for each frame, which needs to be converted to a transparent VP9 webm video. Since the demo sets the video's currentTime manually, for smoothness we set the framerate to 1 FPS and keyframe interval is set to every 2 frames `ffmpeg -framerate 1 -i "./%04d.png" -c:v libvpx-vp9 -g 2 -pix_fmt yuva420p output.webm`.
+The website interactive demo uses a transparent video, at two resolutions which will get served depending on device pixel ratio. The 3D Playdate model is rendered out as a series of RGBA PNGs for each frame, which needs to be converted to a transparent VP9 webm video. Since the demo sets the video's currentTime manually, for smoothness we set the framerate to 1 FPS and keyframe interval is set to every 2 frames.
+- **2x** `ffmpeg -framerate 1 -i "./%04d.png" -c:v libvpx-vp9 -g 2 -pix_fmt yuva420p output_2x.webm`.
+- **1x** `ffmpeg -framerate 1 -i "./%04d.png" -vf scale=iw/2:ih/2 -c:v libvpx-vp9 -g 2 -pix_fmt yuva420p output_1x.webm`.
 
 Because Apple is a very competent browser vendor, we also have to encode a separate alpha HEVC video for Safari...
-- Convert frames to a huge 30mb .mov with `ffmpeg -framerate 1 -i "./%04d.png" -c:v prores_ks -pix_fmt yuva444p10le -profile:v 4444 -alpha_bits 8 output.mov`
-- Right-click the output .mov, go to Services > Encode Selected Video Files. In the modal that opens, the format should be `HEVC 2160p` and `Preserve Transparency` should also be checked. 
+- **2x**
+  - `ffmpeg -framerate 1 -i "./%04d.png" -c:v prores_ks -pix_fmt yuva444p10le -profile:v 4444 -alpha_bits 8 output_2x.mov`
+  - Right-click the output .mov, go to Services > Encode Selected Video Files. In the modal that opens, the format should be `HEVC 2160p` and `Preserve Transparency` should also be checked. 
+- **1x**
+  - `ffmpeg -framerate 1 -i "./%04d.png" -vf scale=iw/2:ih/2 -c:v prores_ks -pix_fmt yuva444p10le -profile:v 4444 -alpha_bits 8 output_1x.mov`
+  - Right-click the output .mov, go to Services > Encode Selected Video Files. In the modal that opens, the format should be `HEVC 1080p` and `Preserve Transparency` should also be checked. 

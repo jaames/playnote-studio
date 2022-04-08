@@ -3,6 +3,7 @@ varying vec2 v_px;
 
 uniform sampler2D u_bgTex;
 uniform sampler2D u_frameTex;
+uniform bool u_showFrame;
 uniform float u_fadeLevel;
 uniform vec4 u_fadeColor;
 
@@ -86,11 +87,16 @@ float dither8x8(vec2 position, float brightness) {
 void main() {
   vec4 foreground = texture2D(u_frameTex, v_uv);
   vec4 background = texture2D(u_bgTex, v_uv);
-  if (u_fadeLevel > 0.0) {
+  vec4 frameColor = foreground * foreground.a + background * (1.0 - foreground.a);
+  if (!u_showFrame && u_fadeLevel > 0.0) {
     float d = dither8x8(v_px, u_fadeLevel);
-    gl_FragColor = u_fadeColor * d + foreground * foreground.a + background * (1.0 - foreground.a);
+    gl_FragColor = vec4(u_fadeColor.rgb, d);
+  }
+  else if (u_fadeLevel > 0.0) {
+    float d = dither8x8(v_px, u_fadeLevel);
+    gl_FragColor = mix(frameColor, u_fadeColor, d);
   }
   else {
-    gl_FragColor = foreground * foreground.a + background * (1.0 - foreground.a);
+    gl_FragColor = frameColor;
   }
 }
