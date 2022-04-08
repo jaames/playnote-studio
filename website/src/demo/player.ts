@@ -285,8 +285,10 @@ function drawPpm() {
   const width = 256;
   const height = 192;
   const dstStride = 400;
-  const pattern1 = DITHER_MASKS[dither1[layer1Color - 1]];
-  const pattern2 = DITHER_MASKS[dither2[layer2Color - 1]];
+  const pattern1 = DITHER_MASKS[dither1[Math.max(layer1Color - 1, 1)]];
+  const pattern2 = DITHER_MASKS[dither2[Math.max(layer2Color - 1, 1)]];
+  const pen = paperColor === 1 ? PLAYDATE_WHITE : PLAYDATE_BLACK;
+  const paper = paperColor === 1 ? PLAYDATE_BLACK : PLAYDATE_WHITE;
   frameBuffer.fill(0);
   for (let srcY = 0, dstY = yOffs; srcY < height; srcY++, dstY++) {
     const patternLine1 = pattern1[srcY % 2];
@@ -296,15 +298,15 @@ function drawPpm() {
       const dstPtr = dstY * dstStride + dstX;
       const a = layer1[srcPtr];
       if (a && patternLine1[srcX % 2]) {
-        frameBuffer[dstPtr] = PLAYDATE_BLACK;
+        frameBuffer[dstPtr] = pen;
         continue;
       }
       const b = layer2[srcPtr];
       if (b && patternLine2[srcX % 2]) {
-        frameBuffer[dstPtr] = PLAYDATE_BLACK;
+        frameBuffer[dstPtr] = pen;
         continue;
       }
-      frameBuffer[dstPtr] = PLAYDATE_WHITE;
+      frameBuffer[dstPtr] = paper;
     }
   }
   // draw
