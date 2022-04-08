@@ -13,7 +13,7 @@ export {
 } from 'three';
 export { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
-export { PpmParser } from 'flipnote.js/dist/PpmParser';
+export { PpmParser, WebAudioPlayer } from 'flipnote.js';
 export { FntRenderer } from './FntRenderer';
 
 import vertexShader from './vert.glsl';

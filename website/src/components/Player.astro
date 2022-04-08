@@ -14,13 +14,19 @@ const pxSize = `${size}px`;
     <video muted playsinline class="Demo__video"></video>
     <img class="Demo__image" width={size} height={size} srcset="/assets/playdate_1x.png, /assets/playdate_2x.png 2x" src="/assets/playdate_1x.png" alt="">
   </div>
-  <div class="Demo__controls">
+  <div class="Demo__overlay">
     <div class="Demo__credit">
       Flipnote by <a class="Demo__creditLink" href="https://twitter.com/pekira1227">ぺきら</a>
     </div>
-    <div class="Demo__playToggle">
-      <Icon class="Demo__playToggleIcon Demo__playTogglePlay" name="icon_play"></Icon>
-      <Icon class="Demo__playToggleIcon Demo__playTogglePause" name="icon_pause"></Icon>
+    <div class="Demo__controls">
+      <div class="Demo__muteToggle">
+        <Icon class="Demo__muteToggleIcon Demo__muteToggleOn" name="icon_volume_on"></Icon>
+        <Icon class="Demo__muteToggleIcon Demo__muteToggleOff" name="icon_volume_off"></Icon>
+      </div>
+      <div class="Demo__playToggle">
+        <Icon class="Demo__playToggleIcon Demo__playTogglePlay" name="icon_play"></Icon>
+        <Icon class="Demo__playToggleIcon Demo__playTogglePause" name="icon_pause"></Icon>
+      </div>
     </div>
   </div>
 </div>
@@ -87,7 +93,7 @@ const pxSize = `${size}px`;
     }
   }
 
-  .Demo__controls {
+  .Demo__overlay {
     z-index: 10;
     margin: 0 auto;
     margin-top: -90px;
@@ -108,15 +114,21 @@ const pxSize = `${size}px`;
     border-bottom: 0.1em solid currentColor;
   }
 
+  .Demo__controls {
+    // margin-left: auto;
+    margin-right: 30px;
+    margin-top: -60px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
   .Demo__playToggle {
     display: none;
     z-index: 10;
-    margin-left: auto;
-    margin-right: 30px;
-    margin-top: -50px;
     cursor: pointer;
-    width: 58px;
-    height: 58px;
+    margin-bottom: -7px;
     
     .Demo:hover & {
       display: block;
@@ -129,8 +141,8 @@ const pxSize = `${size}px`;
 
   .Demo__playToggleIcon {
     cursor: pointer;
-    width: 58px;
-    height: 58px;
+    width: 64px;
+    height: 64px;
   }
 
   .Demo__playTogglePlay {
@@ -145,4 +157,38 @@ const pxSize = `${size}px`;
       display: block;
     }
   }
+
+  .Demo__muteToggle {
+    display: none;
+    z-index: 10;
+    cursor: pointer;
+
+    .Demo:hover & {
+      display: block;
+    }
+
+    .Demo--isInteractionActive & {
+      display: block;
+    }
+  }
+
+  .Demo__muteToggleIcon {
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+  }
+
+  .Demo__muteToggleOn {
+    .Demo--isMuted & {
+      display: none;
+    }
+  }
+
+  .Demo__muteToggleOff {
+    display: none;
+    .Demo--isMuted & {
+      display: block;
+    }
+  }
+
 </style>

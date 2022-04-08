@@ -8,7 +8,6 @@ import type {
   Mesh,
   Object3D,
   Material,
-  PpmParser,
 } from './imports';
 
 const {
@@ -26,6 +25,7 @@ const {
   fragmentShader,
   //
   PpmParser,
+  WebAudioPlayer,
   FntRenderer
 } = await import('./imports');
 
@@ -109,6 +109,7 @@ const canvas = document.querySelector<HTMLCanvasElement>('.Demo__canvas');
 const crankHint = document.querySelector('.Demo__crankHint');
 const creditLink = document.querySelector('.Demo__creditLink');
 const playToggle = document.querySelector('.Demo__playToggle');
+const muteToggle = document.querySelector('.Demo__muteToggle');
 
 // load in video
 await new Promise<void>((resolve) => {
@@ -161,7 +162,8 @@ overrideMaterials(gltf.scene, new ShaderMaterial({
 scene.add(gltf.scene);
 
 // ppm state
-let ppm: PpmParser
+let ppm: InstanceType<typeof PpmParser>;
+let ppmAudio: InstanceType<typeof WebAudioPlayer>;
 let dither1: [DitherType, DitherType, DitherType];
 let dither2: [DitherType, DitherType, DitherType];
 let isPlaying = false;
@@ -180,39 +182,51 @@ let invertCrankInput = true;
 let canCrankInvert = false;
 
 async function loadDemoPpm(key: string) {
+  pause();
   const { url, authorUrl, dithering, startFrame } = DEMO_PPM_INFO[key];
   const resp = await fetch(url);
   const data = await resp.arrayBuffer();
   await fadeOut();
+  // load flipnote
   ppm = new PpmParser(data);
   console.log('loaded ppm:', ppm);
+  // setup ppm state
   dither1 = dithering[0];
   dither2 = dithering[1];
   isPlaying = false;
-  loop = ppm.meta.loop;
+  loop = true; // ignore ppm loop flag and always loop
   totalFrames = ppm.meta.frameCount;
   startTime = 0;
   currFrame = startFrame;
   currTime = startFrame * (1 / ppm.framerate);
+  // load audio
+  if (ppmAudio) ppmAudio.destroy();
+  ppmAudio = new WebAudioPlayer();
+  ppmAudio.setBuffer(ppm.getAudioMasterPcm(), ppm.sampleRate);
+  ppmAudio.loop = true;
+  // display author credit
   creditLink.textContent = ppm.meta.current.username;
   creditLink.setAttribute('href', authorUrl);
+  // set frame visible flag if it wasn't set already
   showFrame.value = true;
   drawPpm();
   await fadeIn();
 }
 
 function play() {
-  if (!isPlaying) {
+  if (ppm && !isPlaying) {
     isPlaying = true;
     startTime = performance.now() / 1000 - currTime;
     requestAnimationFrame(playbackLoop);
+    ppmAudio.playFrom(currTime);
     root.classList.add('Demo--isPlaying');
   }
 }
 
 function pause() {
-  if (isPlaying) {
+  if (ppm && isPlaying) {
     isPlaying = false;
+    ppmAudio.stop();
     root.classList.remove('Demo--isPlaying');
   }
 }
@@ -224,18 +238,33 @@ function togglePlay() {
     play();
 }
 
+function toggleMute() {
+  if (ppmAudio) {
+    if (ppmAudio.volume === 1) {
+      ppmAudio.volume = 0;
+      root.classList.add('Demo--isMuted');
+    }
+    else {
+      root.classList.remove('Demo--isMuted');
+      ppmAudio.volume = 1;
+    }
+  }
+}
+
 function playbackLoop(timestamp: DOMHighResTimeStamp) {
   if (!isPlaying)
     return;
-
   currTime = timestamp / 1000 - startTime;
   const nextFrame = Math.floor(currTime / (1 / ppm.framerate));
-
   if (currFrame !== nextFrame) {
+    // loop back to start
     if (nextFrame >= totalFrames) {
       startTime = performance.now() / 1000;
       setFrame(0);
+      ppmAudio.stop();
+      ppmAudio.playFrom(0);
     }
+    // next frame
     else
       setFrame(nextFrame);
     drawPpm();
@@ -256,11 +285,6 @@ function updateScreen() {
 function setFade(l: number) {
   fadeLevel.value = l;
   updateScreen();
-}
-
-async function fadeInOut() {
-  await animateValue(400, 0, 1, (v) => setFade(v));
-  await animateValue(400, 1, 0, (v) => setFade(v));
 }
 
 async function fadeOut() {
@@ -400,10 +424,14 @@ function handleInputEnd(e: MouseEvent & TouchEvent) {
   document.removeEventListener('touchend',  handleInputEnd,  { passive: false } as any);
 }
 
+// load initial note
+await loadDemoPpm('pekira');
+
 // init dom
 canvas.addEventListener('mousedown', handleInputStart, { passive: false });
 canvas.addEventListener('touchstart', handleInputStart, { passive: false });
 playToggle.addEventListener('click', togglePlay);
+muteToggle.addEventListener('click', toggleMute);
 nextTick(() => {
   crankHint.classList.remove('is-hidden');
   root.classList.add('Demo--isActive');
@@ -413,5 +441,3 @@ nextTick(() => {
 updateScreen();
 
 (window as any).loadDemoPpm = loadDemoPpm;
-
-await loadDemoPpm('pekira');
