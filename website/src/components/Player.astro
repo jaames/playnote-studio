@@ -11,7 +11,7 @@ const pxSize = `${size}px`;
       <Icon class="Demo__crankHintArrow" name="crankhint_arrow"/>
     </div>
     <canvas class="Demo__canvas"></canvas>
-    <video muted playsinline class="Demo__video"></video>
+    <video muted playsinline preload="auto" class="Demo__video"></video>
     <img class="Demo__image" width={size} height={size} srcset="/assets/playdate_1x.png, /assets/playdate_2x.png 2x" src="/assets/playdate_1x.png" alt="">
   </div>
   <div class="Demo__overlay">
@@ -37,13 +37,16 @@ const pxSize = `${size}px`;
 
 <style lang="scss" define:vars={{ pxSize }}>
   .Demo {
-    height: var(--pxSize);
+    // height: var(--pxSize);
+    @include user-select(none);
   }
 
   .Demo__wrapper {
+    @include aspect('1 / 1');
     touch-action: none;
-    width: var(--pxSize);
-    height: var(--pxSize);
+    width: 100%;
+    max-width: var(--pxSize);
+    // height: var(--pxSize);
     position: relative;
     z-index: 0;
   }
@@ -51,17 +54,31 @@ const pxSize = `${size}px`;
   .Demo__crankHint {
     color: $color-text-alt;
     font-size: 14px;
-    position: absolute;
-    left: 495px;
-    bottom: 400px;
     opacity: 1;
     transition: opacity .5s linear;
+    position: absolute;
+    transform: scale(0.8);
+    top: -10px;
+    right: -35px;
+
+    @include breakpoint-tablet {
+      transform: scale(0.9);
+      top: 5px;
+      right: -35px;
+    }
+
+    @include breakpoint-desktop {
+      transform: none;
+      top: 40px;
+      right: -20px;
+    }
 
     &.is-hidden {
       opacity: 0;
     }
 
     .Demo__crankHintText {
+      width: 12ch;
       transform: rotate(-7deg);
     }
 
@@ -73,11 +90,13 @@ const pxSize = `${size}px`;
   }
 
   .Demo__canvas {
+    height: 100%;
     position: absolute;
     z-index: 3;
   }
 
   .Demo__video {
+    height: 100%;
     position: absolute;
     z-index: 2;
   }
@@ -95,12 +114,20 @@ const pxSize = `${size}px`;
 
   .Demo__overlay {
     z-index: 10;
-    margin: 0 auto;
-    margin-top: -90px;
-    margin-bottom: -90px;
-    max-width: 400px;
     font-size: 14px;
     display: flex;
+    margin-left: 50px;
+    margin-top: -50px;
+
+    @include breakpoint-tablet {
+      margin-left: 50px;
+      margin-top: -60px;
+    }
+
+    @include breakpoint-desktop {
+      margin-left: 70px;
+      margin-top: -90px;
+    }
   }
 
   .Demo__credit {
@@ -115,28 +142,40 @@ const pxSize = `${size}px`;
   }
 
   .Demo__controls {
-    // margin-left: auto;
-    margin-right: 30px;
-    margin-top: -60px;
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-  }
+    opacity: 0;
+    margin-right: 75px;
+    margin-top: -55px;
+    margin-bottom: 55px;
 
-  .Demo__playToggle {
-    display: none;
-    z-index: 10;
-    cursor: pointer;
-    margin-bottom: -7px;
-    
+    @include breakpoint-tablet {
+      margin-right: 85px;
+      margin-top: -55px;
+      margin-bottom: 55px;
+    }
+
+    @include breakpoint-desktop {
+      margin-right: 145px;
+      margin-top: -50px;
+      margin-bottom: 50px;
+    }
+
     .Demo:hover & {
-      display: block;
+      opacity: 1;
     }
 
     .Demo--isInteractionActive & {
-      display: block;
+      opacity: 1;
     }
+  }
+
+  .Demo__playToggle {
+    z-index: 10;
+    cursor: pointer;
+    margin-bottom: -7px;
   }
 
   .Demo__playToggleIcon {
@@ -159,17 +198,8 @@ const pxSize = `${size}px`;
   }
 
   .Demo__muteToggle {
-    display: none;
     z-index: 10;
     cursor: pointer;
-
-    .Demo:hover & {
-      display: block;
-    }
-
-    .Demo--isInteractionActive & {
-      display: block;
-    }
   }
 
   .Demo__muteToggleIcon {

@@ -6,17 +6,20 @@ import Player from '../components/Player.astro';
 ---
 <header class="Hero">
   <div class="Hero__head">
-    <Nav/>
+    <!-- <Nav/> -->
   </div>
   <div class="Hero__body">
     <div class="Hero__wrap">
       <div class="Hero__intro">
-        <Icon name="logo" />
+        <Icon class="Hero__logo" name="logo"/>
         <h2 class="Hero__tagline">An unofficial Flipnote animation player for the Panic Playdate</h2>
-        <button class="Hero__downloadButton Button">Download</button>
       </div>
       <div class="Hero__gfx">
         <Player/>
+      </div>
+      <div class="Hero__sub">
+        <h2 class="Hero__tagline">Coming Soon</h2>
+        <!-- <button class="Hero__downloadButton Button">Download</button> -->
       </div>
     </div>
   </div>
@@ -54,21 +57,31 @@ import Player from '../components/Player.astro';
   }
 
   .Hero__wrap {
-    @include grid-row;
+    display: grid;
     align-items: center;
+    grid-template-columns: 1fr;
+    @include breakpoint-tablet {
+      grid-template-columns: 1fr 1.055fr;
+    }
   }
 
   .Hero__intro {
-    @include grid-column(5, 12);
-    @include grid-column-offset-right(1, 12);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    @include breakpoint-tablet {
+      grid-column: 1;
+      align-self: flex-end;
+    }
   }
 
-  .Hero__title {
-     margin-bottom: .5rem;
+  .Hero__logo {
+    @include breakpoint-tablet {
+      // grid-column: 1;
+      margin: 0 auto;
+      max-width: 512px;
+    }
   }
 
   .Hero__tagline {
@@ -80,7 +93,21 @@ import Player from '../components/Player.astro';
   }
 
   .Hero__gfx {
-    @include grid-column(6, 12);
+    @include breakpoint-tablet {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+  }
+
+  .Hero__sub {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    @include breakpoint-tablet {
+      grid-column: 1;
+      align-self: flex-start;
+    }
   }
 
   .Hero__foot {

@@ -146,7 +146,7 @@ const scene = new Scene();
 const renderer = new WebGLRenderer({ canvas, alpha: true, antialias: true });
 const camera = gltf.cameras[0];
 renderer.setPixelRatio(window.devicePixelRatio || 1);
-renderer.setSize(CANVAS_SIZE, CANVAS_SIZE);
+renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 screenTexture.flipY = false;
 overrideMaterials(gltf.scene, new ShaderMaterial({
   vertexShader,
@@ -352,8 +352,10 @@ function getInputPoint(e: MouseEvent & TouchEvent): Point {
   // Prefect default browser action
   e.preventDefault();
   const point = e.touches ? e.changedTouches[0] : e;
-  const x = point.clientX - bounds.left;
-  const y = point.clientY - bounds.top;
+  const xNorm = (point.clientX - bounds.left) / bounds.width;
+  const yNorm = (point.clientY - bounds.top) / bounds.height;
+  const x = xNorm * CANVAS_SIZE;
+  const y = yNorm * CANVAS_SIZE;
   return {x, y};
 }
 
@@ -436,6 +438,14 @@ nextTick(() => {
   crankHint.classList.remove('is-hidden');
   root.classList.add('Demo--isActive');
 })
+
+// resize canvas to fit wrapper
+const resizeObserver = new ResizeObserver(([entry]) => {
+  const box = entry.contentRect;
+  renderer.setSize(box.width, box.height);
+  updateScreen();
+});
+resizeObserver.observe(wrapper);
 
 // init render
 updateScreen();

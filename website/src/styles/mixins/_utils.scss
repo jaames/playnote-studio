@@ -28,3 +28,22 @@
   -ms-user-select: $select;
   user-select: $select; 
 }
+
+@mixin aspect($ratio) {
+  $rawRatio: unquote($ratio);
+  aspect-ratio: $rawRatio;
+
+  @supports not (aspect-ratio: $rawRatio) {
+    &::before {
+      float: left;
+      padding-top: 100%;
+      content: "";
+    }
+  
+    &::after {
+      display: block;
+      content: "";
+      clear: both;
+    }
+  }
+}
