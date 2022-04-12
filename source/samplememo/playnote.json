@@ -1,82 +1,31 @@
 {
   "folderTitle": {
     "en": "Playnote Picks",
-    "jp": "サンプルメモ",
+    "pl": "Przykładowe Flipnotki",
     "fr": "Exemples de Flipnote",
     "es": "Muestras de Flipnote",
-    "de": "Flipnote Beispiele",
-    "it": "Flipnote di esempio",
     "nl": "Flipnote-demos",
-    "pl": "Przykładowe Flipnotki",
     "ru": "Примеры Заметок",
+    "it": "Flipnote di esempio",
+    "jp": "サンプルメモ",
+    "de": "Flipnote Beispiele",
     "cy": "Flipnotes nodwedd"
   },
-  "credits": [
-    {
-      "id": "keke",
-      "name": "Kéké",
-      "links": [
-        "twitter.com/Kekeflipnote",
-        "k-eke.tumblr.com",
-        "www.patreon.com/k_eke"
-      ]
-    },
-    {
-      "id": "bokeh",
-      "name": "bokeh f/2 (who cares)",
-      "links": [
-        "www.instagram.com/gsupnet_"
-      ]
-    },
-    {
-      "id": "pekira",
-      "name": "ぺきら (Pekira)",
-      "links": [
-        "twitter.com/pekira1227"
-      ]
-    },
-    {
-      "id": "mrjohn",
-      "name": "MrJohn",
-      "links": [
-        "flipnot.es/9F990EE00074AC4D"
-      ]
-    },
-    {
-      "id": "akemi",
-      "name": "Akemi",
-      "links": [
-        "flipnot.es/5D4FA9D0A0BE1C09",
-        "www.instagram.com/akemixes"
-      ]
-    },
-    {
-      "id": "bee",
-      "name": "Bee",
-      "links": [
-        "beeyt.carrd.co"
-      ]
-    },
-    {
-      "id": "scarecrow",
-      "name": "Scarecrow",
-      "links": [
-        "flipnot.es/5907142059918D1F"
-      ]
-    }
-  ],
   "notes": [
     {
       "filename": "01_keke1.ppm",
-      "authorId": "keke"
+      "authorId": "keke",
+      "dithering": [[1, 1, 1], [1, 1, 1]]
     },
     {
       "filename": "02_keke2.ppm",
-      "authorId": "keke"
+      "authorId": "keke",
+      "dithering": [[1, 1, 1], [1, 1, 1]]
     },
     {
       "filename": "03_keke3.ppm",
-      "authorId": "keke"
+      "authorId": "keke",
+      "dithering": [[1, 3, 4], [1, 3, 4]]
     },
     {
       "filename": "04_bokeh.ppm",
@@ -84,11 +33,13 @@
     },
     {
       "filename": "05_pekira5.ppm",
-      "authorId": "pekira"
+      "authorId": "pekira",
+      "dithering": [[1, 3, 4], [1, 3, 4]]
     },
     {
       "filename": "06_pekira8.ppm",
-      "authorId": "pekira"
+      "authorId": "pekira",
+      "dithering": [[1, 3, 4], [1, 3, 4]]
     },
     {
       "filename": "07_mrjohn1.ppm",
@@ -96,11 +47,13 @@
     },
     {
       "filename": "08_mrjohn2.ppm",
-      "authorId": "mrjohn"
+      "authorId": "mrjohn",
+      "dithering": [[1, 3, 1], [1, 3, 1]]
     },
     {
       "filename": "09_mrjohn5.ppm",
-      "authorId": "mrjohn"
+      "authorId": "mrjohn",
+      "dithering": [[1, 4, 4], [1, 4, 4]]
     },
     {
       "filename": "10_mrjohn6.ppm",
@@ -112,11 +65,13 @@
     },
     {
       "filename": "12_akemi.ppm",
-      "authorId": "akemi"
+      "authorId": "akemi",
+      "dithering": [[1, 4, 1], [1, 4, 1]]
     },
     {
       "filename": "13_bee.ppm",
-      "authorId": "bee"
+      "authorId": "bee",
+      "dithering": [[1, 3, 4], [1, 3, 3]]
     },
     {
       "filename": "14_mrjohn3.ppm",
@@ -132,7 +87,8 @@
     },
     {
       "filename": "17_pekira2.ppm",
-      "authorId": "pekira"
+      "authorId": "pekira",
+      "dithering": [[1, 3, 1], [1, 3, 1]]
     },
     {
       "filename": "18_pekira3.ppm",
@@ -140,7 +96,8 @@
     },
     {
       "filename": "19_pekira4.ppm",
-      "authorId": "pekira"
+      "authorId": "pekira",
+      "dithering": [[1, 4, 1], [1, 4, 1]]
     },
     {
       "filename": "20_pekira6.ppm",
@@ -161,6 +118,60 @@
     {
       "filename": "24_scarecrow3.ppm",
       "authorId": "scarecrow"
+    }
+  ],
+  "credits": [
+    {
+      "id": "keke",
+      "name": "Kéké",
+      "links": [
+        "twitter.com\/Kekeflipnote",
+        "k-eke.tumblr.com",
+        "www.patreon.com\/k_eke"
+      ]
+    },
+    {
+      "id": "bokeh",
+      "name": "bokeh f\/2 (who cares)",
+      "links": [
+        "www.instagram.com\/gsupnet_"
+      ]
+    },
+    {
+      "id": "pekira",
+      "name": "ぺきら (Pekira)",
+      "links": [
+        "twitter.com\/pekira1227"
+      ]
+    },
+    {
+      "id": "mrjohn",
+      "name": "MrJohn",
+      "links": [
+        "flipnot.es\/9F990EE00074AC4D"
+      ]
+    },
+    {
+      "id": "akemi",
+      "name": "Akemi",
+      "links": [
+        "flipnot.es\/5D4FA9D0A0BE1C09",
+        "www.instagram.com\/akemixes"
+      ]
+    },
+    {
+      "id": "bee",
+      "name": "Bee",
+      "links": [
+        "beeyt.carrd.co"
+      ]
+    },
+    {
+      "id": "scarecrow",
+      "name": "Scarecrow",
+      "links": [
+        "flipnot.es\/5907142059918D1F"
+      ]
     }
   ]
 }
