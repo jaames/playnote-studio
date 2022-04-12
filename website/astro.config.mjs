@@ -1,7 +1,6 @@
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 
-import preact from '@astrojs/preact';
 import glsl from 'vite-plugin-glsl';
 
 const __filename = fileURLToPath(import.meta.url);
