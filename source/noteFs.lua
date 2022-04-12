@@ -105,8 +105,9 @@ function noteFs:refreshFolderNames()
   end
 end
 
-function noteFs:getNoteData(folderPath, filename)
+function noteFs:getNoteData(folderPath, filepath)
   local data = self:getFolderData(folderPath)
+  local filename = fsUtils:pathGetFilename(filepath)
   if type(data.notes) == 'table' then
     for _, noteData in pairs(data.notes) do
       if type(noteData) == 'table' and noteData.filename == filename then
@@ -117,8 +118,9 @@ function noteFs:getNoteData(folderPath, filename)
   return {}
 end
 
-function noteFs:updateNoteData(folderPath, filename, newNoteData)
+function noteFs:updateNoteData(folderPath, filepath, newNoteData)
   local data = self:getFolderData(folderPath)
+  local filename = fsUtils:pathGetFilename(filepath)
   -- if there's no notes array, add it
   if type(data.notes) ~= 'table' then
     data.notes = {}
@@ -172,30 +174,30 @@ function noteFs:getArtistCreditsForId(artistId)
   end
 end
 
-function noteFs:getNoteDitherSettings(filename)
-  local data = self:getNoteData(self.workingFolder, filename)
+function noteFs:getNoteDitherSettings(filepath)
+  local data = self:getNoteData(self.workingFolder, filepath)
   if type(data.dithering) == 'table' then
     return data.dithering
   end
   return table.deepcopy(config.dithering)
 end
 
-function noteFs:updateNoteDitherSettings(filename, ditherSettings)
-  self:updateNoteData(self.workingFolder, filename, {
+function noteFs:updateNoteDitherSettings(filepath, ditherSettings)
+  self:updateNoteData(self.workingFolder, filepath, {
     dithering = ditherSettings
   })
 end
 
-function noteFs:getNoteDetails(filename)
-  local data = self:getNoteData(self.workingFolder, filename)
+function noteFs:getNoteDetails(filepath)
+  local data = self:getNoteData(self.workingFolder, filepath)
   if type(data.authorId) == 'string' then
     data.credits = self:getArtistCreditsForId(data.authorId)
   end
   return data
 end
 
-function noteFs:getNoteCredits(filename)
-  local details = self:getNoteDetails(filename)
+function noteFs:getNoteCredits(filepath)
+  local details = self:getNoteDetails(filepath)
   local name = nil
   local links = nil
   if type(details.credits) == 'table' then
