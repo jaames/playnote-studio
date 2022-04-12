@@ -35,6 +35,14 @@ function fsUtils:pathGetDirectory(path)
   return filedir
 end
 
+function fsUtils:pathGetFilename(path)
+  if playdate.file.isdir(path) then
+    return nil
+  end
+  local filedir, filename = string.match(path, '(.*%S/)(.*%S)$')
+  return filename
+end
+
 function fsUtils:pathGetRootDirectory(path)
   return string.match(path, '([.*%S][^/]+)') .. '/'
 end

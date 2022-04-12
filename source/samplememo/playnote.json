@@ -22,13 +22,6 @@
       ]
     },
     {
-      "id": "mrjohn",
-      "name": "MrJohn",
-      "links": [
-        "flipnot.es/9F990EE00074AC4D"
-      ]
-    },
-    {
       "id": "bokeh",
       "name": "bokeh f/2 (who cares)",
       "links": [
@@ -37,32 +30,137 @@
     },
     {
       "id": "pekira",
-      "name": "ペキラ",
+      "name": "ぺきら (Pekira)",
       "links": [
         "twitter.com/pekira1227"
+      ]
+    },
+    {
+      "id": "mrjohn",
+      "name": "MrJohn",
+      "links": [
+        "flipnot.es/9F990EE00074AC4D"
+      ]
+    },
+    {
+      "id": "akemi",
+      "name": "Akemi",
+      "links": [
+        "flipnot.es/5D4FA9D0A0BE1C09",
+        "www.instagram.com/akemixes"
+      ]
+    },
+    {
+      "id": "bee",
+      "name": "Bee",
+      "links": [
+        "beeyt.carrd.co"
+      ]
+    },
+    {
+      "id": "scarecrow",
+      "name": "Scarecrow",
+      "links": [
+        "flipnot.es/5907142059918D1F"
       ]
     }
   ],
   "notes": [
     {
-      "filename": "samplememo/bokeh.ppm",
+      "filename": "01_keke1.ppm",
+      "authorId": "keke"
+    },
+    {
+      "filename": "02_keke2.ppm",
+      "authorId": "keke"
+    },
+    {
+      "filename": "03_keke3.ppm",
+      "authorId": "keke"
+    },
+    {
+      "filename": "04_bokeh.ppm",
       "authorId": "bokeh"
     },
     {
-      "filename": "samplememo/keke.ppm",
-      "authorId": "keke"
+      "filename": "05_pekira5.ppm",
+      "authorId": "pekira"
     },
     {
-      "filename": "samplememo/keke2.ppm",
-      "authorId": "keke"
+      "filename": "06_pekira8.ppm",
+      "authorId": "pekira"
     },
     {
-      "filename": "samplememo/mrjohn.ppm",
+      "filename": "07_mrjohn1.ppm",
       "authorId": "mrjohn"
     },
     {
-      "filename": "samplememo/pekira_beach.ppm",
+      "filename": "08_mrjohn2.ppm",
+      "authorId": "mrjohn"
+    },
+    {
+      "filename": "09_mrjohn5.ppm",
+      "authorId": "mrjohn"
+    },
+    {
+      "filename": "10_mrjohn6.ppm",
+      "authorId": "mrjohn"
+    },
+    {
+      "filename": "11_mrjohn7.ppm",
+      "authorId": "mrjohn"
+    },
+    {
+      "filename": "12_akemi.ppm",
+      "authorId": "akemi"
+    },
+    {
+      "filename": "13_bee.ppm",
+      "authorId": "bee"
+    },
+    {
+      "filename": "14_mrjohn3.ppm",
+      "authorId": "mrjohn"
+    },
+    {
+      "filename": "15_mrjohn4.ppm",
+      "authorId": "mrjohn"
+    },
+    {
+      "filename": "16_pekira1.ppm",
       "authorId": "pekira"
+    },
+    {
+      "filename": "17_pekira2.ppm",
+      "authorId": "pekira"
+    },
+    {
+      "filename": "18_pekira3.ppm",
+      "authorId": "pekira"
+    },
+    {
+      "filename": "19_pekira4.ppm",
+      "authorId": "pekira"
+    },
+    {
+      "filename": "20_pekira6.ppm",
+      "authorId": "pekira"
+    },
+    {
+      "filename": "21_pekira7.ppm",
+      "authorId": "pekira"
+    },
+    {
+      "filename": "22_scarecrow1.ppm",
+      "authorId": "scarecrow"
+    },
+    {
+      "filename": "23_scarecrow2.ppm",
+      "authorId": "scarecrow"
+    },
+    {
+      "filename": "24_scarecrow3.ppm",
+      "authorId": "scarecrow"
     }
   ]
 }
