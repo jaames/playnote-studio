@@ -1,0 +1,60 @@
+---
+import '../styles/global.scss';
+
+let title = 'Playnote Studio';
+let desc = 'An unofficial Flipnote animation player for the Panic Playdate';
+let websiteUrl = 'https://playnote.studio';
+let imageUrl = '';
+let faviconUrl = '';
+let imageWidth = '';
+let imageHeight = '';
+let imageAlt = '';
+let twitterHandle = '@rakujira';
+
+let locale = 'en';
+
+---
+<html lang={ locale }>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>{ title }</title>
+    <meta name="description" content={ desc }/>
+    <!-- facebook opengraph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content={ websiteUrl }>
+    <meta property="og:title" content={ title }>
+    <meta property="og:description" content={ desc }>
+    <meta property="og:image" content={ imageUrl }>
+    <meta property="og:image:width" content={ imageWidth }>
+    <meta property="og:image:height" content={ imageHeight }>
+    <meta property="og:image:alt" content={ imageAlt }>
+    <meta property="og:site_name" content={ title }>
+    <meta property="og:locale" content={ locale }>
+    <!-- {altLocales} -->
+    <!-- twitter card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content={ twitterHandle }>
+    <meta name="twitter:url" content={ websiteUrl }>
+    <meta name="twitter:title" content={ title }>
+    <meta name="twitter:description" content={ desc }>
+    <meta name="twitter:image" content={ imageUrl }>
+    <meta name="twitter:image:width" content={ imageWidth }>
+    <meta name="twitter:image:height" content={ imageHeight }>
+    <meta name="twitter:image:alt" content={ imageAlt }>
+    <!-- misc -->
+    <link rel="shortcut icon" href={ faviconUrl } type="image/png">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;800" rel="stylesheet">
+  </head>
+  <body>
+    <main class="Content">
+      <slot/>
+    </main>
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "19224d7a1dc44932ab159e5f8466b712"}'></script>
+  </body>
+</html>

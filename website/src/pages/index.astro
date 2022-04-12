@@ -1,82 +1,92 @@
 ---
-import '../styles/global.scss';
-
+import Layout from '../components/Hero.astro';
 import Hero from '../components/Hero.astro';
-
-let title = 'Playnote Studio';
-let desc = 'An unofficial Flipnote animation player for the Panic Playdate console!';
-let websiteUrl = '';
-let imageUrl = '';
-let faviconUrl = '';
-let imageWidth = '';
-let imageHeight = '';
-let imageAlt = '';
-let twitterHandle = '@rakujira';
-
-let locale = 'en';
-// let altLocales = ['en', 'jp'].map((locale) => <meta property="og:locale" content={locale}>);
-
 ---
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>{ title }</title>
-  <meta name="description" content={ desc }/>
-  <!-- facebook opengraph -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content={ websiteUrl }>
-  <meta property="og:title" content={ title }>
-  <meta property="og:description" content={ desc }>
-  <meta property="og:image" content={ imageUrl }>
-  <meta property="og:image:width" content={ imageWidth }>
-  <meta property="og:image:height" content={ imageHeight }>
-  <meta property="og:image:alt" content={ imageAlt }>
-  <meta property="og:site_name" content={ title }>
-  <meta property="og:locale" content={locale}>
-  <!-- {altLocales} -->
-  <!-- twitter card -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:site" content={ twitterHandle }>
-  <meta name="twitter:url" content={ websiteUrl }>
-  <meta name="twitter:title" content={ title }>
-  <meta name="twitter:description" content={ desc }>
-  <meta name="twitter:image" content={ imageUrl }>
-  <meta name="twitter:image:width" content={ imageWidth }>
-  <meta name="twitter:image:height" content={ imageHeight }>
-  <meta name="twitter:image:alt" content={ imageAlt }>
-  <!-- misc -->
-  <link rel="shortcut icon" href={ faviconUrl } type="image/png">
-  <meta name="format-detection" content="telephone=no">
+<Layout>
+  <Hero/>
+  <section class="Section Section--intro Section--narrow">
+    <p>
+      <a href="https://www.nintendo.co.uk/Games/Nintendo-DSiWare/Flipnote-Studio-263126.html">Flipnote&nbsp;Studio</a> was an app for the Nintendo&nbsp;DSi where users could create flipbook-style animations (called "Flipnotes") using the console's touch screen, microphone, and cameras
+    </p>
+    <p>
+      Playnote&nbsp;Studio allows you to view these Flipnotes on the Playdate, the nifty yellow handheld gaming console by Panic.
+      All you have to do is drop them onto your Playdate's storage!
+    </p>
+  </section>
+  
+  <section class="Section Section--features">
+    <h3 class="Section__title">Features</h3>
+    <div class="FeatureGrid">
+      <div class="FeatureGrid__item">
+        <img class="FeatureGrid__itemImage screenshot" src="/assets/movie_lang.gif" alt="">
+        <p class="FeatureGrid__item">
+          Bundled with 24 animations kindly provided by some of the best Flipnote artists in the community!
+        </p>
+          <sub>(this one is by mr john)</sub>
+      </div>
+      <div class="FeatureGrid__item">
+        <img class="FeatureGrid__itemImage screenshot" src="/assets/movie_lang.gif" alt="">
+        <p class="FeatureGrid__item">
+          Available in English, Japanese, French, Spanish, German, Italian, Dutch, Polish, Russian, and Welsh!
+        </p>
+      </div>
+      <div class="FeatureGrid__item">
+        <img class="FeatureGrid__itemImage screenshot" src="/assets/movie_lang.gif" alt="">
+        <p class="FeatureGrid__item">
+          Customisable dithering makes up for the lack of colour on the Playdate's black-and-white screen!
+        </p>
+      </div>
+    </div>
+  </section>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;800" rel="stylesheet">
-</head>
-<body>
-  <main class="Content">
-    <Hero/>
-  </main>
-</body>
-</html>
+  <section class="Section Section--download">
+    <h3 class="Section__title">Download</h3>
+  </section>
+
+  <section class="Section Section--faq">
+    <h3 class="Section__title">FAQ</h3>
+  </section>
+
+  <section class="Section Section--credits">
+    <h3 class="Section__title">Credits</h3>
+  </section>
+</Layout>
 
 <style lang="scss">
-  .Downloads {
+
+  .Section {
     @include wrapper;
   }
 
-  .DownloadGrid {
-    @include grid-column-offset-left(1, 12);
-    @include grid-column-offset-right(1, 12);
-    @include grid-row();
-  }
-
-  .DownloadGrid__item {
-    @include grid-column(1, 2);
-  }
-
-  .DownloadCard {
+  .Section--narrow {
+    max-width: 608px;
     
   }
+
+  .Section__title {
+    text-align: center;
+    width: 100%;
+    margin-top: 5rem;
+    margin-bottom: 2rem;
+  }
+
+  .Section--intro p {
+    margin-bottom: 1em;
+  }
+
+  .Section--features {
+   max-width: 1272px
+    
+  }
+
+  .FeatureGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 24px;
+  }
+
+    .FeatureGrid__item {
+      max-width: 400px;
+    }
+
 </style>

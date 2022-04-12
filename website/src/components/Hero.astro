@@ -6,7 +6,7 @@ import Player from '../components/Player.astro';
 ---
 <header class="Hero">
   <div class="Hero__head">
-    <!-- <Nav/> -->
+    <Nav/>
   </div>
   <div class="Hero__body">
     <div class="Hero__wrap">
@@ -18,8 +18,7 @@ import Player from '../components/Player.astro';
         <Player/>
       </div>
       <div class="Hero__sub">
-        <h2 class="Hero__tagline">Coming Soon</h2>
-        <!-- <button class="Hero__downloadButton Button">Download</button> -->
+        <button class="Hero__downloadButton Button">Download</button>
       </div>
     </div>
   </div>
@@ -35,17 +34,8 @@ import Player from '../components/Player.astro';
     z-index: 0;
 
     height: 100vh;
-    // clamp height
     min-height: 760px;
     max-height: 1200px;
-
-    background-position: center top;
-    background-repeat: repeat;
-    background-image: url('data:image/svg+xml;charset=utf8,\
-      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">\
-        <rect x="0" y="0" width="33" height="33" fill="white" stroke-width="1" stroke-dashoffset="2" stroke-dasharray="4 4" stroke="%23B5C1CE"/>\
-      </svg>\
-    ');
   }
 
   .Hero__head {

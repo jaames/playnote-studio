@@ -6,8 +6,15 @@ html, body {
   letter-spacing: 0.02em;
   line-height: $line-height-global;
   font-weight: $font-weight-global;
-  background: $color-bg;
   color: $color-text;
+  background: $color-bg;
+  background-image: url('data:image/svg+xml;charset=utf8,\
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">\
+      <rect x="0" y="0" width="33" height="33" fill="white" stroke-width="1" stroke-dashoffset="2" stroke-dasharray="4 4" stroke="%23B5C1CE"/>\
+    </svg>\
+  ');
+  background-position: center top;
+  background-repeat: repeat;
 }
 
 img, svg {
@@ -29,6 +36,12 @@ h1, h2, h3, h4, h5, h6 {
 
 .link {
   border-bottom: 0.03em solid currentColor;
+}
+
+.screenshot {
+  image-rendering: auto;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
 }
 
 .Button {

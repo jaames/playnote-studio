@@ -9,7 +9,8 @@ export {
   Uniform,
   DataTexture,
   TextureLoader,
-  LinearFilter
+  LinearFilter,
+  NearestFilter
 } from 'three';
 export { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
