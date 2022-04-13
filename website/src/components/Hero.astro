@@ -3,6 +3,7 @@ import { Icon } from 'astro-icon';
 
 import Nav from '../components/Nav.astro';
 import Player from '../components/Player.astro';
+import Button from '../components/Button.astro';
 ---
 <header class="Hero">
   <div class="Hero__head">
@@ -18,7 +19,7 @@ import Player from '../components/Player.astro';
         <Player/>
       </div>
       <div class="Hero__sub">
-        <button class="Hero__downloadButton Button">Download</button>
+        <Button class="Hero__downloadButton" href="#download">Download</Button>
       </div>
     </div>
   </div>
@@ -70,15 +71,17 @@ import Player from '../components/Player.astro';
     @include breakpoint-tablet {
       // grid-column: 1;
       margin: 0 auto;
-      max-width: 512px;
+      max-width: 480px;
+      margin-top: 1.5rem;
     }
   }
 
   .Hero__tagline {
     color: $color-text-alt;
-    font-weight: normal;
+    font-weight: bold;
     font-size: 1.2rem;
-    margin-bottom: .5rem;
+    margin-top: .75rem;
+    margin-bottom: .75rem;
     max-width: 25ch;
   }
 
