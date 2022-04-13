@@ -39,6 +39,19 @@ function DitherSwatch:click()
   self.clickCallback(self)
 end
 
+function DitherSwatch:addedToScreen()
+  sounds:prepareSfxGroup('dither', {
+    'dither1',
+    'dither2',
+    'dither3',
+    'dither4',
+  })
+end
+
+function DitherSwatch:removedFromScreen()
+  sounds:releaseSfxGroup('dither')
+end
+
 function DitherSwatch:draw()
   local w = self.width
   local h = self.height
@@ -71,10 +84,20 @@ function DitherSwatch:switchPattern()
   local lastPattern = self.pattern
   local n = (self.pattern - 1) % #PATTERNS
   local nextPattern = n == 0 and #PATTERNS or n
-  
+ 
   self.pattern = nextPattern
   self.isTransitionActive = true
   local transitionTimer = playdate.timer.new(200, 0, self.height, playdate.easingFunctions.outCubic)
+
+  if nextPattern == 1 then
+    sounds:playSfx('dither1')
+  elseif nextPattern == 2 then
+    sounds:playSfx('dither4')
+  elseif nextPattern == 3 then
+    sounds:playSfx('dither3')
+  elseif nextPattern == 4 then
+    sounds:playSfx('dither2')
+  end
 
   transitionTimer.updateCallback = function (timer)
     self:updateBitmap(nextPattern, lastPattern, timer.value)

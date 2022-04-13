@@ -8,6 +8,7 @@ local sfxGroups = {}
 local refCounts = {}
 local lastSampleName = nil
 local currMusic = nil
+local cooldownStart = {}
 
 sounds = {}
 
@@ -83,7 +84,48 @@ function sounds:playSfxOnce(sampleName, callbackFn)
   end
 end
 
--- stop the currently playing sound effect
+-- play a sound effect, but wait until it is done before playing it again
+function sounds:playSfxWithoutOverlap(sampleName, callbackFn)
+  if config.enableSoundEffects and sfx[sampleName] ~= nil then
+    lastSampleName = sampleName
+    local sample = sfx[sampleName]
+    if not sample:isPlaying() then
+    -- print('playing ' .. sampleName)
+      sample:play(1)
+      sample:setFinishCallback(callbackFn)
+    else
+      print('prevented overlap')
+    end
+  end
+end
+
+-- play a sound effect, restarting it if it's already playing
+function sounds:playSfxWithOverlap(sampleName, callbackFn)
+  if config.enableSoundEffects and sfx[sampleName] ~= nil then
+    lastSampleName = sampleName
+    local sample = sfx[sampleName]
+    if sample:isPlaying() then
+      sample:setPaused(true)
+      sample:setOffset(0)
+      sample:setPaused(false)
+    else
+      sample:play(1)
+      sample:setFinishCallback(callbackFn)
+    end
+  end
+end
+
+-- play a sound effect, but only if it hasn't already played within a certain duration
+function sounds:playSfxWithCooldown(sampleName, cooldownDuration, callbackFn)
+  local s = cooldownStart[sampleName]
+  local now = playdate.getCurrentTimeMilliseconds()
+  if (not s) or (s < now - cooldownDuration) then
+    self:playSfx(sampleName, callbackFn)
+    cooldownStart[sampleName] = now
+  end
+end
+
+-- stop a currently playing sound effect
 function sounds:stopSfx(sampleName)
   if sfx[sampleName] ~= nil then
     sfx[sampleName]:stop()

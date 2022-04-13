@@ -11,11 +11,11 @@ local buttonGfx <const> = {
     select = newNineSlice('./gfx/shape_button_folderselect_selected', 8, 8, 2, 2),
     click =  newNineSlice('./gfx/shape_button_folderselect_clicked', 8, 8, 2, 2)
   },
-  -- settings = {
-  --   base =   gfx.nineSlice.new('./gfx/shape_button_settings', 8, 8, 2, 2),
-  --   select = gfx.nineSlice.new('./gfx/shape_button_settings_selected', 8, 8, 2, 2),
-  --   click =  gfx.nineSlice.new('./gfx/shape_button_settings_clicked', 8, 8, 2, 2)
-  -- },
+  settings = {
+    base =   newNineSlice('./gfx/shape_button_cap_topleft', 8, 8, 2, 2),
+    select = newNineSlice('./gfx/shape_button_cap_topleft_selected', 8, 8, 2, 2),
+    click =  newNineSlice('./gfx/shape_button_default_clicked', 8, 8, 2, 2)
+  },
 }
 
 Button = {}
@@ -61,6 +61,15 @@ end
 function Button:unfocus()
   self.state = 'base'
   Button.super.unfocus(self)
+end
+
+function Button:click()
+  local lastState = self.state
+  self.state = 'click'
+  playdate.timer.performAfterDelay(300, function ()
+    self.state = lastState
+  end)
+  Button.super.click(self)
 end
 
 function Button:setText(prelocaleText)

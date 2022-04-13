@@ -81,6 +81,18 @@ function playdate.update()
   -- playdate.drawFPS(8, PLAYDATE_H - 20)
 end
 
+playdate.setCrankSoundsDisabled(true)
+
+function playdate.crankDocked()
+  sounds:prepareSfx({'crankDocked'})
+  sounds:playSfxThenRelease('crankDocked')
+end
+
+function playdate.crankUndocked()
+  sounds:prepareSfx({'crankUndocked'})
+  sounds:playSfxThenRelease('crankUndocked')
+end
+
 -- import 'CoreLibs/qrcode'
 -- playdate.graphics.generateQRCode('https://playnote.studio/filehelp', 120, function (qr)
 --   playdate.simulator.writeToFile(qr, '~/qr.png')

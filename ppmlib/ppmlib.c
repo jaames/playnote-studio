@@ -34,7 +34,7 @@ static player_ctx* getPlayerCtx(int n)
 
 static void blitPpmFrame(player_ctx* ctx, u16 frameIndex, void* destBuffer, u16 destX, u16 destY, u16 destStride)
 {
-  void* dest;
+	void* dest;
 
 	ppmVideoDecodeFrame(ctx->ppm, frameIndex, 0);
 
@@ -120,7 +120,7 @@ static int ppmlib_gc(lua_State* L)
 {
 	player_ctx* ctx = getPlayerCtx(1);
 	playerDone(ctx);
-  return 0;
+	return 0;
 }
 
 static int ppmlib_index(lua_State* L)
@@ -150,7 +150,7 @@ static int ppmlib_index(lua_State* L)
 	else
 		pd->lua->pushNil();
 
-  return 1;
+	return 1;
 }
 
 // set a layer's dither pattern from a list of presets
@@ -178,8 +178,8 @@ static int ppmlib_draw(lua_State* L)
 {
 	player_ctx* ctx = getPlayerCtx(1);
 	blitPpmFrame(ctx, ctx->currentFrame, pd->graphics->getFrame(), ctx->x, ctx->y, LCD_ROWSIZE);
-  pd->graphics->drawRect(ctx->x - 2, ctx->y - 2, PPM_SCREEN_WIDTH + 4, PPM_SCREEN_HEIGHT + 4, kColorBlack);
-  pd->graphics->drawRect(ctx->x - 1, ctx->y - 1, PPM_SCREEN_WIDTH + 2, PPM_SCREEN_HEIGHT + 2, kColorWhite);
+	pd->graphics->drawRect(ctx->x - 2, ctx->y - 2, PPM_SCREEN_WIDTH + 4, PPM_SCREEN_HEIGHT + 4, kColorBlack);
+	pd->graphics->drawRect(ctx->x - 1, ctx->y - 1, PPM_SCREEN_WIDTH + 2, PPM_SCREEN_HEIGHT + 2, kColorWhite);
 	return 0;
 }
 
@@ -217,28 +217,28 @@ static int ppmlib_update(lua_State* L)
 {
 	player_ctx* ctx = getPlayerCtx(1);
 	playerUpdate(ctx);
-  return 0;
+	return 0;
 }
 
 static int ppmlib_play(lua_State* L)
 {
 	player_ctx* ctx = getPlayerCtx(1);
 	playerPlay(ctx);
-  return 0;
+	return 0;
 }
 
 static int ppmlib_pause(lua_State* L)
 {
 	player_ctx* ctx = getPlayerCtx(1);
 	playerPause(ctx);
-  return 0;
+	return 0;
 }
 
 static int ppmlib_setStoppedCallback(lua_State* L)
 {
 	player_ctx* ctx = getPlayerCtx(1);
 	ctx->stoppedCallback = pd_strdup(pd->lua->getArgString(2));
-  return 0;
+	return 0;
 }
 
 static const lua_reg libPpm[] =

@@ -93,7 +93,9 @@ function PlayerScreen:beforeEnter()
     'pageNextFast',
     'pagePrevFast',
     'pause',
-    'playMove'
+    'playMove',
+    'crankA',
+    'crankB',
   })
   playdate.getCrankTicks(24) -- prevent crank going nuts if it's been moved since this screen was last active
   self:unloadPpm()
@@ -299,7 +301,14 @@ end
 function PlayerScreen:update()
   if not self.ppm.isPlaying then
     local frameChange = playdate.getCrankTicks(24)
-    self:setCurrentFrame(self.ppm.currentFrame + frameChange)
+    if frameChange ~= 0 then
+      self:setCurrentFrame(self.ppm.currentFrame + frameChange)
+      if frameChange < 0 then
+        sounds:playSfxWithCooldown('crankA', 60)
+      else
+        sounds:playSfxWithCooldown('crankB', 60)
+      end
+    end
   end
   self.ppm:update()
 end

@@ -9,10 +9,10 @@
 
 typedef struct player_ctx
 {
-  ppm_ctx_t* ppm;
-  // drawing
-  u16 x;
-  u16 y;
+	ppm_ctx_t* ppm;
+	// drawing
+	u16 x;
+	u16 y;
 	// ppm meta shorthands
 	u16 numFrames;
 	u8 loop;
@@ -22,7 +22,7 @@ typedef struct player_ctx
 	float currentTime;
 	u16 currentFrame;
 	// ppm dither pattern per color per layer
-  const u8* layerPattern[2][3];
+	const u8* layerPattern[2][3];
 	// ppm audio render
 	s16* masterAudio;
 	AudioSample* masterAudioSample;

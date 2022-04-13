@@ -19,6 +19,7 @@ function HomeScreen:setupSprites()
   self.viewButton = viewButton
 
   local settingsButton = Button(PLAYDATE_W + 6, -6, 128, 42, '%HOME_SETTINGS%')
+  settingsButton.variant = 'settings'
   settingsButton.autoWidth = true
   settingsButton:setIcon('./gfx/icon_settings')
   settingsButton:setAnchor('right', 'top')

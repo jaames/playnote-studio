@@ -86,7 +86,7 @@ LCDBitmap* tmbGetPdBitmap(tmblib_ctx* ctx)
 
 static tmblib_ctx* getTmbCtx(int n)
 {
-  return pd->lua->getArgObject(n, "TmbParser", NULL);
+	return pd->lua->getArgObject(n, "TmbParser", NULL);
 }
 
 static int tmb_new(lua_State* L)
@@ -136,7 +136,7 @@ static int tmb_gc(lua_State* L)
 	pd->graphics->freeBitmap(ctx->bitmap);
 	// pd_log("tmb free at 0x%08x", ctx);
 	pd_free(ctx);
-  return 0;
+	return 0;
 }
 
 static int tmb_index(lua_State* L)
@@ -181,7 +181,7 @@ static int tmb_index(lua_State* L)
 	else
 		pd->lua->pushNil();
 
-  return 1;
+	return 1;
 }
 
 static const lua_reg libTmb[] =

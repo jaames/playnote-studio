@@ -98,6 +98,16 @@ function ScrollController:resetOffset()
   self:setOffset(self.start)
 end
 
+function ScrollController:canScroll()
+  local o = self.offset
+  if o <= -self.range then
+    return false
+  elseif o >= self.start then
+    return false
+  end
+  return true
+end
+
 function ScrollController:clampOffset(o)
   if o <= -self.range then
     return -self.range
@@ -116,6 +126,13 @@ end
 function ScrollController:crankHandler(change, acceleratedChange)
   self:setOffset(self.offset - math.floor(change)) -- math.floor important for avoiding rounding issues when drawing bg grid
   self.autoScroll = false
+  if self:canScroll() then
+    if change < 0 then
+      sounds:playSfxWithCooldown('crankA', 100)
+    else
+      sounds:playSfxWithCooldown('crankB', 100)
+    end
+  end
 end
 
 function ScrollController:connectScreen(screen)
@@ -123,6 +140,17 @@ function ScrollController:connectScreen(screen)
 
   screen:addHook('select:change', function (sprite, rect)
     self:scrollToSelection(rect)
+  end)
+
+  screen:addHook('enter:before', function ()
+    sounds:prepareSfxGroup('crank', {
+      'crankA',
+      'crankB',
+    })
+  end)
+
+  screen:addHook('leave:before', function ()
+    sounds:releaseSfxGroup('crank')
   end)
 
   local inputHandlers = screen.inputHandlers

@@ -16,6 +16,7 @@ function FolderSelect:addOption(value, label, shortLabel)
   end
 end
 
+-- TODO: can remove?
 function FolderSelect:addedToScreen()
   sounds:prepareSfxGroup('select', {
     'optionMenuOpen',

@@ -16,42 +16,42 @@ static void doCallback(char* fnName, int numArgs)
 {
 	const char* err;
 	if (!pd->lua->callFunction(fnName, numArgs, &err))
-    pd_log("Error calling Lua callback: %s", err);
+		pd_log("Error calling Lua callback: %s", err);
 }
 
 player_ctx* playerInit(u16 x, u16 y)
 {
-  player_ctx* ctx = pd_malloc(sizeof(player_ctx));
+	player_ctx* ctx = pd_malloc(sizeof(player_ctx));
 	ctx->ppm = NULL;
 	ctx->masterAudio = NULL;
-  playerMoveTo(ctx, x, y);
-  return ctx;
+	playerMoveTo(ctx, x, y);
+	return ctx;
 }
 
 void playerMoveTo(player_ctx* ctx, u16 x, u16 y)
 {
-  ctx->x = x;
-  ctx->y = y; 
+	ctx->x = x;
+	ctx->y = y; 
 }
 
 int playerLoadPpm(player_ctx* ctx, void* ppmBuffer, size_t ppmSize)
 {
 	ctx->ppm = pd_malloc(sizeof(ppm_ctx_t));
 	int err = ppmInit(ctx->ppm, ppmBuffer, ppmSize);
-  if (err != -1)
+	if (err != -1)
 	{
 		pd_error("Error loading PPM: %d", err);
 		return 1;
 	}
-  
-  ctx->isPlaying = 0;
+	
+	ctx->isPlaying = 0;
 	ctx->startTime = 0;
 	ctx->currentTime = 0;
-  ctx->currentFrame = 0;
+	ctx->currentFrame = 0;
 	ctx->numFrames = ctx->ppm->hdr.numFrames;
 	ctx->loop = ctx->ppm->animHdr.flags.loop;
-  
-  ctx->layerPattern[0][0] = LUT_ppmDitherNone;
+	
+	ctx->layerPattern[0][0] = LUT_ppmDitherNone;
 	ctx->layerPattern[0][1] = LUT_ppmDitherNone;
 	ctx->layerPattern[0][2] = LUT_ppmDitherNone;
 	ctx->layerPattern[1][0] = LUT_ppmDitherNone;
@@ -76,14 +76,14 @@ int playerLoadPpm(player_ctx* ctx, void* ppmBuffer, size_t ppmSize)
 		pd->sound->sampleplayer->setSample(ctx->audioPlayer, ctx->masterAudioSample);
 	}
 
-  return 0;
+	return 0;
 }
 
 void playerDone(player_ctx* ctx)
 {
-  ppmDone(ctx->ppm);
+	ppmDone(ctx->ppm);
 	pd_free(ctx->ppm);
-  if (ctx->masterAudio != NULL)
+	if (ctx->masterAudio != NULL)
 	{
 		pd->sound->sampleplayer->stop(ctx->audioPlayer);
 		pd->sound->sampleplayer->freePlayer(ctx->audioPlayer);
@@ -95,7 +95,7 @@ void playerDone(player_ctx* ctx)
 
 void playerSetLayerDithering(player_ctx* ctx, int layer, int colour, int pattern)
 {
-  switch (pattern)
+	switch (pattern)
 	{
 		case 1:
 			ctx->layerPattern[layer][colour] = LUT_ppmDitherPolka;
@@ -106,7 +106,7 @@ void playerSetLayerDithering(player_ctx* ctx, int layer, int colour, int pattern
 		case 3:
 			ctx->layerPattern[layer][colour] = LUT_ppmDitherInvPolka;
 			break;
-    case 0:
+		case 0:
 		default:
 			ctx->layerPattern[layer][colour] = LUT_ppmDitherNone;
 	}
@@ -114,7 +114,7 @@ void playerSetLayerDithering(player_ctx* ctx, int layer, int colour, int pattern
 
 void playerSetFrame(player_ctx* ctx, int frame)
 {
-  if (ctx->loop)
+	if (ctx->loop)
 		ctx->currentFrame = mod(frame, ctx->numFrames);
 	else
 		ctx->currentFrame = clamp(frame, 0, ctx->numFrames - 1);
@@ -136,38 +136,38 @@ void playerPlay(player_ctx* ctx)
 	ctx->isPlaying = 1;
 	pd->system->resetElapsedTime();
 	ctx->startTime = -ctx->currentTime;
-  playerPlayAudio(ctx);
+	playerPlayAudio(ctx);
 }
 
 void playerPause(player_ctx* ctx)
 {
 	ctx->isPlaying = 0;
-  if (ctx->masterAudio != NULL)
+	if (ctx->masterAudio != NULL)
 		pd->sound->sampleplayer->stop(ctx->audioPlayer);
 }
 
 void playerUpdate(player_ctx* ctx)
 {
-  if (!ctx->isPlaying)
-    return;
+	if (!ctx->isPlaying)
+		return;
 
-  ctx->currentTime = pd->system->getElapsedTime() - ctx->startTime;
-  u16 frameIndex = (u16)floor(ctx->currentTime / (1.0 / (float)ctx->ppm->frameRate));
-  
-  if (frameIndex != ctx->currentFrame)
-  {
-    if (ctx->loop && frameIndex >= ctx->numFrames)
-    {
+	ctx->currentTime = pd->system->getElapsedTime() - ctx->startTime;
+	u16 frameIndex = (u16)floor(ctx->currentTime / (1.0 / (float)ctx->ppm->frameRate));
+	
+	if (frameIndex != ctx->currentFrame)
+	{
+		if (ctx->loop && frameIndex >= ctx->numFrames)
+		{
 			pd->system->resetElapsedTime();
 			ctx->currentFrame = 0;
-      ctx->startTime = 0;
-      ctx->currentTime = 0;
+			ctx->startTime = 0;
+			ctx->currentTime = 0;
 			playerPlayAudio(ctx);
-    }
+		}
 		else if (frameIndex >= ctx->numFrames)
 		{
 			ctx->currentFrame = 0;
-      ctx->currentTime = 0;
+			ctx->currentTime = 0;
 			if (ctx->stoppedCallback != NULL)
 				doCallback(ctx->stoppedCallback, 1);
 			ctx->isPlaying = 0;
@@ -178,5 +178,5 @@ void playerUpdate(player_ctx* ctx)
 		}	
 		LCDRect dirtyRect = {ctx->x - 4, ctx->x + PPM_SCREEN_WIDTH + 4, ctx->y - 4, ctx->y + PPM_SCREEN_HEIGHT + 4};
 		pd->sprite->addDirtyRect(dirtyRect);
-  }
+	}
 }
