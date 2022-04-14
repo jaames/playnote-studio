@@ -127,10 +127,11 @@ function ScrollController:crankHandler(change, acceleratedChange)
   self:setOffset(self.offset - math.floor(change)) -- math.floor important for avoiding rounding issues when drawing bg grid
   self.autoScroll = false
   if self:canScroll() then
+    local cooldown = 500 / math.abs(acceleratedChange)
     if change < 0 then
-      sounds:playSfxWithCooldown('crankA', 100)
+      sounds:playSfxWithCooldown('crankA', cooldown)
     else
-      sounds:playSfxWithCooldown('crankB', 100)
+      sounds:playSfxWithCooldown('crankB', cooldown)
     end
   end
 end
