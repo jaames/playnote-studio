@@ -114,10 +114,10 @@ void playerSetLayerDithering(player_ctx* ctx, int layer, int colour, int pattern
 
 void playerSetFrame(player_ctx* ctx, int frame)
 {
-	if (ctx->loop)
-		ctx->currentFrame = mod(frame, ctx->numFrames);
-	else
-		ctx->currentFrame = clamp(frame, 0, ctx->numFrames - 1);
+	// if (ctx->loop)
+	ctx->currentFrame = mod(frame, ctx->numFrames);
+	// else
+	// 	ctx->currentFrame = clamp(frame, 0, ctx->numFrames - 1);
 	ctx->currentTime = ctx->currentFrame * (1.0 / (float)ctx->ppm->frameRate);
 }
 
