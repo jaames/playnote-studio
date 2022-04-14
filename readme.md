@@ -1,12 +1,8 @@
 ## TODO
 
-- Finalize sample note set, update samplememo/playnote.json for dither settings
-- sfx: dialog open, Flipnote view page not allowed, Note list page slide / page not allowed, Flipnote view crank forward / crank back, Multiple dither swatch sounds
-- Credits lag when song kicks in
-- Credits autoscroll speed adjust
+- only play one sfx when backing out of player while a note is playing
+- sfx: redo dialog open, Note list page slide / page not allowed
 - Scrolling on Settings should change selection
-- Buttons should have gfx for when they've been clicked
-- Website
 - Add DSi username chars to font
 - Redraw hiragana and katakana?
 - Create a PPM test suite to verify against

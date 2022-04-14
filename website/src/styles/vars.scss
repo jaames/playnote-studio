@@ -7,7 +7,7 @@ $font-size-global-mobile: 16px;
 $font-size-header: 1.3rem;
 
 $font-weight-global: 500;
-$font-weight-header: 800;
+$font-weight-header: 500;
 
 $line-height-global: 1.36;
 
@@ -17,7 +17,9 @@ $color-text-invert: #fff;
 $color-text-invert-alt: #BFCFDF;
 
 $color-bg: #fff;
+$color-bg-alt: #E6E7EC;
 $color-bg-invert: #000;
+$color-bg-invert-alt: #6d6e76;
 
 $color-brand-playdate: #ffc833;
 $color-brand-playdate-device: #fbc651;
@@ -29,6 +31,6 @@ $wrapper-padding: 12px;
 $wrapper-width: 1208px;
 $tablet-wrapper-width: 832px;
 $mobile-wrapper-width: 384px;
-$navbar-height: 64px;
+$navbar-height: 96px;
 
 @import './mixins';

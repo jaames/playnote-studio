@@ -1,7 +1,7 @@
 ---
-const { href } = Astro.props
+const { href, type } = Astro.props
 ---
-<div class="Button">
+<div class={['Button', type ? `Button--${type}` : ''].filter(Boolean).join(' ')}>
   <a class="Button__inner" href={ href }>
     <slot/>
   </a>
@@ -12,12 +12,13 @@ const { href } = Astro.props
     margin: 5px;
     border-radius: 15px;
     border: 5px solid $color-bg-invert;
+    box-shadow: $shadow;
   }
 
   .Button__inner {
+    text-align: center;
     display: block;
     cursor: pointer;
-    font-weight: bold;
     color: $color-text-invert;
     background: $color-bg-invert;
     padding: 6px 20px;
@@ -25,7 +26,18 @@ const { href } = Astro.props
     border-right-color: #B3B5C1;
     border-bottom-color: #B3B5C1;
     border-radius: 10px;
-    box-shadow: $shadow-button;
     appearance: none;
+  }
+
+  .Button--inverted {
+    border: 5px solid $color-bg;
+
+    .Button__inner {
+      color: $color-text;
+      background: $color-bg;
+      border: 3px solid rgb(103, 103, 115);
+    border-right-color: #000;
+    border-bottom-color: #000;
+    }
   }
 </style>

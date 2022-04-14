@@ -1,37 +1,21 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
-import Panel from '../components/Panel.astro';
-import CreditsGroup from '../components/CreditsGroup.astro';
-import CreditsColumn from '../components/CreditsColumn.astro';
-import CreditsPerson from '../components/CreditsPerson.astro';
+import Button from '../components/Button.astro';
 ---
 <BaseLayout>
   <Hero/>
-  <section class="Section IntroSection">
-    <div class="Section__body">
-      <Panel>
-        <p>
-          <a href="https://www.nintendo.co.uk/Games/Nintendo-DSiWare/Flipnote-Studio-263126.html">Flipnote&nbsp;Studio</a> was an app for the Nintendo&nbsp;DSi where users could create flipbook-style animations (called "Flipnotes") using the console's touch screen, microphone, and cameras
-        </p>
-        <p>
-          Playnote&nbsp;Studio lets you view these Flipnotes on the Playdate, the nifty yellow handheld gaming console by Panic.
-          All you have to do is drop them onto your Playdate's storage!
-        </p>
-      </Panel>
-    </div>
-  </section>
-  
+
   <section class="Section FeaturesSection" id="features">
-    <h3 class="Section__title">Features</h3>
+    <h2 class="Section__title">Features</h2>
     <div class="Section__body">
       <div class="FeatureGrid">
         <div class="FeatureGrid__item">
           <img class="FeatureGrid__itemImage screenshot" src="/assets/movie_playback.gif" alt="">
           <p class="FeatureGrid__itemText">
-            Bundled with 24 animations kindly provided by some of the best Flipnote artists in the community!
+            Bundled with 24 animations kindly provided by a variety of Flipnote artists
+            <sub>(this one is by <a href="https://twitter.com/Kekeflipnote">Kéké</a>!)</sub>
           </p>
-          <sub>(this one is by <a href="https://twitter.com/Kekeflipnote">kéké</a>)</sub>
         </div>
         <div class="FeatureGrid__item">
           <img class="FeatureGrid__itemImage screenshot" src="/assets/movie_dither.gif" alt="">
@@ -50,139 +34,201 @@ import CreditsPerson from '../components/CreditsPerson.astro';
   </section>
 
   <section class="Section DownloadSection" id="download">
-    <h3 class="Section__title">Download</h3>
+    <h2 class="Section__title">Download</h2>
     <div class="Section__body">
-      <div class="Card DownloadCard">
-        <h4>Playnote Studio <sub>v1.0.0</sub></h4>
-        <p>
-          Size 17.6 MB
-          Includes a selection of 24 sample Flipnotes from Kéké, mrjohn, ぺきら (Pekira), Bee, Who Cares (bokeh f/2), Akemi, and Scarecrow
-        </p>
+      <div class="DownloadCard">
+        <div class="DownloadCard__head">
+          <div class="DownloadCard__info">
+            <h3 class="DownloadCard__title">playnote.pdx</h3>
+            <div class="DownloadCard__stat">Version 1.0</div>
+            <div class="DownloadCard__stat">17.6 MB</div>
+          </div>
+          <div class="DownloadCard__buttons">
+            <Button type="inverted">Download</Button>
+          </div>
+        </div>
+        <div class="DownloadCard__body">
+          <div class="DownloadCard__desc">Includes a selection of 24 sample Flipnotes from Kéké, mrjohn, ぺきら&nbsp;(Pekira), Bee, Who&nbsp;Cares&nbsp;(bokeh&nbsp;f/2), Akemi, and Scarecrow.</div>
+          <div class="DownloadCard__sideloadNote">(?) This app can be installed by <a href="https://help.play.date/games/sideloading/">sideloading</a> it</div>
+          <div class="DownloadCard__compatNote">(!) Please note that the Playdate Simulator isn't supported</div>
+        </div>
       </div>
     </div>
   </section>
 
   <section class="Section FaqSection" id="faqs">
-    <h3 class="Section__title">FAQ</h3>
+    <h2 class="Section__title">FAQs</h2>
     <div class="Section__body">
-      <Panel>
-        <div class="FaqList">
-          <div class="FaqList__item">
-            <h4 class="FaqList__question">
-              Who built this?
-            </h4>
-            <p class="FaqList__answer">
-              That would be me, <a href="https://twitter.com/rakujira">James</a>! But this wouldn't have been remotely possible without a whole *bunch* of favours from very cool friends and members of the Flipnote community, you can find all of their names in the credits towards the end of this page.
-            </p>
+      <div class="FaqList">
+        <div class="FaqList__item">
+          <div class="FaqList__question">
+            What is Flipnote Studio? What are Flipnotes?
           </div>
-          <div class="FaqList__item">
-            <h4 class="FaqList__question">
-              Why make a Flipnote player for the Playdate?
-            </h4>
-            <p class="FaqList__answer">
-              Little else has single-handedly fueled my penchant for making things quite as much as Flipnote&nbsp;Studio. It's left a lasting impact on me and in a roundabout way was influencial in pushing me towards a creative career, so this app is a love-letter to a weird little animation tool and community that I and many others appreciate very much.
-              It also just kinda happens that using the Playdate's crank to scroll through one of <a href="https://twitter.com/Kekeflipnote">Kéké's</a> animations is pretty fun!
-            </p>
-          </div>
-          <div class="FaqList__item">
-            <h4 class="FaqList__question">
-              Can this app create Flipnotes?
-            </h4>
-            <p class="FaqList__answer">
-              It can't, sorry! The Playdate doesn't have a touchscreen, so I came to the conclusion that trying to create detailed animations on it would be overly finicky, and I consider it beyond the scope of this project. That doesn't mean I'm not working on something else along those lines for the distant future, although if you want to make art on the Playdate you should keep an eye out for Dustin Mierau's <a href="https://twitter.com/dmierau/status/1372321742828412936">Playmaker</a>!
-            </p>
-          </div>
-          <div class="FaqList__item">
-            <h4 class="FaqList__question">
-              Is there a way to play Flipnotes without a Playdate or Nintendo&nbsp;DSi?
-            </h4>
-            <p class="FaqList__answer">
-              Yes! I previously built a free <a href="https://flipnote.rakujira.jp/">web-based Flipnote player</a> which can play animation files from both the DSiWare version of Flipnote&nbsp;Studio and Flipnote&nbsp;Studio&nbsp;3D.
-            </p>
-          </div>
-          <div class="FaqList__item">
-            <h4 class="FaqList__question">
-              Why aren't Flipnote&nbsp;Studio&nbsp;3D animations supported?
-            </h4>
-            <p class="FaqList__answer">
-              Flipnote&nbsp;Studio&nbsp;3D - the Nintendo&nbsp;3DS sequel to Flipnote&nbsp;Studio - uses a much more complex animation format compared to the original DSiWare version. I had to pull out a lot of tricks to get DSi Flipnotes running smoothly on the Playdate, and I have some ideas for getting the 3DS format to that point, but I'm saving that challenge for another day.
-            </p>
-          </div>
-          <div class="FaqList__item">
-            <h4 class="FaqList__question">
-              Will there be any updates?
-            </h4>
-            <p class="FaqList__answer">
-              I would like to keep adding new features as the Playdate develops, but it depends on how many people use the app. You should follow me on <a href="https://twitter.com/rakujira">Twitter</a> to keep up to (play)date!
-            </p>
+          <div class="FaqList__answer">
+            <a href="https://www.nintendo.co.uk/Games/Nintendo-DSiWare/Flipnote-Studio-263126.html">Flipnote&nbsp;Studio</a> is an app for the Nintendo&nbsp;DSi where users can create flipbook-style animations using the console's touch screen, microphone, and cameras. These animations are called <b>Flipnotes</b>.
           </div>
         </div>
-      </Panel>
+        <div class="FaqList__item">
+          <div class="FaqList__question">
+            Who built this?
+          </div>
+          <div class="FaqList__answer">
+            That would be me, <a href="https://twitter.com/rakujira">James</a>! But this wouldn't have been remotely possible without a whole *bunch* of favours from very cool friends and members of the Flipnote and Playdate communities, you can find all of their names in the credits towards the end of this page.
+          </div>
+        </div>
+        <div class="FaqList__item">
+          <div class="FaqList__question">
+            Why make a Flipnote player for the Playdate?
+          </div>
+          <div class="FaqList__answer">
+            Little else has single-handedly fueled my penchant for making things quite as much as Flipnote&nbsp;Studio. It's left a lasting impact on me and in a roundabout way was influencial in pushing me towards a creative career, so this app is a love-letter to a weird little animation tool and community that I and many others appreciate very much.
+            It also just kinda happens that using the Playdate's crank to scroll through one of <a href="https://twitter.com/Kekeflipnote">Kéké's</a> animations is pretty fun!
+          </div>
+        </div>
+        <div class="FaqList__item">
+          <div class="FaqList__question">
+            Can this app create Flipnotes?
+          </div>
+          <div class="FaqList__answer">
+            It can't, sorry! The Playdate doesn't have a touchscreen, so I came to the conclusion that trying to create detailed animations on it would be overly finicky, and I consider it beyond the scope of this project. That doesn't mean I'm not working on something else along those lines for the distant future, although if you want to make art on the Playdate you should keep an eye out for Dustin Mierau's <a href="https://twitter.com/dmierau/status/1372321742828412936">Playmaker</a>!
+          </div>
+        </div>
+        <div class="FaqList__item">
+          <div class="FaqList__question">
+            Can I watch Flipnotes without a Playdate or Nintendo&nbsp;DSi?
+          </div>
+          <div class="FaqList__answer">
+            Yes! I previously built a free <a href="https://flipnote.rakujira.jp/">web-based Flipnote player</a> which can play animation files from both the DSiWare version of Flipnote&nbsp;Studio and Flipnote&nbsp;Studio&nbsp;3D.
+          </div>
+        </div>
+        <div class="FaqList__item">
+          <div class="FaqList__question">
+            Why aren't Flipnote&nbsp;Studio&nbsp;3D animations supported?
+          </div>
+          <div class="FaqList__answer">
+            Flipnote&nbsp;Studio&nbsp;3D - the Nintendo&nbsp;3DS sequel to Flipnote&nbsp;Studio - uses a much more complex animation format compared to the original DSiWare version. I had to pull out a lot of tricks to get DSi Flipnotes running smoothly on the Playdate, and I have some ideas for getting the 3DS format to that point, but I'm saving that challenge for another day.
+          </div>
+        </div>
+        <div class="FaqList__item">
+          <div class="FaqList__question">
+            Will there be any updates?
+          </div>
+          <div class="FaqList__answer">
+            I would like to keep adding new features as the Playdate develops, so you should follow me on <a href="https://twitter.com/rakujira">Twitter</a> to keep up to (play)date!
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
   <section class="Section CreditsSection" id="credits">
-    <h3 class="Section__title">Credits</h3>
+    <h2 class="Section__title">Credits</h2>
     <div class="Section__body">
-      <Panel>
-        <CreditsGroup title="Programming and UI Design">
-          <CreditsPerson name="James Daniel" links={[{ url:'https://twitter.com/rakujira', label: 'Twitter' }, { url:'https://github.com/jaames', label: 'GitHub' }]}/>
-        </CreditsGroup>
-        <CreditsGroup title="Flipnote Parser">
-          <CreditsPerson name="Simon Aarons" links={[{ url:'https://twitter.com/itssimontime', label: 'Twitter' }, { url:'https://github.com/simontime', label: 'GitHub' }]}/>
-        </CreditsGroup>
-        <CreditsGroup title="Sound & Music">
-          <CreditsColumn title="Sound Design">
-            <CreditsPerson name="Talon Stradley" links={[{ url:'https://NewtonsDarkRoom.com', label: 'NewtonsDarkRoom.com' }]}/>
-          </CreditsColumn>
-          <CreditsColumn title="Credits Beat">
-            <CreditsPerson name="Talon Stradley" name="madwurmz" links={[{ url:'https://madwurmz.com', label: 'madwurmz.com' }, { url:'https://soundcloud.com/madwurmz', label: 'SoundCloud' }]}/>
-          </CreditsColumn>
-        </CreditsGroup>
-        <CreditsGroup title="Translation">
-          <CreditsColumn title="Español">
-            <CreditsPerson name="Meemo" links={[{ url: 'https://github.com/meemo', label: 'GitHub' }]}/>
-          </CreditsColumn>
-          <CreditsColumn title="Deutsch">
-            <CreditsPerson name="Mario Zoth" links={[{ url: 'https://twitter.com/zothynine', label: 'Twitter' }]}/>
-          </CreditsColumn>
-          <CreditsColumn title="Italiano">
-             <CreditsPerson name="Curren French" links={[{ url: 'https://www.finecurry.newgrounds.com', label: 'NewGrounds' }]}/>
-          </CreditsColumn>
-          <CreditsColumn title="Polski">
-            <CreditsPerson name="Twarda" links={[{ url: 'https://twitter.com/twarda8', label: 'Twitter' }, { url: 'https://www.artstation.com/twarda', label: 'ArtStation' }]}/>
-          </CreditsColumn>
-           <CreditsColumn title="Français">
-            <CreditsPerson name="Eva Lauren Kelly (thejsa)" links={[{ url:'https://www.evalauren.co.uk', label: 'evalauren.co.uk' }, { url: 'https://twitter.com/thejsa', label: 'Twitter' }]}/>
-            <CreditsPerson name="thomasnet" links={[{ url:'https://twitter.com/thomasnet_mc_', label: 'Twitter' }]}/>
-          </CreditsColumn>
-          <CreditsColumn title="Nederlands">
-            <CreditsPerson name="Célistine Oosting" links={[{ url: 'https://twitter.com/therealprocyon', label: 'Twitter' }, { url: 'https://github.com/therealprocyon', label: 'GitHub' }]}/>
-            <CreditsPerson name="Daniël van Melle" links={[{ url: 'https://kaasiand.cool', label: 'kaasiand.cool' }, { url: 'https://twitter.com/kaasIand', label: 'Twitter' }]}/>
-          </CreditsColumn>
-          <CreditsColumn title="Русский">
-            <CreditsPerson name={['Denis (Kashey) Chernesov', 'Alina (\m/eerkat) Smirnova']} links={[{ url: 'https://youtube.com/channel/UCbyMzNGlTGHxLRlShJDoD3Q', label: 'YouTube' }]}/>
-          </CreditsColumn>
-          <CreditsColumn title="Cymraeg">
-            <CreditsPerson name="Eva Lauren Kelly (thejsa)" links={[{ url:'https://www.evalauren.co.uk', label: 'evalauren.co.uk' }, { url: 'https://twitter.com/thejsa', label: 'Twitter' }]}/>
-          </CreditsColumn>
-        </CreditsGroup>
-        <CreditsGroup title="Special Thanks">
-          <CreditsPerson name="Matt Sephton" links={[{ url:'https://twitter.com/gingerbeardman', label: 'Twitter' }]}/>
-          <CreditsPerson name="Kaeru Team" links={[{ url:'https://twitter.com/kaeru.world', label: 'kaeru.world' }]}/>
-          <CreditsPerson name="Rob" links={[{ url:'https://www.sudomemo.net', label: 'sudomemo.net' }]}/>
-          <CreditsPerson name="Austin Burk" links={[{ url:'https://twitter.com/AustinSudomemo', label: 'Twitter' }]}/>
-        </CreditsGroup>
-        <CreditsGroup title="Flipnote Artists">
-          <CreditsPerson name="Kéké" links={[{ url:'https://twitter.com/Kekeflipnote', label: 'Twitter' }, { url:'https://k-eke.tumblr.com"', label: 'Tumblr' }, { url:'https://www.patreon.com/k_eke', label: 'Patreon' }]}/>
-          <CreditsPerson name="MrJohn" links={[{ url:'https://flipnot.es/9F990EE00074AC4D', label: 'Sudomemo' }]}/>
-          <CreditsPerson name="bokeh f/2 (who cares)" links={[{ url:'https://www.instagram.com/gsupnet_', label: 'Instagram' }]}/>
-          <CreditsPerson name="ぺきら (pekira)" links={[{ url:'https://twitter.com/pekira1227', label: 'Twitter' }]}/>
-          <CreditsPerson name="Bee" links={[{ url:'https://beeyt.carrd.co/', label: 'Carrd' }]}/>
-          <CreditsPerson name="Akemi" links={[{ url:'https://www.instagram.com/akemixes', label: 'Instagram' }]}/>
-          <CreditsPerson name="Scarecrow" links={[{ url:'https://www.sudomemo.net/user/5907142059918D1F@DSi', label: 'Sudomemo' }]}/>
-        </CreditsGroup>
-      </Panel>
+      <div class="CreditGroup">
+        <h5 class="CreditGroup__title">Programming and UI Design</h5>
+        <div class="CreditEntry">
+          <a class="CreditEntry__name" href="https://twitter.com/rakujira">James Daniel</a>
+        </div>
+      </div>
+      <div class="CreditGroup">
+        <h5 class="CreditGroup__title">Flipnote Parser</h5>
+        <div class="CreditEntry">
+          <a class="CreditEntry__name" href="https://twitter.com/itssimontime">Simon Aarons</a>
+        </div>
+      </div>
+      <div class="CreditGroup">
+        <h5 class="CreditGroup__title">Sound & Music</h5>
+        <div class="CreditEntry">
+          <span class="CreditEntry__title">Sound Design</span>
+          <a class="CreditEntry__name" href="https://NewtonsDarkRoom.com">Talon Stradley</a>
+        </div>
+        <div class="CreditEntry">
+          <span class="CreditEntry__title">Credits Beat</span>
+          <a class="CreditEntry__name" href="https://madwurmz.com">madwurmz</a>
+        </div>
+      </div>
+      <div class="CreditGroup CreditGroup--artists">
+        <h5 class="CreditGroup__title">Flipnote Artists</h5>
+        <div class="CreditEntry">
+          <a class="CreditEntry__name" href="https://twitter.com/Kekeflipnote">Kéké</a>
+        </div>
+        <div class="CreditEntry">
+          <a class="CreditEntry__name" href="https://flipnot.es/9F990EE00074AC4D">mrjohn</a>
+        </div>
+        <div class="CreditEntry">
+          <a class="CreditEntry__name" href="https://www.instagram.com/gsupnet_">bokeh f/2 (who cares)</a>
+        </div>
+        <div class="CreditEntry">
+          <a class="CreditEntry__name" href="https://twitter.com/pekira1227">ぺきら (pekira)</a>
+        </div>
+        <div class="CreditEntry">
+          <a class="CreditEntry__name" href="https://beeyt.carrd.co/">Bee</a>
+        </div>
+        <div class="CreditEntry">
+          <a class="CreditEntry__name" href="https://www.instagram.com/akemixes">Melaina King (Akemi)</a>
+        </div>
+        <div class="CreditEntry">
+          <a class="CreditEntry__name" href="https://www.sudomemo.net/user/5907142059918D1F@DSi">Scarecrow</a>
+        </div>
+      </div>
+      <div class="CreditGroup CreditGroup--breakColumn">
+        <h5 class="CreditGroup__title">Translation</h5>
+        <div class="CreditEntry">
+          <span class="CreditEntry__title">Français</span>
+          <a class="CreditEntry__name" href="https://www.evalauren.co.uk">Eva Lauren Kelly (thejsa)</a>
+          <a class="CreditEntry__name" href="https://twitter.com/thomasnet_mc_">thomasnet</a>
+        </div>
+        <div class="CreditEntry">
+          <span class="CreditEntry__title">Nederlands</span>
+          <a class="CreditEntry__name" href="https://twitter.com/therealprocyon">Célistine Oosting</a>
+          <a class="CreditEntry__name" href="https://kaasiand.cool">Daniël van Melle</a>
+        </div>
+        <div class="CreditEntry">
+          <span class="CreditEntry__title">日本語</span>
+          <a class="CreditEntry__name" href="http://ryusite.cyber-ninja.jp/">RYU-N</a>
+        </div>
+        <div class="CreditEntry">
+          <span class="CreditEntry__title">Español</span>
+          <a class="CreditEntry__name" href="https://github.com/meemo">Meemo</a>
+        </div>
+        <div class="CreditEntry">
+          <span class="CreditEntry__title">Deutsch</span>
+          <a class="CreditEntry__name" href="https://twitter.com/zothynine">Mario Zoth</a>
+        </div>
+        <div class="CreditEntry">
+          <span class="CreditEntry__title">Italiano</span>
+          <a class="CreditEntry__name" href="https://www.finecurry.newgrounds.com">Curren French</a>
+        </div>
+        <div class="CreditEntry">
+          <span class="CreditEntry__title">Polski</span>
+          <a class="CreditEntry__name" href="https://twitter.com/twarda8">Twarda</a>
+        </div>
+        <div class="CreditEntry">
+          <span class="CreditEntry__title">Русский</span>
+          <a class="CreditEntry__name" href="https://youtube.com/channel/UCbyMzNGlTGHxLRlShJDoD3Q">Denis Chernesov (Kashey)</a>
+          <a class="CreditEntry__name" href="https://youtube.com/channel/UCbyMzNGlTGHxLRlShJDoD3Q">Alina Smirnova (\m/eerkat)</a>
+        </div>
+        <div class="CreditEntry">
+          <span class="CreditEntry__title">Cymraeg</span>
+          <a class="CreditEntry__name" href="https://www.evalauren.co.uk">Eva Lauren Kelly (thejsa)</a>
+        </div>
+      </div>
+      <div class="CreditGroup">
+        <h5 class="CreditGroup__title">Special Thanks</h5>
+        <div class="CreditEntry">
+          <a class="CreditEntry__name" href="https://twitter.com/gingerbeardman">Matt Sephton</a>
+        </div>
+        <div class="CreditEntry">
+          <a class="CreditEntry__name" href="https://twitter.com/kaeru.world">Kaeru Team</a>
+        </div>
+        <div class="CreditEntry">
+          <a class="CreditEntry__name" href="https://www.sudomemo.net">Rob</a>
+        </div>
+        <div class="CreditEntry">
+          <a class="CreditEntry__name" href="https://twitter.com/AustinSudomemo">Austin Burk</a>
+        </div>
+      </div>
+      
     </div>
   </section>
 </BaseLayout>
@@ -190,6 +236,9 @@ import CreditsPerson from '../components/CreditsPerson.astro';
 <style lang="scss">
 
   .Section {
+    margin-top: 7rem;
+    margin-bottom: 2rem;
+
     @include wrapper;
 
     a {
@@ -203,37 +252,241 @@ import CreditsPerson from '../components/CreditsPerson.astro';
   }
 
   .Section__title {
+    // font-weight: 600;
     text-align: center;
+    font-size: 1.25rem;
     width: 100%;
-    margin-top: 5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
  
-  .Section--features {
-   max-width: 1272px
+  .FeaturesSection {
+    margin-top: -60px;
+    max-width: 1304px;
     
+    .Section__title {
+      color: white;
+      background: black;
+      background: url('../icons/panel_head_dark.svg');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      max-width: 15ch;
+      margin: 0 auto;
+      margin-bottom: -0.75rem;
+      padding: .75em 2em .5em 2em;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+    }
+
+    .Section__body {
+      color: white;
+      background: black;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: $shadow;
+    }
   }
 
   .FeatureGrid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: 24px;
+    grid-gap: 20px;
   }
 
   .FeatureGrid__item {
     max-width: 400px;
   }
 
-  .FaqList__question {
-    margin-bottom: .25rem;
+  .FeatureGrid__itemImage {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+
+  .FeatureGrid__itemText {
+    background: $color-bg-invert-alt;
+    margin-top: 1px;
+    padding: 12px 16px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  
+    sub {
+      line-height: inherit;
+      margin: 0;
+      opacity: .7;
+      vertical-align: baseline;
+    }
+  
+  }
+
+  .DownloadSection {
+    .Section__body {
+      max-width: grid-span(8, 12);
+      margin: 0 auto;
+    }
+  }
+
+  .DownloadCard {
+    display: flex;
+    border-radius: 24px;
+    box-shadow: $shadow;
+  }
+
+  .DownloadCard__head {
+    color: $color-text-invert;
+    background: $color-bg-invert;
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 24px;
+    padding: 32px;
+    // padding-right: 3rem;
+    width: 250px;
+  }
+
+  .DownloadCard__body {
+    background: $color-bg-alt;
+    flex: 1;
+    border-top-right-radius: 24px;
+    border-bottom-right-radius: 24px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .DownloadCard__title {
+    margin-top: -0.25em;  
+  }
+
+  .DownloadCard__stat {
+    color: $color-text-invert-alt;
+  }
+
+  .DownloadCard__buttons {
+    color: $color-text-invert-alt;
+    margin-top: 1em;
+    margin-bottom: -.5em;
+
+    :global(.Button) {
+      display: inline-block;
+    }
+  }
+
+  .DownloadCard__desc {
+    margin-bottom: auto;
+  }
+
+  .DownloadCard__sideloadNote {
+    font-size: .9rem;
+  }
+
+  .DownloadCard__compatNote {
+    font-size: .9rem;
+  }
+
+  .FaqSection {
+    .Section__body {
+      max-width: grid-span(8, 12);
+      margin: 0 auto;
+    }
   }
 
   .FaqList__item {
-    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .FaqList__question {
+    color: white;
+    background: black;
+    border-radius: 24px;
+    padding: 20px 24px;
+    margin-right: auto;
+    max-width: 90%;
+    position: relative;
+    // box-shadow: $shadow;
+
+    &::after {
+      position: absolute;
+      top: 100%;
+      left: 38px;
+      content: ' ';
+      display: block;
+      width: 0;
+      height: 0;
+      border-top: 12px solid black;
+      border-right: 16px solid transparent;
+    }
+  }
+
+  .FaqList__answer {
+    background: $color-bg-alt;
+    margin-left: auto;
+    border-radius: 24px;
+    padding: 20px 24px;
+    max-width: 90%;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    position: relative;
+    // box-shadow: $shadow;
+
+    &::after {
+      position: absolute;
+      top: 100%;
+      right: 38px;
+      content: ' ';
+      display: block;
+      width: 0;
+      height: 0;
+      border-top: 12px solid $color-bg-alt;
+      border-left: 16px solid transparent;
+    }
+  }
+
+  .FaqList__item {
+    // margin-bottom: 1.25rem;
   }
 
   .FaqList__item:last-child {
     margin-bottom: 0;
+  }
+
+  .CreditsSection {
+    .Section__body {
+      background: white;
+      max-width: grid-span(8, 12);
+      padding: 32px;
+      margin: 0 auto;
+      column-count: 2;
+    }
+  }
+
+   .CreditGroup {
+     margin-bottom: 1.75rem;
+   }
+
+  .CreditGroup--breakColumn {
+    break-before: column;
+  }
+
+  .CreditGroup__title {
+    font-size: 1rem;
+    margin-bottom: .25rem;
+  }
+
+  .CreditEntry {
+    font-size: .9rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    margin-bottom: .25rem;
+  }
+
+  .CreditEntry__title {
+  }
+
+  .CreditEntry__name {
+    grid-column: span 2;
+  }
+
+  .CreditEntry__title ~ .CreditEntry__name {
+    // color: $color-text-alt;
+    grid-column: 2 / span 1;
   }
 
 </style>
