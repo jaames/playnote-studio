@@ -243,23 +243,16 @@ import Button from '../components/Button.astro';
 <style lang="scss">
 
   .Section {
+    @include wrapper;
     margin-top: 5rem;
     margin-bottom: 2rem;
-
-    @include wrapper;
-
-    a {
-      font-weight: bold;
-    }
-  }
-
-  .Section--narrow {
-    max-width: 608px;
-    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
   .Section__title {
-    // font-weight: 600;
     text-align: center;
     font-size: 1.25rem;
     width: 100%;
@@ -289,14 +282,19 @@ import Button from '../components/Button.astro';
       background: black;
       border-radius: 24px;
       padding: 20px;
+      display: inline-block;
       box-shadow: $shadow;
     }
   }
 
   .FeatureGrid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr;
     grid-gap: 20px;
+
+    @include breakpoint-desktop {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
   }
 
   .FeatureGrid__item {
@@ -316,18 +314,20 @@ import Button from '../components/Button.astro';
     border-bottom-right-radius: 4px;
   
     sub {
+      display: block;
+      color: $color-text-invert-alt;
       line-height: inherit;
       margin: 0;
-      opacity: .7;
       vertical-align: baseline;
     }
-  
   }
 
   .DownloadSection {
     .Section__body {
-      max-width: grid-span(8, 12);
-      margin: 0 auto;
+      @include breakpoint-tablet {
+        max-width: grid-span(8, 12);
+        margin: 0 auto;
+      }
     }
   }
 
@@ -335,26 +335,51 @@ import Button from '../components/Button.astro';
     display: flex;
     border-radius: 24px;
     box-shadow: $shadow;
+
+    @include breakpoint-below-desktop {
+      flex-direction: column;
+    }
   }
 
   .DownloadCard__head {
     color: $color-text-invert;
     background: $color-bg-invert;
-    border-top-left-radius: 24px;
-    border-bottom-left-radius: 24px;
-    padding: 32px;
-    // padding-right: 3rem;
-    // width: 250px;
+    padding: 24px;
+
+    @include breakpoint-below-desktop {
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    @include breakpoint-desktop {
+      border-radius: 0;
+      border-top-left-radius: 24px;
+      border-bottom-left-radius: 24px;
+      padding: 32px;
+    }
   }
 
   .DownloadCard__body {
     background: $color-bg-alt;
     flex: 1;
-    border-top-right-radius: 24px;
-    border-bottom-right-radius: 24px;
-    padding: 28px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
+
+    @include breakpoint-below-desktop {
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+    }
+
+    @include breakpoint-desktop {
+      border-top-right-radius: 24px;
+      border-bottom-right-radius: 24px;
+      padding: 32px;
+    }
+    
   }
 
   .DownloadCard__title {
@@ -367,8 +392,11 @@ import Button from '../components/Button.astro';
 
   .DownloadCard__buttons {
     color: $color-text-invert-alt;
-    margin-top: 1em;
-    margin-bottom: -.5em;
+
+    @include breakpoint-desktop {
+      margin-top: 1em;
+      margin-bottom: -.5em;
+    }
 
     :global(.Button) {
       display: inline-block;
@@ -376,21 +404,32 @@ import Button from '../components/Button.astro';
   }
 
   .DownloadCard__desc {
-    margin-bottom: auto;
+    margin-bottom: 1em;
+    @include breakpoint-desktop {
+      margin-bottom: auto;
+    }
   }
 
   .DownloadCard__sideloadNote {
-    font-size: .9rem;
+    font-size: .8rem;
+    @include breakpoint-desktop {
+      font-size: .9rem;
+    }
   }
 
   .DownloadCard__compatNote {
-    font-size: .9rem;
+    font-size: .8rem;
+    @include breakpoint-desktop {
+      font-size: .9rem;
+    }
   }
 
   .FaqSection {
     .Section__body {
-      max-width: grid-span(8, 12);
-      margin: 0 auto;
+      @include breakpoint-tablet {
+        max-width: grid-span(8, 12);
+        margin: 0 auto;
+      }
     }
   }
 
@@ -417,8 +456,8 @@ import Button from '../components/Button.astro';
       display: block;
       width: 0;
       height: 0;
-      border-top: 12px solid black;
-      border-right: 16px solid transparent;
+      border-top: 20px solid black;
+      border-right: 28px solid transparent;
     }
   }
 
@@ -441,8 +480,8 @@ import Button from '../components/Button.astro';
       display: block;
       width: 0;
       height: 0;
-      border-top: 12px solid $color-bg-alt;
-      border-left: 16px solid transparent;
+      border-top: 20px solid $color-bg-alt;
+      border-left: 28px solid transparent;
     }
   }
 
@@ -456,10 +495,12 @@ import Button from '../components/Button.astro';
 
   .CreditsSection {
     .Section__body {
-    background: white;
-      max-width: grid-span(8, 12);
+      background: white;
       margin: 0 auto;
       padding: 32px;
+      @include breakpoint-desktop {
+        max-width: grid-span(8, 12);
+      }
     }
   }
 
@@ -468,24 +509,17 @@ import Button from '../components/Button.astro';
   }
   
   .Credits__main {
-    column-count: 2;
-    column-gap: 20px;
-  }
-
-  .Credits__foot {
-    font-size: .8rem;
-    color: $color-text-alt;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 20px;
-
-    p {
-      margin: 0;
+    @include breakpoint-tablet {
+      column-count: 2;
+      column-gap: 20px;
     }
   }
 
   .CreditGroup {
-    margin-bottom: 1.92em;
+    margin-bottom: 1em;
+    @include breakpoint-tablet {
+      margin-bottom: 1.92em;
+    }
   }
 
   .CreditGroup--breakColumn {
@@ -519,6 +553,21 @@ import Button from '../components/Button.astro';
   .CreditEntry__title ~ .CreditEntry__name {
     // color: $color-text-alt;
     grid-column: 2 / span 1;
+  }
+
+  .Credits__foot {
+    font-size: .8rem;
+    color: $color-text-alt;
+    display: grid;
+    grid-gap: 20px;
+
+    @include breakpoint-tablet {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    p {
+      margin: 0;
+    }
   }
 
 </style>

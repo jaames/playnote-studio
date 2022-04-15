@@ -15,7 +15,11 @@ html, body {
   ');
   background-position: center top;
   background-repeat: repeat;
-  scroll-behavior:smooth
+  scroll-behavior: smooth;
+
+  @include breakpoint-below-desktop {
+    font-size: $font-size-global-mobile;
+  }
 }
 
 img, svg {
@@ -32,6 +36,7 @@ h1, h2, h3, h4, h5, h6 {
 a {
   cursor: pointer;
   color: inherit;
+  font-weight: bold;
   text-decoration: none;
 }
 
