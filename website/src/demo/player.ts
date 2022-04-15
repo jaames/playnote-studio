@@ -19,6 +19,7 @@ const {
   DataTexture,
   TextureLoader,
   LinearFilter,
+  NearestFilter,
   GLTFLoader,
   // shaders and such
   vertexShader,
@@ -157,6 +158,7 @@ overrideMaterials(gltf.scene, new ShaderMaterial({
     u_fadeLevel: fadeLevel,
     u_bgTex: new Uniform(screenTexture),
     u_frameTex: new Uniform(frameTexture),
+    u_texSize: new Uniform([PLAYDATE_WIDTH, PLAYDATE_HEIGHT]),
   }
 }));
 scene.add(gltf.scene);

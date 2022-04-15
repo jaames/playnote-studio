@@ -6,8 +6,20 @@ html, body {
   letter-spacing: 0.02em;
   line-height: $line-height-global;
   font-weight: $font-weight-global;
-  background: $color-bg;
   color: $color-text;
+  background: $color-bg;
+  background-image: url('data:image/svg+xml;charset=utf8,\
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">\
+      <rect x="0" y="0" width="33" height="33" fill="white" stroke-width="1" stroke-dashoffset="2" stroke-dasharray="4 4" stroke="%23B5C1CE"/>\
+    </svg>\
+  ');
+  background-position: center top;
+  background-repeat: repeat;
+  scroll-behavior: smooth;
+
+  @include breakpoint-below-desktop {
+    font-size: $font-size-global-mobile;
+  }
 }
 
 img, svg {
@@ -16,32 +28,32 @@ img, svg {
   height: auto;
 }
 
-a {
-  cursor: pointer;
-  color: inherit;
-  text-decoration: none;
-}
-
 h1, h2, h3, h4, h5, h6 {
   font-family: inherit;
   font-weight: $font-weight-header;
+}
+
+a {
+  cursor: pointer;
+  color: inherit;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+p {
+  margin-bottom: 1.5em;
+}
+
+p:last-of-type {
+  margin-bottom: 0;
 }
 
 .link {
   border-bottom: 0.03em solid currentColor;
 }
 
-.Button {
-  cursor: pointer;
-  font-weight: bold;
-  color: $color-text-invert;
-  background: $color-bg-invert;
-  padding: 5px 14px;
-  border: 3px solid #fff;
-  border-right-color: #B3B5C1;
-  border-bottom-color: #B3B5C1;
-  border-radius: 8px;
-  outline: 5px solid $color-bg-invert;
-  box-shadow: $shadow-button;
-  margin: 5px;
+.screenshot {
+  image-rendering: auto;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
 }
