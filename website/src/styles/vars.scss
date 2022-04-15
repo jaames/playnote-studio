@@ -12,9 +12,10 @@ $font-weight-header: 500;
 $line-height-global: 1.36;
 
 $color-text: #000;
-$color-text-alt: #868bad;
+$color-text-alt: #676974;
 $color-text-invert: #fff;
-$color-text-invert-alt: #BFCFDF;
+$color-text-invert-alt: #97a2ae;
+$color-text-invert-alt2: #c1cbd7;
 
 $color-bg: #fff;
 $color-bg-alt: #E6E7EC;
@@ -33,4 +34,20 @@ $tablet-wrapper-width: 832px;
 $mobile-wrapper-width: 384px;
 $navbar-height: 96px;
 
+$border-radius: 24px;
+$border-radius-mobile: 16px;
+$padding: 28px;
+$padding-mobile: 20px;
+
+$text-size-title: 1.25rem;
+
 @import './mixins';
+
+@mixin panel {
+  padding: $padding-mobile;
+  border-radius: $border-radius-mobile;
+  @include breakpoint-desktop {
+    padding: $padding;
+    border-radius: $border-radius;
+  }
+}

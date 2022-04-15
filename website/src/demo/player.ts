@@ -439,7 +439,7 @@ muteToggle.addEventListener('click', toggleMute);
 nextTick(() => {
   crankHint.classList.remove('is-hidden');
   root.classList.add('Demo--isActive');
-})
+});
 
 // resize canvas to fit wrapper
 const resizeObserver = new ResizeObserver(([entry]) => {

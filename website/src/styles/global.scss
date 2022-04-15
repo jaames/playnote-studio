@@ -52,8 +52,36 @@ p:last-of-type {
   border-bottom: 0.03em solid currentColor;
 }
 
-.screenshot {
-  image-rendering: auto;
-  image-rendering: crisp-edges;
-  image-rendering: pixelated;
+.Footer {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 2rem;
+  font-size: .9rem;
+  grid-template-columns: 1fr;
+
+  @include breakpoint-below-desktop {
+    text-align: center;
+  }
+
+  @include breakpoint-desktop {
+    grid-template-columns: 300px 180px 300px;
+    grid-gap: 3em;
+  }
+}
+
+.Footer__gfx {
+  max-width: 180px;
+  @include breakpoint-below-desktop {
+    margin: .5em auto;
+  }
+}
+
+.Footer__link {
+}
+
+.Footer__link:first-of-type {
+  @include breakpoint-desktop {
+    text-align: right;
+  }
 }

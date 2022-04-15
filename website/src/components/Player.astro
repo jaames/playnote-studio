@@ -13,6 +13,7 @@ const pxSize = `${size}px`;
     <canvas class="Demo__canvas"></canvas>
     <video muted playsinline preload="auto" class="Demo__video"></video>
     <img class="Demo__image" width={size} height={size} srcset="/assets/playdate_1x.png, /assets/playdate_2x.png 2x" src="/assets/playdate_1x.png" alt="">
+    <Icon class="Demo__crankRange" name="crankrange_arrow"/>
   </div>
   <div class="Demo__overlay">
     <div class="Demo__credit">
@@ -55,7 +56,7 @@ const pxSize = `${size}px`;
     color: $color-text-alt;
     font-size: 14px;
     opacity: 1;
-    transition: opacity .5s linear;
+    transition: opacity .25s linear;
     position: absolute;
     transform: scale(0.8);
     top: -10px;
@@ -89,6 +90,19 @@ const pxSize = `${size}px`;
     }
   }
 
+  .Demo__crankRange {
+    opacity: 0;
+    transition: opacity .25s linear;
+
+    .Demo--isActive:hover & {
+      opacity: 1;
+    }
+
+    .Demo--isInteractionActive & {
+      opacity: 1;
+    }
+  }
+
   .Demo__canvas {
     height: 100%;
     position: absolute;
@@ -107,7 +121,7 @@ const pxSize = `${size}px`;
     z-index: 1;
     // image fades out when video+webgl loads in to prevent flashing in safari
     opacity: 1;
-    transition: opacity .5s linear;
+    transition: opacity .25s linear;
     .Demo--isActive & {
       opacity: 0;
     }
@@ -138,8 +152,8 @@ const pxSize = `${size}px`;
 
   .Demo__creditLink {
     color: black;
-    font-weight: bold;
-    border-bottom: 0.1em solid currentColor;
+    // font-weight: bold;
+    // border-bottom: 0.1em solid currentColor;
   }
 
   .Demo__controls {
@@ -148,6 +162,7 @@ const pxSize = `${size}px`;
     align-items: center;
     justify-content: flex-end;
     opacity: 0;
+    transition: opacity .25s linear;
     margin-right: 75px;
     margin-top: -55px;
     margin-bottom: 55px;
@@ -164,7 +179,7 @@ const pxSize = `${size}px`;
       margin-bottom: 50px;
     }
 
-    .Demo:hover & {
+    .Demo--isActive:hover & {
       opacity: 1;
     }
 

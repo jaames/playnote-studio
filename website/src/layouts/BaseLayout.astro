@@ -1,5 +1,6 @@
 ---
 import '../styles/global.scss';
+import { Icon } from 'astro-icon';
 
 let title = 'Playnote Studio';
 let desc = 'An unofficial Flipnote animation player for the Panic Playdate';
@@ -12,7 +13,6 @@ let imageAlt = '';
 let twitterHandle = '@rakujira';
 
 let locale = 'en';
-
 ---
 <html lang={ locale }>
   <head>
@@ -55,6 +55,11 @@ let locale = 'en';
     <main class="Content">
       <slot/>
     </main>
+    <footer class="Footer">
+      <a class="Footer__link" href="https://playnote.studio">Playnote Studio by James Daniel</a>
+      <Icon class="Footer__gfx" name="icon_footer"></Icon>
+      <a class="Footer__link" href="https://github.com/jaames/playnote-studio">View the source code on GitHub</a>
+    </footer>
     <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "19224d7a1dc44932ab159e5f8466b712"}'></script>
   </body>
 </html>

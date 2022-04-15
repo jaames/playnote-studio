@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import Button from '../components/Button.astro';
+import { Icon } from 'astro-icon';
 ---
 <BaseLayout>
   <Hero/>
@@ -13,20 +14,20 @@ import Button from '../components/Button.astro';
         <div class="FeatureGrid__item">
           <img class="FeatureGrid__itemImage screenshot" src="/assets/movie_playback.gif" alt="">
           <p class="FeatureGrid__itemText">
-            Bundled with 24 animations kindly provided by a variety of Flipnote artists
-            <sub>(this one is by <a href="https://twitter.com/Kekeflipnote">Kéké</a>!)</sub>
+            Smoothly plays any animation made in the DSiWare version of Flipnote Studio
+            <sub>flipnote by <a href="https://twitter.com/Kekeflipnote">Kéké</a></sub>
           </p>
         </div>
         <div class="FeatureGrid__item">
           <img class="FeatureGrid__itemImage screenshot" src="/assets/movie_dither.gif" alt="">
           <p class="FeatureGrid__itemText">
-            Customisable dithering makes up for the lack of colour on the Playdate's black-and-white screen!
+            Customisable dithering makes up for the lack of colour on the Playdate's black and white screen
           </p>
         </div>
         <div class="FeatureGrid__item">
           <img class="FeatureGrid__itemImage screenshot" src="/assets/movie_lang.gif" alt="">
           <p class="FeatureGrid__itemText">
-            Available in English, Japanese, French, Spanish, German, Italian, Dutch, Polish, Russian, and Welsh!
+            Available in English, Japanese, French, Spanish, German, Italian, Dutch, Polish, Russian, and Welsh
           </p>
         </div>
       </div>
@@ -44,13 +45,27 @@ import Button from '../components/Button.astro';
             <div class="DownloadCard__stat">17.6 MB</div>
           </div>
           <div class="DownloadCard__buttons">
-            <Button type="inverted">Download</Button>
+            <Button type="inverted" href="https://github.com/jaames/playnote-studio/releases/latest/download/Playnote.pdx.zip">Download</Button>
           </div>
         </div>
         <div class="DownloadCard__body">
-          <div class="DownloadCard__desc">Includes a selection of 24 sample Flipnotes from Kéké, mrjohn, ぺきら&nbsp;(Pekira), Bee, Who&nbsp;Cares&nbsp;(bokeh&nbsp;f/2), Akemi, and Scarecrow.</div>
-          <div class="DownloadCard__sideloadNote">(?) This app can be installed by <a href="https://help.play.date/games/sideloading/">sideloading</a> it</div>
-          <div class="DownloadCard__compatNote">(!) Please note that the Playdate Simulator isn't supported</div>
+          <div class="DownloadCard__desc">Includes a selection of 24 sample Flipnotes from Kéké, mrjohn, ぺきら, Bee, Who&nbsp;Cares, Akemi, and Scarecrow.</div>
+          <div class="DownloadCard__note">
+            <div class="DownloadCard__noteIcon">
+              <Icon name="icon_hint"></Icon>
+            </div>
+            <div class="DownloadCard__noteText">
+              This app can be installed by <a href="https://help.play.date/games/sideloading/">sideloading</a> it
+            </div>
+          </div>
+          <div class="DownloadCard__note">
+            <div class="DownloadCard__noteIcon">
+              <Icon name="icon_warn"></Icon>
+            </div>
+            <div class="DownloadCard__noteText">
+              Please note that the Playdate Simulator isn't supported
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -183,7 +198,7 @@ import Button from '../components/Button.astro';
           <div class="CreditEntry">
             <span class="CreditEntry__title">Français</span>
             <a class="CreditEntry__name" href="https://www.evalauren.co.uk">Eva Lauren Kelly (thejsa)</a>
-            <a class="CreditEntry__name" href="https://twitter.com/thomasnet_mc_">thomasnet</a>
+            <a class="CreditEntry__name" href="https://twitter.com/thomasnet_mc">thomasnet</a>
           </div>
           <div class="CreditEntry">
             <span class="CreditEntry__title">Español</span>
@@ -222,7 +237,7 @@ import Button from '../components/Button.astro';
             <a class="CreditEntry__name" href="https://twitter.com/gingerbeardman">Matt Sephton</a>
           </div>
           <div class="CreditEntry">
-            <a class="CreditEntry__name" href="https://twitter.com/kaeru.world">Kaeru Team</a>
+            <a class="CreditEntry__name" href="https://kaeru.world">Kaeru Team</a>
           </div>
           <div class="CreditEntry">
             <a class="CreditEntry__name" href="https://www.sudomemo.net">Rob</a>
@@ -244,46 +259,46 @@ import Button from '../components/Button.astro';
 
   .Section {
     @include wrapper;
-    margin-top: 5rem;
-    margin-bottom: 2rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+
+    @include breakpoint-desktop {
+      margin-top: 5rem;
+      margin-bottom: 2rem;
+    }
   }
 
   .Section__title {
     text-align: center;
-    font-size: 1.25rem;
+    font-size: $text-size-title;
     width: 100%;
     margin-bottom: 1rem;
   }
  
   .FeaturesSection {
     margin-top: -60px;
-    max-width: 1304px;
+    max-width: 1320px;
     
     .Section__title {
-      color: white;
-      background: black;
-      background: url('../icons/panel_head_dark.svg');
+      color: $color-text-invert;
+      background: url('/assets/panel_head_dark.svg');
       background-size: 100% 100%;
       background-repeat: no-repeat;
       max-width: 15ch;
       margin: 0 auto;
       margin-bottom: -0.75rem;
       padding: .75em 2em .5em 2em;
-      border-top-left-radius: 20px;
-      border-top-right-radius: 20px;
     }
 
     .Section__body {
-      color: white;
-      background: black;
-      border-radius: 24px;
-      padding: 20px;
+      color: $color-text-invert;
+      background: $color-bg-invert;
       display: inline-block;
-      box-shadow: $shadow;
+      @include panel;
     }
   }
 
@@ -299,14 +314,22 @@ import Button from '../components/Button.astro';
 
   .FeatureGrid__item {
     max-width: 400px;
+    display: flex;
+    flex-direction: column;
   }
 
   .FeatureGrid__itemImage {
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
+    @include breakpoint-desktop {
+      image-rendering: auto;
+      image-rendering: crisp-edges;
+      image-rendering: pixelated;
+    }
   }
 
   .FeatureGrid__itemText {
+    flex: 1;
     background: $color-bg-invert-alt;
     margin-top: 1px;
     padding: 12px 16px;
@@ -315,7 +338,7 @@ import Button from '../components/Button.astro';
   
     sub {
       display: block;
-      color: $color-text-invert-alt;
+      color: $color-text-invert-alt2;
       line-height: inherit;
       margin: 0;
       vertical-align: baseline;
@@ -333,9 +356,6 @@ import Button from '../components/Button.astro';
 
   .DownloadCard {
     display: flex;
-    border-radius: 24px;
-    box-shadow: $shadow;
-
     @include breakpoint-below-desktop {
       flex-direction: column;
     }
@@ -344,11 +364,11 @@ import Button from '../components/Button.astro';
   .DownloadCard__head {
     color: $color-text-invert;
     background: $color-bg-invert;
-    padding: 24px;
+    padding: $padding-mobile;
 
     @include breakpoint-below-desktop {
-      border-top-left-radius: 16px;
-      border-top-right-radius: 16px;
+      border-top-left-radius: $border-radius-mobile;
+      border-top-right-radius: $border-radius-mobile;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -356,28 +376,28 @@ import Button from '../components/Button.astro';
     
     @include breakpoint-desktop {
       border-radius: 0;
-      border-top-left-radius: 24px;
-      border-bottom-left-radius: 24px;
-      padding: 32px;
+      border-top-left-radius: $border-radius;
+      border-bottom-left-radius: $border-radius;
+      padding: $padding;
     }
   }
 
   .DownloadCard__body {
     background: $color-bg-alt;
     flex: 1;
-    padding: 24px;
     display: flex;
     flex-direction: column;
+    padding: $padding-mobile;
 
     @include breakpoint-below-desktop {
-      border-bottom-left-radius: 16px;
-      border-bottom-right-radius: 16px;
+      border-bottom-left-radius: $border-radius-mobile;
+      border-bottom-right-radius: $border-radius-mobile;
     }
 
     @include breakpoint-desktop {
-      border-top-right-radius: 24px;
-      border-bottom-right-radius: 24px;
-      padding: 32px;
+      border-top-right-radius: $border-radius;
+      border-bottom-right-radius: $border-radius;
+      padding: $padding;
     }
     
   }
@@ -410,18 +430,33 @@ import Button from '../components/Button.astro';
     }
   }
 
-  .DownloadCard__sideloadNote {
+  .DownloadCard__note {
+    color: $color-text-alt;
     font-size: .8rem;
+    margin-bottom: .5em;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+
     @include breakpoint-desktop {
       font-size: .9rem;
     }
   }
 
-  .DownloadCard__compatNote {
-    font-size: .8rem;
-    @include breakpoint-desktop {
-      font-size: .9rem;
-    }
+  .DownloadCard__note:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .DownloadCard__noteIcon {
+    display: block;
+    width: 1em;
+    height: 1em;
+    aspect-ratio: 1;
+  }
+
+  .DownloadCard__noteText {
+    margin-left: .25em;
+    flex: 1;
   }
 
   .FaqSection {
@@ -441,17 +476,15 @@ import Button from '../components/Button.astro';
   .FaqList__question {
     color: white;
     background: black;
-    border-radius: 24px;
-    padding: 20px 24px;
     margin-right: auto;
     max-width: 90%;
     position: relative;
-    // box-shadow: $shadow;
+    @include panel;
 
     &::after {
       position: absolute;
       top: 100%;
-      left: 38px;
+      left: 28px;
       content: ' ';
       display: block;
       width: 0;
@@ -464,18 +497,16 @@ import Button from '../components/Button.astro';
   .FaqList__answer {
     background: $color-bg-alt;
     margin-left: auto;
-    border-radius: 24px;
-    padding: 20px 24px;
     max-width: 90%;
+    position: relative;
+    @include panel;
     margin-top: 1rem;
     margin-bottom: 2rem;
-    position: relative;
-    // box-shadow: $shadow;
 
     &::after {
       position: absolute;
       top: 100%;
-      right: 38px;
+      right: 28px;
       content: ' ';
       display: block;
       width: 0;
@@ -494,15 +525,41 @@ import Button from '../components/Button.astro';
   }
 
   .CreditsSection {
-    .Section__body {
-      background: white;
+    
+    .Section__title {
+      background: url('/assets/panel_head_light.svg');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      max-width: 15ch;
       margin: 0 auto;
-      padding: 32px;
+      margin-bottom: -0.75rem;
+      padding: .75em 2em .5em 2em;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+    }
+
+    .Section__body {
+      // color: white;
+      background: #E6E7EC;
+      padding: 20px;
+      display: inline-block;
+      @include panel;
       @include breakpoint-desktop {
+        margin: 0 auto;
         max-width: grid-span(8, 12);
       }
+      // box-shadow: $shadow;
     }
   }
+
+  // .CreditsSection {
+  //   .Section__body {
+  //     background: white;
+  //     margin: 0 auto;
+  //     padding: 32px;
+      
+  //   }
+  // }
 
   .Credits {
     font-size: .9rem;
