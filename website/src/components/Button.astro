@@ -16,6 +16,7 @@ const { href, type } = Astro.props
   }
 
   .Button__inner {
+    font-weight: bold;
     text-align: center;
     display: block;
     cursor: pointer;
@@ -33,11 +34,12 @@ const { href, type } = Astro.props
     border: 5px solid $color-bg;
 
     .Button__inner {
+      font-weight: normal;
       color: $color-text;
       background: $color-bg;
-      border: 3px solid rgb(103, 103, 115);
-    border-right-color: #000;
-    border-bottom-color: #000;
+      border: 3px solid #9090a1;
+      border-right-color: #000;
+      border-bottom-color: #000;
     }
   }
 </style>
