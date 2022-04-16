@@ -56,9 +56,11 @@ let locale = 'en';
       <slot/>
     </main>
     <footer class="Footer">
-      <a class="Footer__link" href="https://playnote.studio">Playnote Studio by James Daniel</a>
+      <a class="Footer__group" href="/">Playnote Studio</a>
       <Icon class="Footer__gfx" name="icon_footer"></Icon>
-      <a class="Footer__link" href="https://github.com/jaames/playnote-studio">View the source code on GitHub</a>
+      <div class="Footer__group Footer__group--links">
+        <a href="/filehelp">File help</a> | <a href="https://github.com/jaames/playnote-studio">Source code</a>
+      </div>
     </footer>
     <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "19224d7a1dc44932ab159e5f8466b712"}'></script>
   </body>

@@ -42,7 +42,7 @@
     <use fill="#000" filter="url(#icon_play-a)" xlink:href="#icon_play-b"/>
     <rect width="49" height="49" x="4.5" y="4.5" fill="#000" stroke="#FFF" stroke-linejoin="square" stroke-width="9" rx="24.5"/>
     <rect width="52" height="52" x="3" y="3" stroke="#000" stroke-linejoin="square" stroke-width="6" rx="26"/>
-    <g transform="rotate(45 36.601 36.601)">
+    <g stroke-linecap="round" stroke-linejoin="round" transform="rotate(45 36.601 36.601)">
       <use fill="#000" filter="url(#icon_play-c)" xlink:href="#icon_play-d"/>
       <use stroke="#B3B5C1" stroke-width="3" xlink:href="#icon_play-d"/>
     </g>

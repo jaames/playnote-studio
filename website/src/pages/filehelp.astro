@@ -1,0 +1,145 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout>
+
+  <header class="Header">
+    <div class="Header__top"></div>
+    <div class="Header__main">
+      <h1 class="Header__title">Adding Flipnotes to Playnote Studio</h1>
+    </div>
+  </header>
+
+  <div class="Instructions">
+
+    <section class="Panel">
+      <h2>Transfer your Flipnotes to a PC</h2>
+      <p>Dust off your Nintendo DSi, boot it up, insert an SD card, and enter Flipnote Studio. Select the Flipnote you'd like to save.</p>
+      <div class="ScreenshotGrid">
+        <div class="ScreenshotGrid__item">
+          <img class="ScreenshotGrid__image" src="/assets/tutorial_sdcard/1.png" alt="">
+          <p class="ScreenshotGrid__text">Tap <b>Save</b></p>
+        </div>
+        <div class="ScreenshotGrid__item">
+          <img class="ScreenshotGrid__image" src="/assets/tutorial_sdcard/2.png" alt="">
+          <p class="ScreenshotGrid__text">Tap <b>Other</b></p>
+        </div>
+        <div class="ScreenshotGrid__item">
+          <img class="ScreenshotGrid__image" src="/assets/tutorial_sdcard/3.png" alt="">
+          <p class="ScreenshotGrid__text">Tap <b>SD Card</b></p>
+        </div>
+      </div>
+      <p>Once saving is complete, turn off your Nintendo DSi then eject the SD card.</p>
+      <p>Insert your SD card into your PC. If you navigate to the SD card in the file explorer, you should be able to see a folder called <b>private</b>.</p>
+      <p>
+        Any flipnotes you saved to your SD card can be found as <b>.ppm</b> files at the following location, depending on your Nintendo DSi's region:
+        <ul>
+          <li>
+            <b>Europe &amp; Oceania:</b> /private/ds/app/4B475556
+          </li>
+          <li>
+            <b>Americas:</b> /private/ds/app/4B475545
+          </li>
+          <li>
+            <b>Japan:</b> /private/ds/app/4B47554A
+          </li>
+        </ul>
+      </p>
+    </section>
+
+    <section class="Panel">
+      <h2>Transfer Flipnotes from your PC to your Playdate</h2>
+      <p>Launch Playnote Studio on your Playdate so that it can set up the filesystem.</p>
+      <p>Connect your Playdate to your PC using a USB cable.</p>
+      <p>On your Playdate, hold down the <b>lock</b>, <b>menu</b>, and <b>dpad-left</b> buttons for 5 seconds to enter the Playdate's <b>disk mode</b>. Your Playdate should show up as an external drive called <b>PLAYDATE</b>.</p>
+      <p>Nagivate to the Playdate drive, and drop your Flipnote <b>.ppm</b> files into the folder at Data/com.jaames.playnote/001</p>
+      <p>You can add more folders next to 001 and place Flipnotes in them to organise your collection. Folders can also be named whatever you like, but something relatively short that uses only alphanumeric characters works the best.</p>
+      <p>Press <b>A</b> on the Playdate to stop disk mode.</p>
+      <p>Launch Playnote Studio. If you did everything correctly, your Flipnotes should show up when you select a folder from the "View Flipnotes" screen!</p>
+    </section>
+
+  </div>
+</BaseLayout>
+
+<style lang="scss">
+
+  .Header {
+    @include wrapper;
+    margin-top: 5rem;
+  }
+
+  .Header__top {
+    background: url('/assets/panel_head_light.svg');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    width: 15ch;
+    margin: 0 auto;
+    margin-bottom: -0.1rem;
+    padding: .75em 2em .5em 2em;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+  }
+
+  .Header__main {
+    background: $color-bg-alt;
+    padding: 20px;
+    margin: 0 auto;
+    @include panel;
+    @include breakpoint-desktop {
+      max-width: grid-span(8, 12);
+    }
+  }
+
+  .Header__title {
+    font-size: 1.5rem;
+    max-width: 20ch;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .Instructions {
+    @include wrapper;
+    margin-top: 2rem;
+  }
+
+  .Panel {
+    color: $color-text-invert;
+    background: $color-bg-invert;
+    margin: 0 auto;
+    margin-bottom: 2em;
+    @include panel;
+    @include breakpoint-desktop {
+      max-width: grid-span(8, 12);
+    }
+
+    h2 {
+      font-size: 1.25em;
+      margin-bottom: .5em;
+    }
+
+    p {
+      margin-bottom: 1em;
+    }
+
+    .ScreenshotGrid {
+      margin-bottom: 1em;
+    }
+
+    *:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .ScreenshotGrid {
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: 1fr;
+    @include breakpoint-tablet {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  .ScreenshotGrid__image {
+    width: 100%;
+  }
+</style>

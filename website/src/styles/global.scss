@@ -7,6 +7,14 @@ html, body {
   line-height: $line-height-global;
   font-weight: $font-weight-global;
   color: $color-text;
+  scroll-behavior: smooth;
+
+  @include breakpoint-below-desktop {
+    font-size: $font-size-global-mobile;
+  }
+}
+
+html {
   background: $color-bg;
   background-image: url('data:image/svg+xml;charset=utf8,\
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">\
@@ -15,11 +23,6 @@ html, body {
   ');
   background-position: center top;
   background-repeat: repeat;
-  scroll-behavior: smooth;
-
-  @include breakpoint-below-desktop {
-    font-size: $font-size-global-mobile;
-  }
 }
 
 img, svg {
@@ -77,11 +80,14 @@ p:last-of-type {
   }
 }
 
-.Footer__link {
+.Footer__group {
+  @include breakpoint-desktop { 
+    text-align: right;
+  }
 }
 
-.Footer__link:first-of-type {
-  @include breakpoint-desktop {
-    text-align: right;
+.Footer__group--links {
+  @include breakpoint-desktop { 
+    text-align: left;
   }
 }
