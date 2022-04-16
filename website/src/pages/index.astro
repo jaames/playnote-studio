@@ -128,6 +128,14 @@ import { Icon } from 'astro-icon';
         </div>
         <div class="FaqList__item">
           <div class="FaqList__question">
+            Why isn't the Playdate Simulator supported?
+          </div>
+          <div class="FaqList__answer">
+            The Flipnote parsing and playback timing code is written in C, which needs to be compiled specifically for whatever platform the Playdate Simulator is running on. I decided to avoid that for now in the interest of saving space (and because I don't know how to cross-compile...)
+          </div>
+        </div>
+        <div class="FaqList__item">
+          <div class="FaqList__question">
             Will there be any updates?
           </div>
           <div class="FaqList__answer">

@@ -15,26 +15,26 @@
 ## Demo GIFs
 
 ![home screen](https://raw.githubusercontent.com/jaames/playnote-studio/main/assets/movie_homescreen.gif)
-Home menu
+<br/>Home menu
 
 ![playback](https://raw.githubusercontent.com/jaames/playnote-studio/main/assets/movie_playback.gif)
-Flipnote playback
+<br/>Flipnote playback
 
 ![frame-by-frame playback](https://raw.githubusercontent.com/jaames/playnote-studio/main/assets/movie_frames.gif)
-Flipnote frame-by-frame seeking
+<br/>Flipnote frame-by-frame seeking
 
 ![language settings](https://raw.githubusercontent.com/jaames/playnote-studio/main/assets/movie_lang.gif)
-Language settings
+<br/>Language settings
 
 ![dither settings](https://raw.githubusercontent.com/jaames/playnote-studio/main/assets/movie_dither.gif)
-Dithering settings
+<br/>Dithering settings
 
 ## Special Thanks
 
 - All of the Flipnote artists who kindly granted me permission to include some of their works as sample notes:
-  - [Kéké](twitter.com/Kekeflipnote)
-  - [MrJohn](flipnot.es/9F990EE00074AC4D)
-  - [bokeh f/2 (who cares)](www.instagram.com/gsupnet_)
+  - [Kéké](https://twitter.com/Kekeflipnote)
+  - [MrJohn](https://flipnot.es/9F990EE00074AC4D)
+  - [bokeh f/2 (who cares)](https://www.instagram.com/gsupnet_)
   - [ぺきら (Pekira)](https://twitter.com/pekira1227),
   - [Bee](https://beeyt.carrd.co)
   - [Melaina King (Akemi)](https://www.instagram.com\/akemixes)

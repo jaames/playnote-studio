@@ -5,7 +5,10 @@
 # REPLACE WITH THE NAME OF YOUR PLAYDATE GAME PDX
 GAME="Playnote.pdx"
 # SDK installer writes the install location to ~/.Playdate/config
-SDK=$(egrep '^\s*SDKRoot' ~/.Playdate/config | head -n 1 | cut -c9-)
+SDK = ${PLAYDATE_SDK_PATH}
+ifeq ($(SDK),)
+SDK = $(shell egrep '^\s*SDKRoot' ~/.Playdate/config | head -n 1 | cut -c9-)
+endif
 CMD=$1
 
 if [ -z $CMD ]; then
