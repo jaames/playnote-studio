@@ -44,10 +44,10 @@ if [ $CMD == "build" ]; then
   # compile lua and assets, tell pdc to compile lua without debug symbols
   pdc -s Source ${GAME}
   # assumes that you import all the files your game uses into main.lua
-  # strip unused .pdz files and macOS C binaries
+  # strip unused .pdz files
   find ./${GAME} -name "*.pdz" -type f -depth 2 -delete
   find ./${GAME} -name "*.pdz" -not -name "main.pdz" -type f -delete
-  # remove stuff that's not needed for a device-only build
+  # remove simulator binaries that aren't needed for a device-only build
   find ./${GAME} -name "*.dylib" -type f -delete
   find ./${GAME} -name "*.dll" -type f -delete
   # cleapup empty directories
@@ -73,13 +73,12 @@ fi
 
 if [ $CMD == "release" ]; then
   if [ -z $2 ]; then
-    echo "Specify a release version (e.g. v1.0.0)"
+    echo "Specify a release version (e.g. 1.0.0)"
     exit 1
   fi
   ./build.sh build
-  zip -r ./${GAME}.zip ./${GAME}
-  gh release create v${2} --draft "./${GAME}.zip#Device Build"
-  rm ./{GAME}.zip
+  gh release create v${2} --draft "./${GAME}.zip#Playnote Studio for Playdate"
+  rm ./${GAME}.zip
 fi
 
 exit 0

@@ -137,8 +137,6 @@ const frameBuffer = new Uint32Array(PLAYDATE_WIDTH * PLAYDATE_HEIGHT * 4);
 const frameTexture = new DataTexture(new Uint8Array(frameBuffer.buffer), PLAYDATE_WIDTH, PLAYDATE_HEIGHT);
 frameTexture.magFilter = LinearFilter;
 frameTexture.minFilter = LinearFilter;
-frameTexture.generateMipmaps = false;
-screenTexture.generateMipmaps = false;
 // set up ui 
 counterFont.tracking = 2;
 const seekerLine = makeLine(126, 218, PLAYDATE_WIDTH - 126, 218);
