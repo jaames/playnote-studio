@@ -42,11 +42,11 @@ import './components/NoNoteDialog'
 import './components/Thumbnail'
 import './components/Timeline'
 import './components/DitherSwatch'
-import './components/ScrollBar'
+import './components/Scrollbar'
 import './components/KeyValList'
 import './components/TextView'
 
-import './scenes/Screenbase'
+import './scenes/ScreenBase'
 
 playdate.graphics.setFont(MAIN_FONT)
 playdate.display.setRefreshRate(REFRESH_RATE_GLOBAL)
