@@ -216,6 +216,10 @@ function noteFs:getNoteCredits(filepath)
   return name, links
 end
 
+function noteFs:isValidPpmFilename(s)
+  return string.sub(s, -4) == '.ppm' and string.sub(s, 1, 2) ~= '._'
+end
+
 function noteFs:setWorkingFolder(folderPath)
   if folderPath == '/samplememo' and not fs.isdir(folderPath) then
     fs.mkdir(folderPath)
@@ -230,9 +234,9 @@ function noteFs:setWorkingFolder(folderPath)
   self.workingFolder = folderPath
   noteList = {}
   local list = fs.listFiles(folderPath)
-  for _, name in pairs(list) do
-    if string.sub(name, -3) == 'ppm' then
-      table.insert(noteList, folderPath .. name)
+  for _, filename in pairs(list) do
+    if noteFs:isValidPpmFilename(filename) then
+      table.insert(noteList, folderPath .. filename)
     end
   end
   numNotes = #noteList

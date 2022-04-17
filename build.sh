@@ -63,7 +63,10 @@ if [ $CMD == "build" ]; then
   find ./${GAME} -name "*.dll" -type f -delete
   # cleapup empty directories
   find ./${GAME} -empty -type d -delete
+  # cleanup macOS extended attribute files
+  find . -type f -name '._*' -delete
   # zip result, skipping pesky DS_Store files
+  rm ./${GAME}.zip
   zip -vr ./${GAME}.zip ./${GAME}/ -x "*.DS_Store"
 fi
 
