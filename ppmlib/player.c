@@ -34,10 +34,10 @@ void playerMoveTo(player_ctx* ctx, u16 x, u16 y)
 	ctx->y = y; 
 }
 
-int playerLoadPpm(player_ctx* ctx, void* ppmBuffer, size_t ppmSize)
+int playerLoadPpm(player_ctx* ctx, const char* filePath)
 {
-	ctx->ppm = pd_malloc(sizeof(ppm_ctx_t));
-	int err = ppmInit(ctx->ppm, ppmBuffer, ppmSize);
+	ctx->ppm = ppmNew();
+	int err = ppmOpen(ctx->ppm, filePath);
 	if (err != -1)
 	{
 		pd_error("Error loading PPM: %d", err);

@@ -1,119 +1,17 @@
 #include "ppm.h"
 #include "platform.h"
 
-int ppmInit(ppm_ctx_t* ctx, u8* ppm, int len)
+ppm_ctx_t* ppmNew()
 {
-	u8* start = ppm;
-	
-	if (len < sizeof(ppm_header_t))
-		return 0;
+	ppm_ctx_t* ctx = pd_malloc(sizeof(ppm_ctx_t));
 
-	memcpy(&ctx->hdr, ppm, sizeof(ppm_header_t));
-	ppm += sizeof(ppm_header_t);
-	
-	if (strncmp(ctx->hdr.magic, "PARA", 4) != 0)
-	{
-		pd_log("Invalid PPM magic");
-		return 1;
-	}
-
-	if (ppm - start + sizeof(ctx->thumbnail) >= len)
-	{
-		pd_log("PPM too small for thumbnail data size");
-		return 2;
-	}
-
-	memcpy(ctx->thumbnail, ppm, sizeof(ctx->thumbnail));
-	ppm += sizeof(ctx->thumbnail);
-	
-	if (ppm - start + sizeof(ppm_animation_header_t) >= len)
-	{
-		pd_log("PPM too small for expected animation header");
-		return 3;
-	}
-	
-	memcpy(&ctx->animHdr, ppm, sizeof(ppm_animation_header_t));
-	ppm += sizeof(ppm_animation_header_t);
-
-	ctx->hdr.numFrames++;
-
-	if (ppm - start + (sizeof(u32) * ctx->hdr.numFrames) >= len)
-	{
-		pd_log("PPM too small for expected frame table size");
-		return 4;
-	}
-
-	ctx->videoOffsets = pd_malloc(sizeof(u32) * ctx->hdr.numFrames);
-	memcpy(ctx->videoOffsets, ppm, sizeof(u32) * ctx->hdr.numFrames);
-	ppm += sizeof(u32) * ctx->hdr.numFrames;
-	
-	if (ppm - start + ctx->hdr.animationLength - sizeof(ppm_animation_header_t) - (sizeof(u32) * ctx->hdr.numFrames) >= len)
-	{
-		pd_free(ctx->videoOffsets);	
-		pd_log("PPM too small for expected frame data size");
-		return 5;
-	}
-	
-	ctx->videoData = pd_malloc(ctx->hdr.animationLength - sizeof(ppm_animation_header_t) - (sizeof(u32) * ctx->hdr.numFrames));
-	memcpy(ctx->videoData, ppm, ctx->hdr.animationLength - sizeof(ppm_animation_header_t) - (sizeof(u32) * ctx->hdr.numFrames));
-	ppm += ctx->hdr.animationLength - sizeof(ppm_animation_header_t) - (sizeof(u32) * ctx->hdr.numFrames);
-
-	if (ppm - start + ctx->hdr.numFrames >= len)
-	{
-		pd_free(ctx->videoOffsets);
-		pd_free(ctx->videoData);	
-		pd_log("PPM too small for expected sound effect flag data size");
-		return 6;
-	}
-	
-	ctx->audioFrames = pd_malloc(ctx->hdr.numFrames);
-	memcpy(ctx->audioFrames, ppm, ctx->hdr.numFrames);
-	ppm += ctx->hdr.numFrames;
-
-	ppm = (u8*)ROUND_UP_4((long int)ppm);
-
-	if (ppm - start + sizeof(ppm_sound_header_t) >= len)
-	{
-		pd_free(ctx->videoOffsets);
-		pd_free(ctx->videoData);
-		pd_free(ctx->audioFrames);
-		pd_log("PPM too small for sound header size");
-		return 7;
-	}
-
-	memcpy(&ctx->sndHdr, ppm, sizeof(ppm_sound_header_t));
-	ppm += sizeof(ppm_sound_header_t);
-
-	if (ppm - start + ctx->sndHdr.bgmLength >= len)
-	{
-		pd_free(ctx->videoOffsets);
-		pd_free(ctx->videoData);
-		pd_free(ctx->audioFrames);
-		pd_log("PPM too small for expected bgm data size");
-		return 8;
-	}
-	
-	ctx->bgmData = pd_malloc(ctx->sndHdr.bgmLength);
-	memcpy(ctx->bgmData, ppm, ctx->sndHdr.bgmLength);
-
-	if (ppm - start + ctx->sndHdr.seLength[0] + ctx->sndHdr.seLength[1] + ctx->sndHdr.seLength[2] >= len)
-	{
-		pd_free(ctx->videoOffsets);
-		pd_free(ctx->videoData);
-		pd_free(ctx->audioFrames);
-		pd_free(ctx->bgmData);
-		pd_log("PPM too small for expected sound effect data size");
-		return 9;
-	}
-
-	ppm += ctx->sndHdr.bgmLength;
+	ctx->videoOffsets = NULL;
+	ctx->videoData = NULL;
+	ctx->audioFrames = NULL;
+	ctx->bgmData = NULL;
 
 	for (u8 i = 0; i < PPM_SE_CHANNELS; i++)
-	{
-		ctx->seData[i] = pd_malloc(ctx->sndHdr.seLength[i]);
-		memcpy(ctx->seData[i], ppm, ctx->sndHdr.seLength[i]);
-		ppm += ctx->sndHdr.seLength[i];
-	}
+		ctx->seData[i] = NULL;
 
 	for (u8 i = 0; i < PPM_LAYERS; i++)
 	{
@@ -123,8 +21,165 @@ int ppmInit(ppm_ctx_t* ctx, u8* ppm, int len)
 
 	ctx->prevFrame = -1;
 
+	return ctx;
+}
+
+int ppmOpen(ppm_ctx_t* ctx, const char* filePath)
+{
+	SDFile* file;
+	int readResult;
+
+	ctx->file = file;
+	ctx->filePath = filePath;
+
+	file = pd->file->open(filePath, kFileRead | kFileReadData);
+	if (file == NULL)
+	{
+		const char* err = pd->file->geterr();
+		pd_error("Error opening %s: %s", filePath, err);
+		pd->lua->pushNil();
+		return 0;
+	}
+
+	readResult = pd->file->read(file, &ctx->hdr, sizeof(ppm_header_t));
+	ctx->hdr.numFrames++;
+	if (readResult < 1)
+	{
+		if (readResult == -1) {
+			const char* err = pd->file->geterr();
+			pd_error("Error reading header %s: %s", filePath, err);
+			pd->lua->pushNil();
+			return 1;
+		}
+		pd->lua->pushNil();
+		return 2;
+	}
+	if (strncmp(ctx->hdr.magic, "PARA", 4) != 0)
+	{
+		pd_error("Invalid PPM magic");
+		pd->lua->pushNil();
+		return 3;
+	}
+
+	readResult = pd->file->read(file, ctx->thumbnail, sizeof(ctx->thumbnail));
+	if (readResult < 1)
+	{
+		if (readResult == -1) {
+			const char* err = pd->file->geterr();
+			pd_error("Error reading thumbnail %s: %s", filePath, err);
+			pd->lua->pushNil();
+			return 4;
+		}
+		pd->lua->pushNil();
+		return 5;
+	}
+
+	readResult = pd->file->read(file, &ctx->animHdr, sizeof(ppm_animation_header_t));
+	if (readResult < 1)
+	{
+		if (readResult == -1) {
+			const char* err = pd->file->geterr();
+			pd_error("Error reading animation header %s: %s", filePath, err);
+			pd->lua->pushNil();
+			return 6;
+		}
+		pd->lua->pushNil();
+		return 7;
+	}
+
+	ctx->videoOffsets = pd_malloc(sizeof(u32) * ctx->hdr.numFrames);
+	readResult = pd->file->read(file, ctx->videoOffsets, sizeof(u32) * ctx->hdr.numFrames);
+	if (readResult < 1)
+	{
+		pd_free(ctx->videoOffsets);
+		if (readResult == -1) {
+			const char* err = pd->file->geterr();
+			pd_error("Error reading animation frame offsets %s: %s", filePath, err);
+			pd->lua->pushNil();
+			return 8;
+		}
+		pd->lua->pushNil();
+		return 9;
+	}
+
+	ctx->videoData = pd_malloc(ctx->hdr.animationLength - sizeof(ppm_animation_header_t) - (sizeof(u32) * ctx->hdr.numFrames));
+	readResult = pd->file->read(file, ctx->videoData, ctx->hdr.animationLength - sizeof(ppm_animation_header_t) - (sizeof(u32) * ctx->hdr.numFrames));
+	if (readResult < 1)
+	{
+		ppmDone(ctx);
+		if (readResult == -1) {
+			const char* err = pd->file->geterr();
+			pd_error("Error reading animation frame data %s: %s", filePath, err);
+			pd->lua->pushNil();
+			return 10;
+		}
+		pd->lua->pushNil();
+		return 11;
+	}
+
+	ctx->audioFrames = pd_malloc(ctx->hdr.numFrames);
+	readResult = pd->file->read(file, ctx->audioFrames, ctx->hdr.numFrames);
+	if (readResult < 1)
+	{
+		ppmDone(ctx);
+		if (readResult == -1) {
+			const char* err = pd->file->geterr();
+			pd_error("Error reading sound effect flags %s: %s", filePath, err);
+			pd->lua->pushNil();
+			return 12;
+		}
+		pd->lua->pushNil();
+		return 13;
+	}
+
+	pd->file->seek(file, ROUND_UP_4(pd->file->tell(file)), SEEK_SET);
+
+	readResult = pd->file->read(file, &ctx->sndHdr, sizeof(ppm_sound_header_t));
+	if (readResult < 1)
+	{
+		ppmDone(ctx);
+		if (readResult == -1) {
+			const char* err = pd->file->geterr();
+			pd_error("Error reading sound headers %s: %s", filePath, err);
+			pd->lua->pushNil();
+			return 14;
+		}
+		pd->lua->pushNil();
+		return 15;
+	}
+	
+	ctx->bgmData = pd_malloc(ctx->sndHdr.bgmLength);
+	readResult = pd->file->read(file, ctx->bgmData, ctx->sndHdr.bgmLength);
+	if (readResult < 0 || readResult != ctx->sndHdr.bgmLength)
+	{
+		ppmDone(ctx);
+		const char* err = pd->file->geterr();
+		pd_error("Error reading bgm data %s: %s", filePath, err);
+		pd->lua->pushNil();
+		return 16;
+	}
+
+	for (u8 i = 0; i < PPM_SE_CHANNELS; i++)
+	{
+		ctx->seData[i] = pd_malloc(ctx->sndHdr.seLength[i]);
+		readResult = pd->file->read(file, ctx->seData[i], ctx->sndHdr.seLength[i]);
+		if (readResult < 0 || readResult != ctx->sndHdr.seLength[i])	break;
+	}
+	if (readResult < 0)
+	{
+		ppmDone(ctx);
+		const char* err = pd->file->geterr();
+		pd_error("Error reading sound effect data %s: %s", filePath, err);
+		pd->lua->pushNil();
+		return 17;
+	}
+
 	ctx->frameRate    = speedTable[8 - ctx->sndHdr.playbackSpeed];
 	ctx->bgmFrameRate = speedTable[8 - ctx->sndHdr.recordedSpeed];
+
+	pd->file->close(file);
+	ctx->file = NULL;
+	ctx->filePath = NULL;
 	
 	return -1;
 }
@@ -142,16 +197,38 @@ int ppmInit(ppm_ctx_t* ctx, u8* ppm, int len)
 
 void ppmDone(ppm_ctx_t* ctx)
 {
-	pd_free(ctx->audioFrames);
+	if (ctx->videoOffsets != NULL)
+	{
+		pd_free(ctx->videoOffsets);
+		ctx->videoOffsets = NULL;
+	}
 
-	pd_free(ctx->videoOffsets);
+	if (ctx->videoData != NULL)
+	{
+		pd_free(ctx->videoData);
+		ctx->videoData = NULL;
+	}
 
-	pd_free(ctx->bgmData);
+	if (ctx->audioFrames != NULL)
+	{
+		pd_free(ctx->audioFrames);
+		ctx->audioFrames = NULL;
+	}
+
+	if (ctx->bgmData != NULL)
+	{
+		pd_free(ctx->bgmData);
+		ctx->bgmData = NULL;
+	}
 
 	for (u8 i = 0; i < PPM_SE_CHANNELS; i++)
-		pd_free(ctx->seData[i]);
-
-	pd_free(ctx->videoData);
+	{
+		if (ctx->seData[i] != NULL)
+		{
+			pd_free(ctx->seData[i]);
+			ctx->seData[i] = NULL;
+		}
+	}
 
 	for (u8 i = 0; i < PPM_LAYERS; i++)
 	{

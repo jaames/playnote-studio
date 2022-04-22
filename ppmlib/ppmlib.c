@@ -84,26 +84,27 @@ static int ppmlib_new(lua_State* L)
 	int x = pd->lua->getArgInt(2);
 	int y = pd->lua->getArgInt(3);
 
-	SDFile* f = pd->file->open(filePath, kFileRead | kFileReadData);
-	if (f == NULL)
-	{
-		const char* err = pd->file->geterr();
-		pd_error("Error opening %s: %s", filePath, err);
-		pd->lua->pushNil();
-		return 1;
-	}
+	// SDFile* f = pd->file->open(filePath, kFileRead | kFileReadData);
+	// if (f == NULL)
+	// {
+	// 	const char* err = pd->file->geterr();
+	// 	pd_error("Error opening %s: %s", filePath, err);
+	// 	pd->lua->pushNil();
+	// 	return 1;
+	// }
 
-	pd->file->seek(f, 0, SEEK_END);
-	int fsize = pd->file->tell(f);
-	pd->file->seek(f, 0, SEEK_SET);
+	// pd->file->seek(f, 0, SEEK_END);
+	// int fsize = pd->file->tell(f);
+	// pd->file->seek(f, 0, SEEK_SET);
 
-	u8* ppm = pd_malloc(fsize);
-	pd->file->read(f, ppm, fsize);
-	pd->file->close(f);
+	// u8* ppm = pd_malloc(fsize);
+	// pd->file->read(f, ppm, fsize);
+	// pd->file->close(f);
 
 	player_ctx* ctx = playerInit((u16)x, (u16)y);
-	int err = playerLoadPpm(ctx, ppm, fsize);
-	pd_free(ppm);
+	int err = playerLoadPpm(ctx, filePath);
+	
+	// pd_free(ppm);
 	
 	if (err == 1)
 	{

@@ -36,7 +36,7 @@ player_ctx* playerInit(u16 x, u16 y);
 
 void playerMoveTo(player_ctx* ctx, u16 x, u16 y);
 
-int playerLoadPpm(player_ctx* ctx, void* ppmBuffer, size_t ppmSize);
+int playerLoadPpm(player_ctx* ctx, const char* filePath);
 
 void playerDone(player_ctx* ctx);
 

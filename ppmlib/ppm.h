@@ -116,10 +116,14 @@ typedef struct ppm_ctx_t
 	u8   paperColour;
 	float frameRate;
 	float bgmFrameRate;
+	// open function state
+	SDFile* file;
+	char* filePath;
 } ppm_ctx_t;
 
 #pragma pack(pop)
 
-int  ppmInit(ppm_ctx_t* ctx, u8* ppm, int len);
-void ppmDone(ppm_ctx_t* ctx);
-char* fsidFromStr(u8 fsid[8]);
+ppm_ctx_t* ppmNew();
+int        ppmOpen(ppm_ctx_t* ctx, const char* filePath);
+void       ppmDone(ppm_ctx_t* ctx);
+char*      fsidFromStr(u8 fsid[8]);
