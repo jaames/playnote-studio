@@ -33,7 +33,7 @@ function SettingsScreen:setupSprites()
       .. '*Playnote Studio*\n'
       .. 'https://playnote.studio\n'
       .. '\n'
-      .. locales:getTextFormatted('ABOUT_VERSION', playdate.metadata.version) .. '\n'
+      .. locales:getTextFormatted('ABOUT_VERSION', tostring(playdate.metadata.version)) .. '\n'
       .. locales:getTextFormatted('ABOUT_BUILT_BY', 'James Daniel')
     )
   end)

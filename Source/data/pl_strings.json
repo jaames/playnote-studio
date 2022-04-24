@@ -21,7 +21,7 @@
   "SETTINGS_RESET_CONFIRM": "Wszystkie ustawienia zostaną usunięte",
   "SETTINGS_RESET_DONE": "Ustawienia zostały usunięte",
 
-  "ABOUT_VERSION": "Wersja %d",
+  "ABOUT_VERSION": "Wersja %s",
   "ABOUT_BUILT_BY": "Autor: %s",
 
   "CREDITS_HEADER_JAMES": "Programowanie i Projekt UI",
