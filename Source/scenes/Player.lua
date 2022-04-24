@@ -114,6 +114,17 @@ end
 
 function PlayerScreen:loadPpm()
   local ppm = PpmPlayer.new(noteFs.currentNote, NOTE_X, NOTE_Y)
+  -- local success = ppm.open(noteFs.currentNote)
+  print('read success', ppm)
+
+  if not ppm then
+    dialog:sequence({
+      {type = dialog.kTypeAlert, delay = 100, message = "Could not load Flipnote", callback = function ()
+        sceneManager:pop()
+      end}
+    })
+    return
+  end
   local ditherSetttings = noteFs:getNoteDitherSettings(noteFs.currentNote)
   for layer = 1,2 do
     for colour = 1,3 do
@@ -231,7 +242,7 @@ function PlayerScreen:play()
 end
 
 function PlayerScreen:pause()
-  if self.isPlayTransitionActive then return end
+  if self.isPlayTransitionActive or not self.ppm then return end
   if self.ppm.isPlaying then
     self:refreshControls()
     sounds:playSfx('pause')
@@ -282,7 +293,7 @@ end
 function PlayerScreen:drawBg(x, y, w, h)
   grid:draw(x, y, w, h)
   -- draw frame here only if the transition is active
-  if not self.isFrameTransitionActive then
+  if self.ppm and not self.isFrameTransitionActive then
     -- only draw frame if clip rect overlaps it
     local _, _, iw, ih = fast_intersection(NOTE_X - 4, NOTE_Y - 4, NOTE_W + 8, NOTE_H + 8, x, y, w, h)
     if iw > 0 and ih > 0 then
@@ -299,18 +310,22 @@ function PlayerScreen:drawBg(x, y, w, h)
 end
 
 function PlayerScreen:update()
-  if not self.ppm.isPlaying then
-    local frameChange = playdate.getCrankTicks(24)
-    if frameChange ~= 0 then
-      self:setCurrentFrame(self.ppm.currentFrame + frameChange)
-      if frameChange < 0 then
-        sounds:playSfxWithCooldown('crankA', 60)
-      else
-        sounds:playSfxWithCooldown('crankB', 60)
+  if self.ppm then
+    if self.ppm.isPlaying then
+      local frameChange = playdate.getCrankTicks(24)
+      if frameChange ~= 0 then
+        self:setCurrentFrame(self.ppm.currentFrame + frameChange)
+        if frameChange < 0 then
+          sounds:playSfxWithCooldown('crankA', 60)
+        else
+          sounds:playSfxWithCooldown('crankB', 60)
+        end
       end
+
+    else
+      self.ppm:update()
     end
   end
-  self.ppm:update()
 end
 
 function PlayerScreen:updateTransitionIn(t, fromScreen)

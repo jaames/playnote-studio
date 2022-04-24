@@ -200,7 +200,7 @@ function dialog:show(text, type)
           self.cancelButton:click()
         end
       }, true)
-    elseif self.type == dialog.kTypeError then
+    else
       playdate.inputHandlers.push({}, true)
     end
   end
@@ -269,7 +269,14 @@ function dialog:sequence(seq, fn)
       end
     end
     self.wasAlreadyOpened = i > 1
-    self:show(locales:replaceKeysInText(item.message), item.type)
+    local text = locales:replaceKeysInText(item.message)
+    if item.delay ~= nil then
+      playdate.timer.performAfterDelay(item.delay, function ()
+        dialog:show(text, item.type)
+      end)
+    else
+      dialog:show(text, item.type)
+    end
   end
   doItem(seq[i])
 end

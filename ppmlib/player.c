@@ -19,7 +19,7 @@ static void doCallback(char* fnName, int numArgs)
 		pd_log("Error calling Lua callback: %s", err);
 }
 
-player_ctx* playerInit(u16 x, u16 y)
+player_ctx* playerNew(u16 x, u16 y)
 {
 	player_ctx* ctx = pd_malloc(sizeof(player_ctx));
 	ctx->ppm = NULL;
@@ -34,15 +34,12 @@ void playerMoveTo(player_ctx* ctx, u16 x, u16 y)
 	ctx->y = y; 
 }
 
-int playerLoadPpm(player_ctx* ctx, const char* filePath)
+int playerOpenPpm(player_ctx* ctx, const char* filePath)
 {
 	ctx->ppm = ppmNew();
 	int err = ppmOpen(ctx->ppm, filePath);
-	if (err != -1)
-	{
-		pd_error("Error loading PPM: %d", err);
-		return 1;
-	}
+	if (err == -1)
+		return -1;
 	
 	ctx->isPlaying = 0;
 	ctx->startTime = 0;
@@ -76,6 +73,15 @@ int playerLoadPpm(player_ctx* ctx, const char* filePath)
 		pd->sound->sampleplayer->setSample(ctx->audioPlayer, ctx->masterAudioSample);
 	}
 
+	// free ppm adpcm audio buffers now master track has been rendered
+	pd_free(ctx->ppm->bgmData);
+	ctx->ppm->bgmData = NULL;
+	for (u8 i = 0; i < PPM_SE_CHANNELS; i++)
+	{
+		pd_free(ctx->ppm->seData[i]);
+		ctx->ppm->seData[i] = NULL;
+	}
+
 	return 0;
 }
 
@@ -83,12 +89,14 @@ void playerDone(player_ctx* ctx)
 {
 	ppmDone(ctx->ppm);
 	pd_free(ctx->ppm);
+	ctx->ppm = NULL;
 	if (ctx->masterAudio != NULL)
 	{
 		pd->sound->sampleplayer->stop(ctx->audioPlayer);
 		pd->sound->sampleplayer->freePlayer(ctx->audioPlayer);
 		pd->sound->sample->freeSample(ctx->masterAudioSample);
 		pd_free(ctx->masterAudio);
+		ctx->masterAudio = NULL;
 	}
 	pd_free(ctx);
 }
