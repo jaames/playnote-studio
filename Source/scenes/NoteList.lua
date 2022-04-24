@@ -101,7 +101,7 @@ function NoteListScreen:beforeEnter()
     self.focus:setFocus(self.folderSelect)
   end
   if not folderSelect.isSelected then
-    self:selectThumbAt(self.selectedCol, self.selectedRow)
+    self:selectThumbAt(self.selectedCol, self.selectedRow, true)
   end
   -- update counter
   counter:setTotal(noteFs.numPages)
@@ -229,11 +229,11 @@ function NoteListScreen:setThumbComponentsOffset(list, xOffset)
   end
 end
 
-function NoteListScreen:selectThumbAt(column, row)
+function NoteListScreen:selectThumbAt(column, row, muteSfx)
   column = utils:clamp(GRID_COLS - 1, 0, column)
   row = utils:clamp(GRID_ROWS - 1, 0, row)
   local index = math.min((row * 4 + column) + 1, self.notesOnCurrPage)
-  self.focus:setFocus(self.currThumbs[index])
+  self.focus:setFocus(self.currThumbs[index], muteSfx)
 end
 
 function NoteListScreen:drawBg()

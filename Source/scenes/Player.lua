@@ -104,7 +104,7 @@ end
 
 function PlayerScreen:beforeLeave()
   if self.ppm then
-    self:pause()
+    self:pause(true)
     self.removeTimers()
   end
 end
@@ -244,11 +244,13 @@ function PlayerScreen:play()
   end
 end
 
-function PlayerScreen:pause()
+function PlayerScreen:pause(muteSfx)
   if self.isPlayTransitionActive then return end
   if self.ppm.isPlaying then
     self:refreshControls()
-    sounds:playSfx('pause')
+    if not muteSfx then
+      sounds:playSfx('pause')
+    end
     self.ppm:pause()
     self:setControlsVisible(true)
     playdate.setAutoLockDisabled(false)
