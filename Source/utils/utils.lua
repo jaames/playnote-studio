@@ -55,6 +55,26 @@ function utils:createRepeater(delayAfterInitialFiring, delayAfterSecondFiring, c
   return buttonDown, buttonUp, remove
 end
 
+function utils:createTransition(duration, fromValue, toValue, easingFunction, updateCallback, doneCallback)
+  local timer = playdate.timer.new(duration, fromValue, toValue, easingFunction)
+  updateCallback(fromValue)
+
+  timer.updateCallback = function ()
+    updateCallback(timer.value)
+  end
+
+  timer.timerEndedCallback = function ()
+    updateCallback(toValue)
+    if type(doneCallback) == 'function' then
+      doneCallback(toValue)
+    end
+  end
+  -- return cancel function
+  return function ()
+    timer:remove()
+  end
+end
+
 function utils:hookFn(origFn, hookFn)
   if type(origFn) == 'function' then
     return function (...)
