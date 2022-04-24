@@ -1,6 +1,33 @@
 #include "ppm.h"
 #include "platform.h"
 
+ppm_ctx_t* ppmNew()
+{
+	ppm_ctx_t* ctx = pd_malloc(sizeof(ppm_ctx_t));
+
+	ctx->prevFrame = -1;
+
+	ctx->videoOffsets = NULL;
+	ctx->videoData = NULL;
+	ctx->audioFrames = NULL;
+	ctx->bgmData = NULL;
+
+	for (u8 i = 0; i < PPM_SE_CHANNELS; i++)
+		ctx->seData[i] = NULL;
+
+	for (u8 i = 0; i < PPM_LAYERS; i++)
+	{
+		ctx->layers[i]     = pd_calloc(PPM_BUFFER_SIZE, 1);
+		ctx->prevLayers[i] = pd_calloc(PPM_BUFFER_SIZE, 1);
+	}
+
+	ctx->file = NULL;
+	ctx->filePath = NULL;
+	ctx->lastError = NULL;
+
+	return ctx;
+}
+
 static void closeWithError(ppm_ctx_t* ctx, const char* msg)
 {
 	if (ctx->lastError != NULL)
@@ -31,33 +58,6 @@ static int errorHandledFileRead(ppm_ctx_t* ctx, void* buf, unsigned int len, con
 		return -1;
 	}
 	return 0;
-}
-
-ppm_ctx_t* ppmNew()
-{
-	ppm_ctx_t* ctx = pd_malloc(sizeof(ppm_ctx_t));
-
-	ctx->prevFrame = -1;
-
-	ctx->videoOffsets = NULL;
-	ctx->videoData = NULL;
-	ctx->audioFrames = NULL;
-	ctx->bgmData = NULL;
-
-	for (u8 i = 0; i < PPM_SE_CHANNELS; i++)
-		ctx->seData[i] = NULL;
-
-	for (u8 i = 0; i < PPM_LAYERS; i++)
-	{
-		ctx->layers[i]     = pd_calloc(PPM_BUFFER_SIZE, 1);
-		ctx->prevLayers[i] = pd_calloc(PPM_BUFFER_SIZE, 1);
-	}
-
-	ctx->file = NULL;
-	ctx->filePath = NULL;
-	ctx->lastError = NULL;
-
-	return ctx;
 }
 
 char* ppmGetError(ppm_ctx_t* ctx)

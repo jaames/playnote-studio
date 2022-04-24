@@ -1,6 +1,85 @@
 #include "tmb.h"
 #include "platform.h"
 
+tmb_ctx_t* tmbNew()
+{
+	tmb_ctx_t* ctx = pd_malloc(sizeof(tmb_ctx_t));
+	ctx->bitmap = NULL;
+	ctx->file = NULL;
+	ctx->filePath = NULL;
+	ctx->lastError = NULL;
+	return ctx;
+}
+
+static void closeWithError(tmb_ctx_t* ctx, const char* msg)
+{
+	if (ctx->lastError != NULL)
+		pd_free(ctx->lastError);
+	ctx->lastError = NULL;
+	pd->system->formatString(&ctx->lastError, "Thumbnail load error\n%s\n%s", ctx->filePath, msg);
+	pd_log(ctx->lastError);
+	pd->file->close(ctx->file);
+	ctx->file = NULL;
+	ctx->filePath = NULL;
+}
+
+static int errorHandledFileRead(tmb_ctx_t* ctx, void* buf, unsigned int len, const char* errorMsg)
+{
+	int res = pd->file->read(ctx->file, buf, len);
+	if (res == -1)
+	{
+		const char* fileErr = pd->file->geterr();
+		char* err = NULL;
+		pd->system->formatString(&err, "%s\n%s", errorMsg, fileErr);
+		closeWithError(ctx, err);
+		return -1;
+	}
+	else if (len > 0 && res != len)
+	{
+		closeWithError(ctx, errorMsg);
+		return -1;
+	}
+	return 0;
+}
+
+int tmbOpen(tmb_ctx_t* ctx, const char* filePath)
+{
+	SDFile* file;
+	int readResult;
+
+	file = pd->file->open(filePath, kFileRead | kFileReadData);
+	if (file == NULL)
+	{
+		const char* fileErr = pd->file->geterr();
+		char* err = NULL;
+		pd->system->formatString(&err, "Couldn't open file (%s)", fileErr);
+		closeWithError(ctx, err);
+		return -1;
+	}
+
+	ctx->file = file;
+	ctx->filePath = filePath;
+
+	readResult = errorHandledFileRead(ctx, &ctx->hdr, sizeof(ppm_header_t), "Couldn't read header");
+	if (readResult == -1)
+		return -1;
+
+	if (strncmp(ctx->hdr.magic, "PARA", 4) != 0)
+	{
+		closeWithError(ctx, "Invalid format");
+		return -1;
+	}
+
+	readResult = errorHandledFileRead(ctx, ctx->thumbnail, sizeof(ctx->thumbnail), "Couldn't read thumb bitmap");
+	if (readResult == -1)
+		return -1;
+
+	pd->file->close(file);
+	ctx->file = NULL;
+	// keep filePath
+	return 0;
+}
+
 // just parses enough of the ppm to get the tmb (thumbnail + meta) data
 int tmbInit(tmb_ctx_t* ctx, u8* ppm, int len)
 {
@@ -41,5 +120,26 @@ void tmbGetThumbnail(tmb_ctx_t* ctx, u8* out)
 	{
 		out[(y + l) * 64 + (x + p + 0)] = *rawData  & 0xf;
 		out[(y + l) * 64 + (x + p + 1)] = *rawData++ >> 4;
+	}
+}
+
+void tmbDone(tmb_ctx_t* ctx)
+{
+	if (ctx->filePath != NULL)
+	{
+		pd_free(ctx->filePath);
+		ctx->filePath = NULL;
+	}
+
+	if (ctx->lastError != NULL)
+	{
+		pd_free(ctx->lastError);
+		ctx->lastError = NULL;
+	}
+
+	if (ctx->bitmap != NULL)
+	{
+		pd->graphics->freeBitmap(ctx->bitmap);
+		ctx->bitmap = NULL;
 	}
 }
