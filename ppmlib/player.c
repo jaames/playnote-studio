@@ -37,8 +37,8 @@ void playerMoveTo(player_ctx* ctx, u16 x, u16 y)
 int playerOpenPpm(player_ctx* ctx, const char* filePath)
 {
 	ctx->ppm = ppmNew();
-	int err = ppmOpen(ctx->ppm, filePath);
-	if (err == -1)
+	int res = ppmOpen(ctx->ppm, filePath);
+	if (res == -1)
 		return -1;
 	
 	ctx->isPlaying = 0;

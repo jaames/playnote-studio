@@ -6,7 +6,7 @@ static inline void closeWithError(ppm_ctx_t* ctx, const char* msg)
 	if (ctx->lastError != NULL)
 		pd_free(ctx->lastError);
 	ctx->lastError = NULL;
-	pd->system->formatString(&ctx->lastError, "Flipnote Error\n%s\n%s", ctx->filePath, msg);
+	pd->system->formatString(&ctx->lastError, "Flipnote load error\n%s\n%s", ctx->filePath, msg);
 	pd_log(ctx->lastError);
 	ppmDone(ctx);
 	pd->file->close(ctx->file);
@@ -37,6 +37,8 @@ ppm_ctx_t* ppmNew()
 {
 	ppm_ctx_t* ctx = pd_malloc(sizeof(ppm_ctx_t));
 
+	ctx->prevFrame = -1;
+
 	ctx->videoOffsets = NULL;
 	ctx->videoData = NULL;
 	ctx->audioFrames = NULL;
@@ -50,8 +52,6 @@ ppm_ctx_t* ppmNew()
 		ctx->layers[i]     = pd_calloc(PPM_BUFFER_SIZE, 1);
 		ctx->prevLayers[i] = pd_calloc(PPM_BUFFER_SIZE, 1);
 	}
-
-	ctx->prevFrame = -1;
 
 	ctx->file = NULL;
 	ctx->filePath = NULL;
@@ -101,7 +101,7 @@ int ppmOpen(ppm_ctx_t* ctx, const char* filePath)
 		return -1;
 	}
 
-	readResult = errorHandledFileRead(ctx, ctx->thumbnail, sizeof(ctx->thumbnail), "Couldn't read thumb");
+	readResult = errorHandledFileRead(ctx, ctx->thumbnail, sizeof(ctx->thumbnail), "Couldn't read thumbnail");
 	if (readResult == -1)
 		return -1;
 
@@ -200,7 +200,15 @@ void ppmDone(ppm_ctx_t* ctx)
 
 	for (u8 i = 0; i < PPM_LAYERS; i++)
 	{
-		pd_free(ctx->layers[i]);
-		pd_free(ctx->prevLayers[i]);
+		if (ctx->layers[i] != NULL)
+		{
+			pd_free(ctx->layers[i]);
+			ctx->layers[i] = NULL;
+		}
+		if (ctx->prevLayers[i] != NULL)
+		{
+			pd_free(ctx->prevLayers[i]);
+			ctx->prevLayers[i] = NULL;
+		}
 	}
 }

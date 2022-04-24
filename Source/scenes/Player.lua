@@ -113,30 +113,30 @@ function PlayerScreen:afterLeave()
 end
 
 function PlayerScreen:loadPpm()
-  local ppm = PpmPlayer.new(noteFs.currentNote, NOTE_X, NOTE_Y)
-  -- local success = ppm.open(noteFs.currentNote)
-  print('read success', ppm)
+  local ppm = PpmPlayer.new(NOTE_X, NOTE_Y)
+  local openedSuccessfully = ppm:open(noteFs.currentNote)
 
-  if not ppm then
+  if openedSuccessfully then
+    self.ppm = ppm
+    local ditherSetttings = noteFs:getNoteDitherSettings(noteFs.currentNote)
+    for layer = 1,2 do
+      for colour = 1,3 do
+        ppm:setLayerDither(layer, colour, ditherSetttings[layer][colour])
+      end
+    end
+    self:refreshControls()
+    local this = self
+    ppm:setStoppedCallback(utils:newCallbackFn(function (a, b)
+      this:pause()
+    end))
+  else
+    local err = stringUtils:escape(ppm:getError())
     dialog:sequence({
-      {type = dialog.kTypeAlert, delay = 100, message = "Could not load Flipnote", callback = function ()
+      {type = dialog.kTypeAlert, delay = 100, message = err, callback = function ()
         sceneManager:pop()
       end}
     })
-    return
   end
-  local ditherSetttings = noteFs:getNoteDitherSettings(noteFs.currentNote)
-  for layer = 1,2 do
-    for colour = 1,3 do
-      ppm:setLayerDither(layer, colour, ditherSetttings[layer][colour])
-    end
-  end
-  self.ppm = ppm
-  self:refreshControls()
-  local this = self
-  ppm:setStoppedCallback(utils:newCallbackFn(function (a, b)
-    this:pause()
-  end))
 end
 
 function PlayerScreen:unloadPpm()
