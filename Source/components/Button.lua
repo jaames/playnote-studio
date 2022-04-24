@@ -27,6 +27,7 @@ function Button:init(x, y, w, h, text)
 
   self.variant = 'default'
   self.state = 'base'
+  self.stateTimer = nil
 
   self.padLeft = 16
   self.padRight = 16
@@ -54,19 +55,31 @@ function Button:init(x, y, w, h, text)
 end
 
 function Button:focus()
+  if self.stateTimer then
+    self.stateTimer:remove()
+    self.stateTimer = nil
+  end
   self.state = 'select'
   Button.super.focus(self)
 end
 
 function Button:unfocus()
+  if self.stateTimer then
+    self.stateTimer:remove()
+    self.stateTimer = nil
+  end
   self.state = 'base'
   Button.super.unfocus(self)
 end
 
 function Button:click()
-  local lastState = self.state
+  if self.stateTimer then
+    self.stateTimer:remove()
+    self.stateTimer = nil
+  end
+  local lastState = self.state ~= 'click' and self.state or 'base'
   self.state = 'click'
-  playdate.timer.performAfterDelay(300, function ()
+  self.stateTimer = playdate.timer.performAfterDelay(300, function ()
     self.state = lastState
   end)
   Button.super.click(self)
