@@ -91,6 +91,7 @@ function DitheringScreen:drawBg(x, y, w, h)
   gfx.fillRoundRect(RECT_LABELS, 6)
 
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+  gfx.setFontTracking(2)
   gfx.drawTextAligned(locales:getText('DITHER_COLOUR_BLACK'), COL_BLACK, ROW_LABELS, kTextAlignment.center)
   gfx.drawTextAligned(locales:getText('DITHER_COLOUR_RED'),   COL_RED,   ROW_LABELS, kTextAlignment.center)
   gfx.drawTextAligned(locales:getText('DITHER_COLOUR_BLUE'),  COL_BLUE,  ROW_LABELS, kTextAlignment.center)
