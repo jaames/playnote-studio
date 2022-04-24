@@ -166,6 +166,8 @@ function NoteListScreen:setCurrentPage(pageIndex)
 
     if transitionDir == -1 then
       self:setThumbComponentsOffset(self.currThumbs, -PLAYDATE_W)
+    elseif transitionDir == 1 then
+      self:setThumbComponentsOffset(self.currThumbs, PLAYDATE_W)
     end
 
     transitionTimer.updateCallback = function (timer)
