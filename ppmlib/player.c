@@ -24,6 +24,7 @@ player_ctx* playerNew(u16 x, u16 y)
 	player_ctx* ctx = pd_malloc(sizeof(player_ctx));
 	ctx->ppm = NULL;
 	ctx->masterAudio = NULL;
+	ctx->isPlaying = 0;
 	playerMoveTo(ctx, x, y);
 	return ctx;
 }

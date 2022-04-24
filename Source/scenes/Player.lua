@@ -103,8 +103,10 @@ function PlayerScreen:beforeEnter()
 end
 
 function PlayerScreen:beforeLeave()
-  self:pause()
-  self.removeTimers()
+  if self.ppm then
+    self:pause()
+    self.removeTimers()
+  end
 end
 
 function PlayerScreen:afterLeave()
@@ -118,6 +120,7 @@ function PlayerScreen:loadPpm()
 
   if openedSuccessfully then
     self.ppm = ppm
+    local this = self
     local ditherSetttings = noteFs:getNoteDitherSettings(noteFs.currentNote)
     for layer = 1,2 do
       for colour = 1,3 do
@@ -125,12 +128,12 @@ function PlayerScreen:loadPpm()
       end
     end
     self:refreshControls()
-    local this = self
     ppm:setStoppedCallback(utils:newCallbackFn(function (a, b)
       this:pause()
     end))
   else
     local err = stringUtils:escape(ppm:getError())
+    -- display parser error then push back to previous screen
     dialog:sequence({
       {type = dialog.kTypeAlert, delay = 100, message = err, callback = function ()
         sceneManager:pop()
@@ -242,7 +245,7 @@ function PlayerScreen:play()
 end
 
 function PlayerScreen:pause()
-  if self.isPlayTransitionActive or not self.ppm then return end
+  if self.isPlayTransitionActive then return end
   if self.ppm.isPlaying then
     self:refreshControls()
     sounds:playSfx('pause')
@@ -311,7 +314,7 @@ end
 
 function PlayerScreen:update()
   if self.ppm then
-    if self.ppm.isPlaying then
+    if not self.ppm.isPlaying then
       local frameChange = playdate.getCrankTicks(24)
       if frameChange ~= 0 then
         self:setCurrentFrame(self.ppm.currentFrame + frameChange)
@@ -321,7 +324,6 @@ function PlayerScreen:update()
           sounds:playSfxWithCooldown('crankB', 60)
         end
       end
-
     else
       self.ppm:update()
     end

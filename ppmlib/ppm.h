@@ -118,14 +118,14 @@ typedef struct ppm_ctx_t
 	float bgmFrameRate;
 	// open function state
 	SDFile* file;
-	const char* filePath;
-	const char* lastError;
+	char* filePath;
+	char* lastError;
 } ppm_ctx_t;
 
 #pragma pack(pop)
 
 ppm_ctx_t* ppmNew();
 char*      ppmGetError(ppm_ctx_t* ctx);
-int        ppmOpen(ppm_ctx_t* ctx, const char* filePath);
+int        ppmOpen(ppm_ctx_t* ctx, char* filePath);
 void       ppmDone(ppm_ctx_t* ctx);
 char*      fsidFromStr(u8 fsid[8]);

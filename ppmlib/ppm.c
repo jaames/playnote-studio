@@ -1,7 +1,7 @@
 #include "ppm.h"
 #include "platform.h"
 
-static inline void closeWithError(ppm_ctx_t* ctx, const char* msg)
+static void closeWithError(ppm_ctx_t* ctx, const char* msg)
 {
 	if (ctx->lastError != NULL)
 		pd_free(ctx->lastError);
@@ -68,7 +68,7 @@ char* ppmGetError(ppm_ctx_t* ctx)
 		return "No error";
 }
 
-int ppmOpen(ppm_ctx_t* ctx, const char* filePath)
+int ppmOpen(ppm_ctx_t* ctx, char* filePath)
 {
 	SDFile* file;
 	int readResult;
