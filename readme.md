@@ -39,7 +39,7 @@
   - [Bee](https://beeyt.carrd.co)
   - [Melaina King (Akemi)](https://www.instagram.com\/akemixes)
   - [Scarecrow](https://flipnot.es/5907142059918D1F)
-- [Simon](https://github.com/simontime) for kindly letting me use his C PPM library and answering my dumb C questions while I was trying to port it to the Playdate. 
+- [Simon](https://github.com/simontime) for kindly letting me use his C PPM library as a base for the Flipnote decoder, and for answering my dumb C questions while I was trying to port it to the Playdate. 
 - [Lauren](https://github.com/thejsa) and [Ezekiel](https://github.com/Stary2001) for additional C tips
 - Rob and Austin from [Sudomemo](https://www.sudomemo.net/) for helping me reach out to various Flipnote artists, and for the cross-promo
 - [Matt](https://github.com/gingerbeardman) for helping me get into to the Playdate Developer Preview
@@ -48,11 +48,11 @@
 
 This project is under a permissive license, however if you wish to use parts of this repo in your own project, crediting the relevant people would be appreciated:
 
-- *Lua or web code, UI design elements, image assets or the 3d playdate model* - [James](https://github.com/jaames)
-- *C Flipnote parser* - [Simon](https://github.com/simontime) and [James](https://github.com/jaames)
-- *Sound Effects* - [Talon Stradley](NewtonsDarkRoom.com)
-- *Credits Beat* - [madwurmz](https://www.colorslive.com/artist/madwurmz.com)
-- *Flipnote Studio screenshots* - [Austin](https://twitter.com/AustinSudomemo), [Rob](https://sudomemo.net)
+- **Lua or web code, UI design elements, image assets or the 3d playdate model** - [James](https://github.com/jaames)
+- **C Flipnote parser** - [Simon](https://github.com/simontime) and [James](https://github.com/jaames)
+- **Sound Effects** - [Talon Stradley](NewtonsDarkRoom.com)
+- **Credits Beat** - [madwurmz](https://www.colorslive.com/artist/madwurmz.com)
+- **Flipnote Studio screenshots** - [Austin](https://twitter.com/AustinSudomemo), [Rob](https://sudomemo.net)
 
 If you wish to use any of the sample Flipnotes, you *must* get explicit permission from their authors.
 
