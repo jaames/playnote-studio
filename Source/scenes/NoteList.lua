@@ -215,7 +215,7 @@ function NoteListScreen:transitionPageArrows()
 
   -- show next arrow
   if not self.arrowNextVisible and hasNextPage then
-    utils:createTransition(PAGE_TRANSITION_DUR, 40, 0, playdate.easingFunctions.inBack,
+    utils:createTransition(PAGE_TRANSITION_DUR, 60, 0, playdate.easingFunctions.outQuad,
       function (x)
         self.arrowNext:offsetByX(x)
       end,
@@ -225,7 +225,7 @@ function NoteListScreen:transitionPageArrows()
     )
   -- hide next arrow
   elseif self.arrowNextVisible and not hasNextPage then
-    utils:createTransition(PAGE_TRANSITION_DUR, 0, 40, playdate.easingFunctions.outBack,
+    utils:createTransition(PAGE_TRANSITION_DUR, 0, 60, playdate.easingFunctions.inQuad,
       function (x)
         self.arrowNext:offsetByX(x)
       end,
@@ -237,7 +237,7 @@ function NoteListScreen:transitionPageArrows()
 
   -- show prev arrow
   if not self.arrowPrevVisible and hasPrevPage then
-    utils:createTransition(PAGE_TRANSITION_DUR, -40, 0, playdate.easingFunctions.inBack,
+    utils:createTransition(PAGE_TRANSITION_DUR, -60, 0, playdate.easingFunctions.outQuad,
       function (x)
         self.arrowPrev:offsetByX(x)
       end,
@@ -247,7 +247,7 @@ function NoteListScreen:transitionPageArrows()
     )
   -- hide prev arrow
   elseif self.arrowPrevVisible and not hasPrevPage then
-    utils:createTransition(PAGE_TRANSITION_DUR, 0, -40, playdate.easingFunctions.outBack,
+    utils:createTransition(PAGE_TRANSITION_DUR, 0, -60, playdate.easingFunctions.inQuad,
       function (x)
         self.arrowPrev:offsetByX(x)
       end,
