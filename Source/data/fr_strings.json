@@ -21,7 +21,7 @@
   "SETTINGS_RESET_CONFIRM": "Toutes les options seront réinitialisées",
   "SETTINGS_RESET_DONE": "Les options ont été réinitialisées",
 
-  "ABOUT_VERSION": "Version %d",
+  "ABOUT_VERSION": "Version %s",
   "ABOUT_BUILT_BY": "Créé par %s",
 
   "CREDITS_HEADER_JAMES": "Programmation et design de l’interface",

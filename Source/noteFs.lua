@@ -240,7 +240,7 @@ function noteFs:setWorkingFolder(folderPath)
     end
   end
   numNotes = #noteList
-  self.hasNotes = numNotes > 1
+  self.hasNotes = numNotes > 0
   self.numPages = math.ceil(numNotes / notesPerPage)
 end
 

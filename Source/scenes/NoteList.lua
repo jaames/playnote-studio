@@ -19,11 +19,11 @@ function NoteListScreen:init()
   self.notesOnCurrPage = 0
   self.currThumbs = {}
   self.prevThumbs = {}
-  self.hasPrevPage = false
+  self.pageTransitionEnabled = false
   self.hasNoNotes = false
 
   self.transitionDir = 1
-  self.isTransitionActive = false
+  self.isPageTransitionActive = false
   self.transitionTimer = nil
   self.xOffset = 0
 
@@ -70,8 +70,11 @@ function NoteListScreen:setupSprites()
 
   self.noNoteDialog = NoNoteDialog(20, 52, PLAYDATE_W - 38, PLAYDATE_H - 72)
 
+  self.arrowPrev = PageArrow(22,              PLAYDATE_H / 2 + 16, PageArrow.kTypePrev)
+  self.arrowNext = PageArrow(PLAYDATE_W - 22, PLAYDATE_H / 2 + 16, PageArrow.kTypeNext)
+
   self.focus:setFocus(folderSelect, true)
-  return { folderSelect, counter, self.noNoteDialog }
+  return { folderSelect, counter, self.noNoteDialog, self.arrowPrev, self.arrowNext }
 end
 
 function NoteListScreen:setupMenuItems(menu)
@@ -85,6 +88,12 @@ function NoteListScreen:setupMenuItems(menu)
 end
 
 function NoteListScreen:beforeEnter()
+  -- set initial arrow position
+  self.arrowPrevVisible = false
+  self.arrowNextVisible = false
+  self.arrowNext:offsetByX(50)
+  self.arrowPrev:offsetByX(-50)
+  -- set page
   self:setCurrentPage(self.currPage)
   -- update folderselect
   local folderSelect = self.folderSelect
@@ -96,12 +105,14 @@ function NoteListScreen:beforeEnter()
   folderSelect:setValue(noteFs.workingFolder)
   -- if there's no notes to display, force the folder button to be selected
   if self.notesOnCurrPage == 0 then
+    self.arrowPrevVisible = false
+    self.arrowNextVisible = false
     self.hasNoNotes = true
     self.noNoteDialog.show = true
     self.focus:setFocus(self.folderSelect)
   end
   if not folderSelect.isSelected then
-    self:selectThumbAt(self.selectedCol, self.selectedRow)
+    self:selectThumbAt(self.selectedCol, self.selectedRow, true)
   end
   -- update counter
   counter:setTotal(noteFs.numPages)
@@ -113,7 +124,7 @@ end
 
 function NoteListScreen:leave()
   self.noNoteDialog.show = false
-  self.hasPrevPage = false -- prevent initial page transition when returning to this screen
+  self.pageTransitionEnabled = false -- prevent initial page transition when returning to this screen
 end
 
 function NoteListScreen:afterLeave()
@@ -125,9 +136,10 @@ function NoteListScreen:setCurrentFolder(folder)
   noteFs:setWorkingFolder(folder)
   self:removeThumbComponents(self.currThumbs)
   self:removeThumbComponents(self.prevThumbs)
+
   if noteFs.hasNotes then
     self.hasNoNotes = false
-    self.hasPrevPage = false
+    self.pageTransitionEnabled = false
     self:setCurrentPage(1)
     self.noNoteDialog.show = false
   else
@@ -137,6 +149,7 @@ function NoteListScreen:setCurrentFolder(folder)
     self.notesOnCurrPage = 0
     self.currPage = 0
     self.noNoteDialog.show = true
+    self:transitionPageArrows(true)
     self.focus:setFocus(self.folderSelect)
   end
   self.counter:setVisible(not self.hasNoNotes)
@@ -145,7 +158,7 @@ end
 
 function NoteListScreen:setCurrentPage(pageIndex)
   -- navigation guard
-  if self.isTransitionActive or pageIndex < 1 or pageIndex > noteFs.numPages then
+  if self.isPageTransitionActive or pageIndex < 1 or pageIndex > noteFs.numPages then
     return
   end
   -- swap page
@@ -156,8 +169,8 @@ function NoteListScreen:setCurrentPage(pageIndex)
   self:addThumbComponents(page, self.currThumbs)
   self.notesOnCurrPage = #page
   -- transition time!
-  if self.hasPrevPage then
-    self.isTransitionActive = true
+  if self.pageTransitionEnabled then
+    self.isPageTransitionActive = true
     self.focus.allowNavigation = false
     -- self.focus:setFocus(nil)
 
@@ -166,6 +179,8 @@ function NoteListScreen:setCurrentPage(pageIndex)
 
     if transitionDir == -1 then
       self:setThumbComponentsOffset(self.currThumbs, -PLAYDATE_W)
+    elseif transitionDir == 1 then
+      self:setThumbComponentsOffset(self.currThumbs, PLAYDATE_W)
     end
 
     transitionTimer.updateCallback = function (timer)
@@ -187,13 +202,63 @@ function NoteListScreen:setCurrentPage(pageIndex)
       -- BUGFIX: prevent glitches when redrawing the background, because the thumbnails move quickly,
       -- sometimes patches of the background wouldn't be covered by the thumbnail dirtyrects and will be left undrawn
       spritelib.addDirtyRect(GRID_X - 6, GRID_Y - 6, (GRID_COLS * (THUMB_W + GRID_GAP)), (GRID_ROWS * (THUMB_H + GRID_GAP)))
-      self.isTransitionActive = false
+      self.isPageTransitionActive = false
       self.focus.allowNavigation = true
     end
   end
   self.currPage = pageIndex
   self.counter:setValue(pageIndex)
-  self.hasPrevPage = true
+  self.pageTransitionEnabled = true
+  -- setup page arrow transitions
+  self:transitionPageArrows()
+end
+
+function NoteListScreen:transitionPageArrows(forceHide)
+  local hasPrevPage = self.currPage ~= 1
+  local hasNextPage = self.currPage ~= noteFs.numPages
+  -- hide next arrow
+  if self.arrowNextVisible and (forceHide or (not hasNextPage)) then
+    utils:createTransition(PAGE_TRANSITION_DUR, 0, 60, playdate.easingFunctions.inQuad,
+      function (x)
+        self.arrowNext:offsetByX(x)
+      end,
+      function ()
+        self.arrowNextVisible = false
+      end
+    )
+  -- show next arrow
+  elseif (not forceHide) and (not self.arrowNextVisible) and hasNextPage then
+    utils:createTransition(PAGE_TRANSITION_DUR, 60, 0, playdate.easingFunctions.outQuad,
+      function (x)
+        self.arrowNext:offsetByX(x)
+      end,
+      function ()
+        self.arrowNextVisible = true
+      end
+    )
+  end
+
+  -- hide prev arrow
+  if self.arrowPrevVisible and (forceHide or (not hasPrevPage)) then
+    utils:createTransition(PAGE_TRANSITION_DUR, 0, -60, playdate.easingFunctions.inQuad,
+      function (x)
+        self.arrowPrev:offsetByX(x)
+      end,
+      function ()
+        self.arrowPrevVisible = false
+      end
+    )
+  -- show prev arrow
+  elseif (not forceHide) and (not self.arrowPrevVisible) and hasPrevPage then
+    utils:createTransition(PAGE_TRANSITION_DUR, -60, 0, playdate.easingFunctions.outQuad,
+      function (x)
+        self.arrowPrev:offsetByX(x)
+      end,
+      function ()
+        self.arrowPrevVisible = true
+      end
+    )
+  end
 end
 
 function NoteListScreen:addThumbComponents(tmbs, list)
@@ -227,11 +292,11 @@ function NoteListScreen:setThumbComponentsOffset(list, xOffset)
   end
 end
 
-function NoteListScreen:selectThumbAt(column, row)
+function NoteListScreen:selectThumbAt(column, row, muteSfx)
   column = utils:clamp(GRID_COLS - 1, 0, column)
   row = utils:clamp(GRID_ROWS - 1, 0, row)
   local index = math.min((row * 4 + column) + 1, self.notesOnCurrPage)
-  self.focus:setFocus(self.currThumbs[index])
+  self.focus:setFocus(self.currThumbs[index], muteSfx)
 end
 
 function NoteListScreen:drawBg()
@@ -249,6 +314,11 @@ function NoteListScreen:updateTransitionIn(t, fromScreen)
   end
   self.folderSelect:offsetByY(playdate.easingFunctions.outQuad(t, -40, 40, 1))
   self.counter:offsetByX(playdate.easingFunctions.outQuad(t, 50, -50, 1))
+  if self.arrowPrevVisible then
+    self.arrowPrev:offsetByX(playdate.easingFunctions.outQuad(t, -50, 50, 1))
+  elseif self.arrowNextVisible then
+    self.arrowNext:offsetByX(playdate.easingFunctions.outQuad(t, 50, -50, 1))
+  end
 end
 
 function NoteListScreen:updateTransitionOut(t, toScreen)
@@ -265,6 +335,11 @@ function NoteListScreen:updateTransitionOut(t, toScreen)
   end
   self.folderSelect:offsetByY(playdate.easingFunctions.inQuad(t, 0, -40, 1))
   self.counter:offsetByX(playdate.easingFunctions.inQuad(t, 0, 50, 1))
+  if self.arrowPrevVisible then
+    self.arrowPrev:offsetByX(playdate.easingFunctions.inQuad(t, 0, -50, 1))
+  elseif self.arrowNextVisible then
+    self.arrowNext:offsetByX(playdate.easingFunctions.inQuad(t, 0, 50, 1))
+  end
 end
 
 return NoteListScreen

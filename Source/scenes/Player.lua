@@ -103,8 +103,10 @@ function PlayerScreen:beforeEnter()
 end
 
 function PlayerScreen:beforeLeave()
-  self:pause()
-  self.removeTimers()
+  if self.ppm then
+    self:pause(true)
+    self.removeTimers()
+  end
 end
 
 function PlayerScreen:afterLeave()
@@ -113,19 +115,31 @@ function PlayerScreen:afterLeave()
 end
 
 function PlayerScreen:loadPpm()
-  local ppm = PpmPlayer.new(noteFs.currentNote, NOTE_X, NOTE_Y)
-  local ditherSetttings = noteFs:getNoteDitherSettings(noteFs.currentNote)
-  for layer = 1,2 do
-    for colour = 1,3 do
-      ppm:setLayerDither(layer, colour, ditherSetttings[layer][colour])
+  local ppm = PpmPlayer.new(NOTE_X, NOTE_Y)
+  local openedSuccessfully = ppm:open(noteFs.currentNote)
+
+  if openedSuccessfully then
+    self.ppm = ppm
+    local this = self
+    local ditherSetttings = noteFs:getNoteDitherSettings(noteFs.currentNote)
+    for layer = 1,2 do
+      for colour = 1,3 do
+        ppm:setLayerDither(layer, colour, ditherSetttings[layer][colour])
+      end
     end
+    self:refreshControls()
+    ppm:setStoppedCallback(utils:newCallbackFn(function (a, b)
+      this:pause()
+    end))
+  else
+    local err = stringUtils:escape(ppm:getError())
+    -- display parser error then push back to previous screen
+    dialog:sequence({
+      {type = dialog.kTypeAlert, delay = 100, message = err, callback = function ()
+        sceneManager:pop()
+      end}
+    })
   end
-  self.ppm = ppm
-  self:refreshControls()
-  local this = self
-  ppm:setStoppedCallback(utils:newCallbackFn(function (a, b)
-    this:pause()
-  end))
 end
 
 function PlayerScreen:unloadPpm()
@@ -230,11 +244,13 @@ function PlayerScreen:play()
   end
 end
 
-function PlayerScreen:pause()
+function PlayerScreen:pause(muteSfx)
   if self.isPlayTransitionActive then return end
   if self.ppm.isPlaying then
     self:refreshControls()
-    sounds:playSfx('pause')
+    if not muteSfx then
+      sounds:playSfx('pause')
+    end
     self.ppm:pause()
     self:setControlsVisible(true)
     playdate.setAutoLockDisabled(false)
@@ -282,7 +298,7 @@ end
 function PlayerScreen:drawBg(x, y, w, h)
   grid:draw(x, y, w, h)
   -- draw frame here only if the transition is active
-  if not self.isFrameTransitionActive then
+  if self.ppm and not self.isFrameTransitionActive then
     -- only draw frame if clip rect overlaps it
     local _, _, iw, ih = fast_intersection(NOTE_X - 4, NOTE_Y - 4, NOTE_W + 8, NOTE_H + 8, x, y, w, h)
     if iw > 0 and ih > 0 then
@@ -299,18 +315,21 @@ function PlayerScreen:drawBg(x, y, w, h)
 end
 
 function PlayerScreen:update()
-  if not self.ppm.isPlaying then
-    local frameChange = playdate.getCrankTicks(24)
-    if frameChange ~= 0 then
-      self:setCurrentFrame(self.ppm.currentFrame + frameChange)
-      if frameChange < 0 then
-        sounds:playSfxWithCooldown('crankA', 60)
-      else
-        sounds:playSfxWithCooldown('crankB', 60)
+  if self.ppm then
+    if not self.ppm.isPlaying then
+      local frameChange = playdate.getCrankTicks(24)
+      if frameChange ~= 0 then
+        self:setCurrentFrame(self.ppm.currentFrame + frameChange)
+        if frameChange < 0 then
+          sounds:playSfxWithCooldown('crankA', 60)
+        else
+          sounds:playSfxWithCooldown('crankB', 60)
+        end
       end
+    else
+      self.ppm:update()
     end
   end
-  self.ppm:update()
 end
 
 function PlayerScreen:updateTransitionIn(t, fromScreen)

@@ -32,11 +32,11 @@ typedef struct player_ctx
 	char* stoppedCallback;
 } player_ctx;
 
-player_ctx* playerInit(u16 x, u16 y);
+player_ctx* playerNew(u16 x, u16 y);
 
 void playerMoveTo(player_ctx* ctx, u16 x, u16 y);
 
-int playerLoadPpm(player_ctx* ctx, const char* filePath);
+int playerOpenPpm(player_ctx* ctx, const char* filePath);
 
 void playerDone(player_ctx* ctx);
 

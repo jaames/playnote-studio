@@ -80,38 +80,11 @@ static void blitPpmFrame(player_ctx* ctx, u16 frameIndex, void* destBuffer, u16 
 
 static int ppmlib_new(lua_State* L)
 {
-	const char* filePath = pd->lua->getArgString(1);
-	int x = pd->lua->getArgInt(2);
-	int y = pd->lua->getArgInt(3);
+	int x = pd->lua->getArgInt(1);
+	int y = pd->lua->getArgInt(2);
 
-	// SDFile* f = pd->file->open(filePath, kFileRead | kFileReadData);
-	// if (f == NULL)
-	// {
-	// 	const char* err = pd->file->geterr();
-	// 	pd_error("Error opening %s: %s", filePath, err);
-	// 	pd->lua->pushNil();
-	// 	return 1;
-	// }
-
-	// pd->file->seek(f, 0, SEEK_END);
-	// int fsize = pd->file->tell(f);
-	// pd->file->seek(f, 0, SEEK_SET);
-
-	// u8* ppm = pd_malloc(fsize);
-	// pd->file->read(f, ppm, fsize);
-	// pd->file->close(f);
-
-	player_ctx* ctx = playerInit((u16)x, (u16)y);
-	int err = playerLoadPpm(ctx, filePath);
+	player_ctx* ctx = playerNew((u16)x, (u16)y);
 	
-	// pd_free(ppm);
-	
-	if (err == 1)
-	{
-		pd->lua->pushNil();
-		return 1;
-	}
-
 	pd->lua->pushObject(ctx, "PpmPlayer", 0);
 	return 1;
 }
@@ -151,6 +124,39 @@ static int ppmlib_index(lua_State* L)
 	else
 		pd->lua->pushNil();
 
+	return 1;
+}
+
+// load a flipnote ppm from a given filepath
+static int ppmlib_open(lua_State* L)
+{
+	player_ctx* ctx = getPlayerCtx(1);
+	const char* filePath = pd->lua->getArgString(2);
+	int res = playerOpenPpm(ctx, pd_strdup(filePath));
+	
+	if (res == -1)
+	{
+		pd->lua->pushBool(0);
+		return 1;
+	}
+
+	pd->lua->pushBool(1);
+	return 1;
+}
+
+// get ppm parser error message
+static int ppmlib_getPpmError(lua_State* L)
+{
+	player_ctx* ctx = getPlayerCtx(1);
+	if (ctx->ppm != NULL)
+	{
+		const char* err = ppmGetError(ctx->ppm);
+		pd->lua->pushString(err);
+	}
+	else
+	{
+		pd->lua->pushNil();
+	}
 	return 1;
 }
 
@@ -247,6 +253,8 @@ static const lua_reg libPpm[] =
 	{ "new",                 ppmlib_new },
 	{ "__gc",                ppmlib_gc },
 	{ "__index",             ppmlib_index },
+	{ "open",                ppmlib_open },
+	{ "getError",            ppmlib_getPpmError },
 	{ "draw",                ppmlib_draw },
 	{ "drawFrameToBitmap",   ppmlib_drawFrameToBitmap },
 	{ "setLayerDither",      ppmlib_setLayerDither },

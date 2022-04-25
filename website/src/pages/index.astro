@@ -35,14 +35,18 @@ import { Icon } from 'astro-icon';
   </section>
 
   <section class="Section DownloadSection" id="download">
-    <h2 class="Section__title">Download</h2>
+    <div class="Section__head">
+      <span class="Section__headSpacer"></span>
+      <h2 class="Section__title">Latest Release</h2>
+      <a class="Section__headLink" href="/releases">Past Releases &amp; Changelog →</a>
+    </div>
     <div class="Section__body">
       <div class="DownloadCard">
         <div class="DownloadCard__head">
           <div class="DownloadCard__info">
             <h3 class="DownloadCard__title">playnote.pdx</h3>
-            <div class="DownloadCard__stat">Version 1.0.1</div>
-            <div class="DownloadCard__stat">17.5 MB</div>
+            <div class="DownloadCard__stat">Version 1.1</div>
+            <div class="DownloadCard__stat">16.8 MB</div>
           </div>
           <div class="DownloadCard__buttons">
             <Button type="inverted" href="https://github.com/jaames/playnote-studio/releases/latest/download/Playnote.pdx.zip">Download</Button>
@@ -67,6 +71,10 @@ import { Icon } from 'astro-icon';
             </div>
           </div>
         </div>
+      </div>
+      <div class="BtwCard">
+        <p class="BtwCard__text">By the way! You can add your own Flipnotes by dropping them onto your Playdate's storage</p>
+        <Button class="BtwCard__button" href="/filehelp">Learn How</Button>
       </div>
     </div>
   </section>
@@ -265,6 +273,8 @@ import { Icon } from 'astro-icon';
 
 <style lang="scss">
 
+  // this code is ugly fyi, i haven't had enough time to really polish this...
+
   .Section {
     @include wrapper;
     display: flex;
@@ -354,6 +364,48 @@ import { Icon } from 'astro-icon';
   }
 
   .DownloadSection {
+
+    .Section__head {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      @include breakpoint-tablet {
+        width: 100%;
+        max-width: grid-span(8, 12);
+        margin: 0 auto;
+        margin-bottom: 1rem;
+      }
+    }
+
+    .Section__head > * {
+      flex: 1;
+    }
+
+    .Section__title {
+      flex: 1;
+      margin-bottom: 0;
+
+      @include breakpoint-phone-only {
+        text-align: left;
+      }
+    }
+
+    .Section__headSpacer {
+
+      @include breakpoint-phone-only {
+        display: none;
+      }
+    }
+
+    .Section__headLink {
+      flex: 1;
+      font-weight: normal;
+      color: $color-text-alt;
+      text-align: right;
+      font-size: 0.9rem;
+    }
+
     .Section__body {
       @include breakpoint-tablet {
         max-width: grid-span(8, 12);
@@ -465,6 +517,27 @@ import { Icon } from 'astro-icon';
   .DownloadCard__noteText {
     margin-left: .25em;
     flex: 1;
+  }
+
+  .BtwCard {
+    // color: $color-text-invert;
+    background: $color-bg-alt;
+    @include punchcard;
+    @include panel;
+    padding-top: 40px;
+    padding-top: 40px;
+    margin-top: 1rem;
+    align-items: center;
+
+    display: flex;
+    @include breakpoint-desktop {
+      padding-top: 40px;
+    }
+  }
+
+  .BtwCard__text {
+    max-width: 42ch;
+    margin-right: auto;
   }
 
   .FaqSection {

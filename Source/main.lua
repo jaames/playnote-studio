@@ -45,6 +45,7 @@ import './components/DitherSwatch'
 import './components/Scrollbar'
 import './components/KeyValList'
 import './components/TextView'
+import './components/PageArrow'
 
 import './scenes/ScreenBase'
 

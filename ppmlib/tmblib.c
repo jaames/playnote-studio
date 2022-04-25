@@ -22,8 +22,7 @@ void registerTmblib()
 	}
 }
 
-
-LCDBitmap* tmbGetPdBitmap(tmblib_ctx* ctx)
+LCDBitmap* tmbGetPdBitmap(tmb_ctx_t* ctx)
 {
 	u8* pixels = pd_malloc(PPM_THUMBNAIL_WIDTH * PPM_THUMBNAIL_HEIGHT);
 
@@ -36,7 +35,7 @@ LCDBitmap* tmbGetPdBitmap(tmblib_ctx* ctx)
 	LCDBitmap* bitmap = pd->graphics->newBitmap(PPM_THUMBNAIL_WIDTH, PPM_THUMBNAIL_HEIGHT, kColorBlack);
 	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &hasMask, &bitmapData);
 
-	tmbGetThumbnail(ctx->tmb, pixels);
+	tmbGetThumbnail(ctx, pixels);
 
 	u8 chunk = 0;
 	u8 patternOffset = 0;
@@ -84,7 +83,7 @@ LCDBitmap* tmbGetPdBitmap(tmblib_ctx* ctx)
 	return bitmap;
 }
 
-static tmblib_ctx* getTmbCtx(int n)
+static tmb_ctx_t* getTmbCtx(int n)
 {
 	return pd->lua->getArgObject(n, "TmbParser", NULL);
 }
@@ -93,34 +92,15 @@ static int tmb_new(lua_State* L)
 {
 	const char* filePath = pd->lua->getArgString(1);
 
-	int fsize = 0x06A0;
-	u8* tmb = pd_malloc(fsize);
+	tmb_ctx_t* ctx = tmbNew();
+	int result = tmbOpen(ctx, pd_strdup(filePath));
 
-	SDFile* f = pd->file->open(filePath, kFileRead | kFileReadData);
-	if (f == NULL)
+	if (result == -1)
 	{
-		const char* err = pd->file->geterr();
-		pd_error("Error opening %s: %s", filePath, err);
-		pd->lua->pushNil();
-		return 1;
-	}
-	
-	pd->file->read(f, tmb, fsize);
-	pd->file->close(f);
-
-	tmblib_ctx* ctx = pd_malloc(sizeof(tmblib_ctx));
-	ctx->tmb = pd_malloc(sizeof(tmb_ctx_t));
-	int err = tmbInit(ctx->tmb, tmb, fsize);
-	pd_free(tmb);
-
-	if (err != -1)
-	{
-		pd_error("tmbInit error %d when trying to read %s", err, filePath);
 		pd->lua->pushNil();
 		return 1;
 	}
 
-	ctx->ppmPath = pd_strdup(filePath);
 	ctx->bitmap = tmbGetPdBitmap(ctx);
 
 	pd->lua->pushObject(ctx, "TmbParser", 0);
@@ -130,10 +110,8 @@ static int tmb_new(lua_State* L)
 // called when lua garbage-collects a class instance
 static int tmb_gc(lua_State* L)
 {
-	tmblib_ctx* ctx = getTmbCtx(1);
-	pd_free(ctx->tmb);
-	pd_free(ctx->ppmPath);
-	pd->graphics->freeBitmap(ctx->bitmap);
+	tmb_ctx_t* ctx = getTmbCtx(1);
+	tmbDone(ctx);
 	// pd_log("tmb free at 0x%08x", ctx);
 	pd_free(ctx);
 	return 0;
@@ -144,33 +122,33 @@ static int tmb_index(lua_State* L)
 	if (pd->lua->indexMetatable() == 1)
 		return 1;
 	
-	tmblib_ctx* ctx = getTmbCtx(1);
+	tmb_ctx_t* ctx = getTmbCtx(1);
 	const char* key = pd->lua->getArgString(2);
 
 	if (strcmp(key, "bitmap") == 0)
 		pd->lua->pushBitmap(ctx->bitmap);
 	else if (strcmp(key, "path") == 0)
-		pd->lua->pushString(ctx->ppmPath);
+		pd->lua->pushString(ctx->filePath);
 	else if (strcmp(key, "numFrames") == 0)
-		pd->lua->pushInt(ctx->tmb->hdr.numFrames);
+		pd->lua->pushInt(ctx->hdr.numFrames);
 	else if (strcmp(key, "currentAuthor") == 0)
-		pd->lua->pushBytes((char*)ctx->tmb->hdr.currentAuthor, 22);
+		pd->lua->pushBytes((char*)ctx->hdr.currentAuthor, 22);
 	else if (strcmp(key, "previousAuthor") == 0)
-		pd->lua->pushBytes((char*)ctx->tmb->hdr.previousAuthor, 22);
+		pd->lua->pushBytes((char*)ctx->hdr.previousAuthor, 22);
 	else if (strcmp(key, "originalAuthor") == 0)
-		pd->lua->pushBytes((char*)ctx->tmb->hdr.originalAuthor, 22);
+		pd->lua->pushBytes((char*)ctx->hdr.originalAuthor, 22);
 	else if (strcmp(key, "currentAuthorId") == 0)
-		pd->lua->pushBytes((char*)ctx->tmb->hdr.currentAuthorId, 8);
+		pd->lua->pushBytes((char*)ctx->hdr.currentAuthorId, 8);
 	else if (strcmp(key, "previousAuthorId") == 0)
-		pd->lua->pushBytes((char*)ctx->tmb->hdr.previousAuthorId, 8);
+		pd->lua->pushBytes((char*)ctx->hdr.previousAuthorId, 8);
 	else if (strcmp(key, "originalAuthorId") == 0)
-		pd->lua->pushBytes((char*)ctx->tmb->hdr.originalAuthorId, 8);
+		pd->lua->pushBytes((char*)ctx->hdr.originalAuthorId, 8);
 	else if (strcmp(key, "timestamp") == 0)
-		pd->lua->pushInt(ctx->tmb->hdr.timeStamp);
+		pd->lua->pushInt(ctx->hdr.timeStamp);
 	else if (strcmp(key, "ppmSize") == 0)
 	{
 		FileStat* stat = pd_malloc(sizeof(FileStat));
-		int res = pd->file->stat(ctx->ppmPath, stat);
+		int res = pd->file->stat(ctx->filePath, stat);
 		if (res == 0)
 			pd->lua->pushInt(stat->size);
 		else

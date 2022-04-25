@@ -21,7 +21,7 @@
   "SETTINGS_RESET_CONFIRM": "Все настройки будут сброшены",
   "SETTINGS_RESET_DONE": "Настройки сброшены",
 
-  "ABOUT_VERSION": "Версия %d",
+  "ABOUT_VERSION": "Версия %s",
   "ABOUT_BUILT_BY": "Создано %s",
 
   "CREDITS_HEADER_JAMES": "Программирование и UI-Дизайн",

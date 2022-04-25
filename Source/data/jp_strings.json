@@ -21,7 +21,7 @@
   "SETTINGS_RESET_CONFIRM": "すべての設定をリセットします",
   "SETTINGS_RESET_DONE": "設定のリセットが完了しました",
 
-  "ABOUT_VERSION": "Version %d",
+  "ABOUT_VERSION": "Version %s",
   "ABOUT_BUILT_BY": "開発者: %s",
 
   "CREDITS_HEADER_JAMES": "プログラム&UIデザイン",

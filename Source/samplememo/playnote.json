@@ -86,29 +86,29 @@
       "authorId": "pekira"
     },
     {
-      "filename": "17_pekira2.ppm",
+      "filename": "17_pekira4.ppm",
       "authorId": "pekira",
-      "dithering": [[1, 3, 1], [1, 3, 1]]
+      "dithering": [[1, 4, 1], [1, 4, 1]]
     },
     {
       "filename": "18_pekira3.ppm",
       "authorId": "pekira"
     },
     {
-      "filename": "19_pekira4.ppm",
-      "authorId": "pekira",
-      "dithering": [[1, 4, 1], [1, 4, 1]]
+      "filename": "19_pekira6.ppm",
+      "authorId": "pekira"
     },
     {
-      "filename": "20_pekira6.ppm",
-      "authorId": "pekira"
+      "filename": "20_pekira2.ppm",
+      "authorId": "pekira",
+      "dithering": [[1, 3, 1], [1, 3, 1]]
     },
     {
       "filename": "21_pekira7.ppm",
       "authorId": "pekira"
     },
     {
-      "filename": "22_scarecrow1.ppm",
+      "filename": "22_scarecrow4.ppm",
       "authorId": "scarecrow"
     },
     {

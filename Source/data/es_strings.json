@@ -21,7 +21,7 @@
   "SETTINGS_RESET_CONFIRM": "Cada ajuste se va a restablecer",
   "SETTINGS_RESET_DONE": "Se han restablecido los ajustes",
 
-  "ABOUT_VERSION": "Versión %d",
+  "ABOUT_VERSION": "Versión %s",
   "ABOUT_BUILT_BY": "Compilado por %s",
 
   "CREDITS_HEADER_JAMES": "Programación y Diseño de UI",

@@ -1,0 +1,185 @@
+---
+import { Markdown } from 'astro/components';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+
+import { parseISO, format } from 'date-fns';
+
+const resp = await fetch('https://api.github.com/repos/jaames/playnote-studio/releases');
+const releaseData = await resp.json();
+
+const releases = releaseData.map((release) => {
+
+  const assets = release.assets.map((asset) => ({
+    name: asset.name,
+    download: asset.browser_download_url
+  }));
+
+  return {
+    version: release.tag_name,
+    timestamp: format(parseISO(release.published_at), 'do MMMM y'),
+    notes: release.body,
+    assets
+  };
+});
+
+---
+<BaseLayout>
+
+  <header class="Header">
+    <!-- <div class="Header__top"></div> -->
+    <div class="Header__main">
+      <h1 class="Header__title">Releases</h1>
+    </div>
+  </header>
+
+  <div class="Releases">
+
+  {releases.map((release) => (
+    <div class="ReleaseCard">
+      <div class="ReleaseCard__head">
+        <div class="ReleaseCard__info">
+          <h3 class="ReleaseCard__title">{ release.version }</h3>
+          <div class="ReleaseCard__stat">{ release.timestamp }</div>
+        </div>
+        <div class="ReleaseCard__buttons">
+          <Button type="inverted" href={ release.assets[0].download }>Download</Button>
+        </div>
+      </div>
+      <div class="ReleaseCard__body">
+        <Markdown>
+          { release.notes }
+        </Markdown>
+      </div>
+    </div>
+  ))}
+
+  </div>
+
+</BaseLayout>
+
+<style lang="scss">
+
+  .Header {
+    @include wrapper;
+    margin-top: 5rem;
+    margin-bottom: 2rem;
+  }
+
+  .Header__main {
+    background: $color-bg-alt;
+    margin: 0 auto;
+    @include punchcard;
+    @include panel;
+    padding-top: 40px;
+    @include breakpoint-desktop {
+      padding-top: 40px;
+      max-width: grid-span(8, 12);
+    }
+  }
+
+  .Header__title {
+    font-size: 1.5rem;
+    max-width: 20ch;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .Releases {
+    @include wrapper;
+  }
+
+  .ReleaseCard {
+    display: flex;
+    margin-bottom: 2rem;
+    @include breakpoint-below-desktop {
+      flex-direction: column;
+    }
+    @include breakpoint-desktop {
+      margin: 0 auto;
+      margin-bottom: 2rem;
+      max-width: grid-span(8, 12);
+    }
+  }
+
+  .ReleaseCard__head {
+    color: $color-text-invert;
+    background: $color-bg-invert;
+    padding: $padding-mobile;
+
+    @include breakpoint-below-desktop {
+      border-top-left-radius: $border-radius-mobile;
+      border-top-right-radius: $border-radius-mobile;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    @include breakpoint-desktop {
+      border-radius: 0;
+      border-top-left-radius: $border-radius;
+      border-bottom-left-radius: $border-radius;
+      padding: $padding;
+    }
+  }
+
+  .ReleaseCard__body {
+    background: $color-bg-alt;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: $padding-mobile;
+
+    @include breakpoint-below-desktop {
+      border-bottom-left-radius: $border-radius-mobile;
+      border-bottom-right-radius: $border-radius-mobile;
+    }
+
+    @include breakpoint-desktop {
+      border-top-right-radius: $border-radius;
+      border-bottom-right-radius: $border-radius;
+      padding: $padding;
+    }
+    
+  }
+
+  .ReleaseCard__title {
+    margin-top: -0.25em;  
+  }
+
+  .ReleaseCard__stat {
+    color: $color-text-invert-alt;
+  }
+
+  .ReleaseCard__buttons {
+    color: $color-text-invert-alt;
+
+    @include breakpoint-desktop {
+      margin-top: 1em;
+      margin-bottom: -.5em;
+    }
+
+    :global(.Button) {
+      display: inline-block;
+    }
+  }
+
+  // .ReleaseCard__desc {
+  //   margin-bottom: 1em;
+  //   @include breakpoint-desktop {
+  //     margin-bottom: auto;
+  //   }
+  // }
+
+  .ReleaseCard__body {
+    ul {
+      padding: 0;
+      padding-left: 1em;
+    }
+
+    ul, p {
+      margin-bottom: .5em;
+    }
+  }
+
+</style>

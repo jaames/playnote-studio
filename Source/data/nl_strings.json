@@ -21,7 +21,7 @@
   "SETTINGS_RESET_CONFIRM": "Alle instellingen worden hersteld",
   "SETTINGS_RESET_DONE": "Instellingen zijn hersteld",
 
-  "ABOUT_VERSION": "Versie %d",
+  "ABOUT_VERSION": "Versie %s",
   "ABOUT_BUILT_BY": "Ontwikkeld door %s",
 
   "CREDITS_HEADER_JAMES": "Programmeren en UI Ontwerp",
