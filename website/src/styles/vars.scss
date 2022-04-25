@@ -51,3 +51,8 @@ $text-size-title: 1.25rem;
     border-radius: $border-radius;
   }
 }
+
+@mixin punchcard {
+  -webkit-mask-image: radial-gradient(circle at center 22px, transparent 10px, white 10px);
+  mask-image: radial-gradient(circle at center 22px, transparent 10px, white 10px);
+}

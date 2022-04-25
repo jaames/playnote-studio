@@ -68,24 +68,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     margin-top: 5rem;
   }
 
-  .Header__top {
-    background: url('/assets/panel_head_light.svg');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    width: 15ch;
-    margin: 0 auto;
-    margin-bottom: -0.1rem;
-    padding: .75em 2em .5em 2em;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-  }
-
   .Header__main {
     background: $color-bg-alt;
-    padding: 20px;
     margin: 0 auto;
+    @include punchcard;
     @include panel;
+    padding-top: 40px;
     @include breakpoint-desktop {
+      padding-top: 40px;
       max-width: grid-span(8, 12);
     }
   }
@@ -103,8 +93,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   .Panel {
-    color: $color-text-invert;
-    background: $color-bg-invert;
+    // color: $color-text-invert;
+    background: $color-bg-alt;
     margin: 0 auto;
     margin-bottom: 2em;
     @include panel;
