@@ -105,6 +105,8 @@ function NoteListScreen:beforeEnter()
   folderSelect:setValue(noteFs.workingFolder)
   -- if there's no notes to display, force the folder button to be selected
   if self.notesOnCurrPage == 0 then
+    self.arrowPrevVisible = false
+    self.arrowNextVisible = false
     self.hasNoNotes = true
     self.noNoteDialog.show = true
     self.focus:setFocus(self.folderSelect)
@@ -134,6 +136,7 @@ function NoteListScreen:setCurrentFolder(folder)
   noteFs:setWorkingFolder(folder)
   self:removeThumbComponents(self.currThumbs)
   self:removeThumbComponents(self.prevThumbs)
+
   if noteFs.hasNotes then
     self.hasNoNotes = false
     self.pageTransitionEnabled = false
@@ -146,6 +149,7 @@ function NoteListScreen:setCurrentFolder(folder)
     self.notesOnCurrPage = 0
     self.currPage = 0
     self.noNoteDialog.show = true
+    self:transitionPageArrows(true)
     self.focus:setFocus(self.folderSelect)
   end
   self.counter:setVisible(not self.hasNoNotes)
@@ -209,22 +213,11 @@ function NoteListScreen:setCurrentPage(pageIndex)
   self:transitionPageArrows()
 end
 
-function NoteListScreen:transitionPageArrows()
+function NoteListScreen:transitionPageArrows(forceHide)
   local hasPrevPage = self.currPage ~= 1
   local hasNextPage = self.currPage ~= noteFs.numPages
-
-  -- show next arrow
-  if not self.arrowNextVisible and hasNextPage then
-    utils:createTransition(PAGE_TRANSITION_DUR, 60, 0, playdate.easingFunctions.outQuad,
-      function (x)
-        self.arrowNext:offsetByX(x)
-      end,
-      function ()
-        self.arrowNextVisible = true
-      end
-    )
   -- hide next arrow
-  elseif self.arrowNextVisible and not hasNextPage then
+  if self.arrowNextVisible and (forceHide or (not hasNextPage)) then
     utils:createTransition(PAGE_TRANSITION_DUR, 0, 60, playdate.easingFunctions.inQuad,
       function (x)
         self.arrowNext:offsetByX(x)
@@ -233,26 +226,36 @@ function NoteListScreen:transitionPageArrows()
         self.arrowNextVisible = false
       end
     )
-  end
-
-  -- show prev arrow
-  if not self.arrowPrevVisible and hasPrevPage then
-    utils:createTransition(PAGE_TRANSITION_DUR, -60, 0, playdate.easingFunctions.outQuad,
+  -- show next arrow
+  elseif (not forceHide) and (not self.arrowNextVisible) and hasNextPage then
+    utils:createTransition(PAGE_TRANSITION_DUR, 60, 0, playdate.easingFunctions.outQuad,
       function (x)
-        self.arrowPrev:offsetByX(x)
+        self.arrowNext:offsetByX(x)
       end,
       function ()
-        self.arrowPrevVisible = true
+        self.arrowNextVisible = true
       end
     )
+  end
+
   -- hide prev arrow
-  elseif self.arrowPrevVisible and not hasPrevPage then
+  if self.arrowPrevVisible and (forceHide or (not hasPrevPage)) then
     utils:createTransition(PAGE_TRANSITION_DUR, 0, -60, playdate.easingFunctions.inQuad,
       function (x)
         self.arrowPrev:offsetByX(x)
       end,
       function ()
         self.arrowPrevVisible = false
+      end
+    )
+  -- show prev arrow
+  elseif (not forceHide) and (not self.arrowPrevVisible) and hasPrevPage then
+    utils:createTransition(PAGE_TRANSITION_DUR, -60, 0, playdate.easingFunctions.outQuad,
+      function (x)
+        self.arrowPrev:offsetByX(x)
+      end,
+      function ()
+        self.arrowPrevVisible = true
       end
     )
   end
@@ -311,9 +314,9 @@ function NoteListScreen:updateTransitionIn(t, fromScreen)
   end
   self.folderSelect:offsetByY(playdate.easingFunctions.outQuad(t, -40, 40, 1))
   self.counter:offsetByX(playdate.easingFunctions.outQuad(t, 50, -50, 1))
-  if self.currPage ~= 1 then
+  if self.arrowPrevVisible then
     self.arrowPrev:offsetByX(playdate.easingFunctions.outQuad(t, -50, 50, 1))
-  elseif self.currPage ~= noteFs.numPages then
+  elseif self.arrowNextVisible then
     self.arrowNext:offsetByX(playdate.easingFunctions.outQuad(t, 50, -50, 1))
   end
 end
@@ -332,9 +335,9 @@ function NoteListScreen:updateTransitionOut(t, toScreen)
   end
   self.folderSelect:offsetByY(playdate.easingFunctions.inQuad(t, 0, -40, 1))
   self.counter:offsetByX(playdate.easingFunctions.inQuad(t, 0, 50, 1))
-  if self.currPage ~= 1 then
+  if self.arrowPrevVisible then
     self.arrowPrev:offsetByX(playdate.easingFunctions.inQuad(t, 0, -50, 1))
-  elseif self.currPage ~= noteFs.numPages then
+  elseif self.arrowNextVisible then
     self.arrowNext:offsetByX(playdate.easingFunctions.inQuad(t, 0, 50, 1))
   end
 end
