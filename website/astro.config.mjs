@@ -16,7 +16,7 @@ export default {
     ssr: {
       external: ["svgo"],
     },
-    plugins: [glsl.default()],
+    plugins: [glsl()],
     resolve: {
       alias: {
         '@': `${path.resolve(__dirname, 'src')}`

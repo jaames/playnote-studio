@@ -17,7 +17,7 @@
     "astro-icon": "^0.7.1",
     "date-fns": "^2.28.0",
     "sass": "^1.49.9",
-    "vite-plugin-glsl": "^0.1.2"
+    "vite-plugin-glsl": "^1.1.2"
   },
   "dependencies": {
     "flipnote.js": "^5.7.0",
