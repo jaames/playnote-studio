@@ -59,17 +59,17 @@ const DITHER_MASKS = {
   [DitherType.Polka]:        [[1, 1], [0, 1]],
 };
 
-const URL_SCREEN_MODEL = '/assets/playdate_screen.glb';
-const URL_SCREEN_IMAGE = '/assets/screen.png';
-const URL_COUNTER_FONT = '/assets/WhalesharkCounter.fnt';
+const URL_SCREEN_MODEL = '/assets/demo/playdate_screen.glb';
+const URL_SCREEN_IMAGE = '/assets/demo/screen.png';
+const URL_COUNTER_FONT = '/assets/demo/WhalesharkCounter.fnt';
 const SOURCE_VIDEOS = [
-  { src1x: '/assets/playdate_1x.mov',  src2x: '/assets/playdate_2x.mov',  type: 'video/mp4;codecs=hvc1' },
-  { src1x: '/assets/playdate_1x.webm', src2x: '/assets/playdate_2x.webm', type: 'video/webm' },
+  { src1x: '/assets/demo/playdate_1x.mov',  src2x: '/assets/demo/playdate_2x.mov',  type: 'video/mp4;codecs=hvc1' },
+  { src1x: '/assets/demo/playdate_1x.webm', src2x: '/assets/demo/playdate_2x.webm', type: 'video/webm' },
 ];
 
 const DEMO_PPM_INFO: Record<string, DemoPpm> = {
   'pekira': {
-    url: '/assets/pekira_beach.ppm',
+    url: '/assets/demo/pekira_beach.ppm',
     thumbUrl: 'TODO',
     authorUrl: 'https://twitter.com/pekira1227',
     startFrame: 94,
@@ -79,23 +79,23 @@ const DEMO_PPM_INFO: Record<string, DemoPpm> = {
     ],
   },
   'keke': {
-    url: '/assets/keke.ppm',
+    url: '/assets/demo/keke.ppm',
     thumbUrl: 'TODO',
     startFrame: 0,
     authorUrl: 'https://twitter.com/Kekeflipnote',
     dithering: [
-      [DitherType.None, DitherType.Checker, DitherType.Polka],
-      [DitherType.None, DitherType.Checker, DitherType.Polka],
+      [DitherType.None, DitherType.None, DitherType.None],
+      [DitherType.None, DitherType.None, DitherType.None],
     ],
   },
   'mrjohn': {
-    url: '/assets/mrjohn.ppm',
+    url: '/assets/demo/mrjohn.ppm',
     thumbUrl: 'TODO',
     startFrame: 70,
     authorUrl: 'https://www.sudomemo.net/user/9F990EE00074AC4D@DSi',
     dithering: [
-      [DitherType.None, DitherType.Checker, DitherType.Polka],
-      [DitherType.None, DitherType.Checker, DitherType.Polka],
+      [DitherType.None, DitherType.None, DitherType.None],
+      [DitherType.None, DitherType.None, DitherType.None],
     ],
   }
 };
@@ -109,6 +109,8 @@ const video = document.querySelector<HTMLVideoElement>('.Demo__video');
 const canvas = document.querySelector<HTMLCanvasElement>('.Demo__canvas');
 const crankHint = document.querySelector('.Demo__crankHint');
 const creditLink = document.querySelector('.Demo__creditLink');
+const leftArrow = document.querySelector('.Demo__leftArrow');
+const rightArrow = document.querySelector('.Demo__rightArrow');
 const playToggle = document.querySelector('.Demo__playToggle');
 const muteToggle = document.querySelector('.Demo__muteToggle');
 
@@ -164,6 +166,7 @@ overrideMaterials(gltf.scene, new ShaderMaterial({
 scene.add(gltf.scene);
 
 // ppm state
+let ppmKey = '';
 let ppm: InstanceType<typeof PpmParser>;
 let ppmAudio: InstanceType<typeof WebAudioPlayer>;
 let dither1: [DitherType, DitherType, DitherType];
@@ -190,8 +193,9 @@ async function loadDemoPpm(key: string) {
   const data = await resp.arrayBuffer();
   await fadeOut();
   // load flipnote
+  ppmKey = key;
   ppm = new PpmParser(data);
-  console.log('loaded ppm:', ppm);
+  // console.log('loaded ppm:', ppm);
   // setup ppm state
   dither1 = dithering[0];
   dither2 = dithering[1];
@@ -213,6 +217,24 @@ async function loadDemoPpm(key: string) {
   showFrame.value = true;
   drawPpm();
   await fadeIn();
+}
+
+function prevPpm() {
+  if (ppmKey === 'pekira')
+    loadDemoPpm('mrjohn');
+  else if (ppmKey === 'keke')
+    loadDemoPpm('pekira');
+  else if (ppmKey === 'mrjohn')
+    loadDemoPpm('keke');
+}
+
+function nextPpm() {
+  if (ppmKey === 'pekira')
+    loadDemoPpm('keke');
+  else if (ppmKey === 'keke')
+    loadDemoPpm('mrjohn');
+  else if (ppmKey === 'mrjohn')
+    loadDemoPpm('pekira');
 }
 
 function play() {
@@ -434,6 +456,8 @@ await loadDemoPpm('pekira');
 // init dom
 canvas.addEventListener('mousedown', handleInputStart, { passive: false });
 canvas.addEventListener('touchstart', handleInputStart, { passive: false });
+leftArrow.addEventListener('click', prevPpm);
+rightArrow.addEventListener('click', nextPpm);
 playToggle.addEventListener('click', togglePlay);
 muteToggle.addEventListener('click', toggleMute);
 nextTick(() => {

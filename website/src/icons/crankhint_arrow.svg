@@ -1,6 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="27" height="67" viewBox="0 0 27 67">
-  <g fill="none" fill-rule="evenodd" stroke="#676974" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" transform="translate(2.566 2)">
-    <path d="M11.1271505,0 C9.62715052,19 9.15524676,37.9616607 9.58757632,62" transform="matrix(-1 0 0 1 20.561 0)"/>
-    <polyline points=".263 51.555 11.043 62.187 22.263 51.555" transform="rotate(3 11.263 56.87)"/>
-  </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="92px" height="117px" viewBox="0 0 92 117" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>website/src/icons/crankhint_arrow</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g id="Artboard" transform="translate(-1592.000000, -343.000000)" stroke="#FF8212" stroke-width="2">
+            <g id="website/src/icons/crankhint_arrow" transform="translate(1593.983416, 345.138539)">
+                <path d="M74.5553418,7.1672736 C-1.22112393,0.208305315 -7.15980578,91.4592344 58.8526238,106.412801" id="Path-2" transform="translate(43.889468, 56.601049) scale(-1, 1) rotate(-17.000000) translate(-43.889468, -56.601049) "></path>
+                <polyline id="Path-3" transform="translate(19.279732, 99.732222) rotate(83.000000) translate(-19.279732, -99.732222) " points="8.27973204 94.4161209 19.0597478 105.048322 30.279732 94.4161209"></polyline>
+            </g>
+        </g>
+    </g>
 </svg>

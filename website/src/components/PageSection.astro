@@ -1,0 +1,75 @@
+---
+const { title, titleTilt, anchor } = Astro.props;
+const tilt = `${ titleTilt }deg`;
+---
+<section class="PageSection" id={ anchor }>
+  <div class="PageSection__title CardDecal">
+    <div class="CardDecal__top"></div>
+    <div class="CardDecal__body">
+      <h2 class="CardDecal__text">
+        { title }
+      </h2>
+    </div>
+  </div>
+  <div class="PageSection__body">
+    <slot/>
+  </div>
+</section>
+
+<style define:vars={{ tilt }} lang="scss">
+
+  .PageSection {
+    @include wrapper;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .PageSection__body {
+    width: 100%;
+  }
+
+  .PageSection__title {
+    margin-top: 8em;
+    margin-bottom: 3em;
+
+    @include breakpoint-desktop {
+      margin-top: 10em;
+      margin-bottom: 5em;
+    }
+  }
+
+  .CardDecal {
+    transform: rotate(var(--tilt));
+    position: relative;
+    display: inline-block;
+  }
+
+  .CardDecal__top {
+    width: 118px;
+    height: 28px;
+    background: url(/assets/sectionheader_top.svg);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: -16px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+  }
+
+  .CardDecal__body {
+    border-radius: 18px;
+    background: var(--color-bg-accent);
+    padding: 16px 96px;
+  }
+
+  .CardDecal__text {
+    transform: rotate(calc(0deg - var(--tilt)));
+    color: var(--color-text-accent);
+    font-size: var(--font-size-big);
+    font-weight: 900;
+    text-align: center;
+  }
+</style>

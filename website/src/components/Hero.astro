@@ -1,30 +1,38 @@
 ---
 import { Icon } from 'astro-icon';
-
-import Nav from '../components/Nav.astro';
 import Player from '../components/Player.astro';
-import Button from '../components/Button.astro';
 ---
 <header class="Hero">
-  <div class="Hero__head">
-    <!-- <Nav/> -->
-  </div>
+  <div class="Hero__bg"></div>
+  <div class="Hero__head"></div>
   <div class="Hero__body">
     <div class="Hero__wrap">
       <div class="Hero__intro">
         <Icon class="Hero__logo" name="logo"/>
-        <h2 class="Hero__tagline">An unofficial Flipnote animation player for the Panic Playdate</h2>
+        <h2 class="Hero__tagline">An unofficial Flipnote animation player for the Panic&nbsp;Playdate</h2>
+        <div class="Hero__buttons">
+          <a class="HeroButton" href="#download">↓ Download</a>
+          <a class="HeroButton" href="https://github.com/jaames/playnote-studio">GitHub | ★ <span id="stars"></span></a>
+        </div>
       </div>
       <div class="Hero__gfx">
         <Player/>
-      </div>
-      <div class="Hero__sub">
-        <!-- <Button class="Hero__downloadButton" href="#download">Download</Button> -->
+        <div class="Hero__gradient"></div>
       </div>
     </div>
   </div>
-  <div class="Hero__foot"></div>
+  <div class="Hero__foot">↓</div>
 </header>
+
+<script>
+  (async () => {
+    const resp = await fetch('https://api.github.com/repos/jaames/playnote-studio');
+    const gh = await resp.json();
+
+    const el = document.getElementById('stars');
+    el.innerText = gh.stargazers_count;
+  })();
+</script>
 
 <style lang="scss">
   .Hero {
@@ -37,6 +45,22 @@ import Button from '../components/Button.astro';
     height: 100vh;
     min-height: 760px;
     max-height: 1200px;
+
+    position: relative;
+  }
+
+  .Hero__bg {
+    z-index: -99;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #FFEBCA;
+    background-image: url(assets/bgtile.svg);
+    background-position: center top;
+    background-repeat: repeat;
+    background-blend-mode: multiply;
   }
 
   .Hero__head {
@@ -64,7 +88,7 @@ import Button from '../components/Button.astro';
     text-align: center;
     @include breakpoint-tablet {
       grid-column: 1;
-      align-self: flex-end;
+      align-self: center;
     }
   }
 
@@ -78,20 +102,45 @@ import Button from '../components/Button.astro';
   }
 
   .Hero__tagline {
-    color: $color-text-alt;
-    font-weight: normal;
-    // font-weight: 600;
-    font-size: $text-size-title;
-    margin-top: .75rem;
+    color: var(--color-text-accent);
+    font-size: var(--font-size-big);
+    font-weight: 900;
+    margin-top: 1.5rem;
     margin-bottom: .75rem;
-    max-width: 25ch;
+    max-width: 30ch;
+  }
+
+  .Hero__buttons {
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .HeroButton {
+    padding: 12px 28px;
+    background:#fff;
+    color: var(--color-text-accent);
+    border-radius: 100px;
   }
 
   .Hero__gfx {
+    position: relative;
     @include breakpoint-tablet {
       grid-column: 2;
-      grid-row: 1 / span 2;
+      // grid-row: 1 / span 2;
     }
+  }
+
+  .Hero__gradient {
+    position: absolute;
+    top: 2%;
+    left: -5%;
+    width: 120%;
+    height: 120%;
+    z-index: -10;
+    background-image: radial-gradient(circle at 47% 49%, #f49f4fd1 0%, rgba(253,226,182,0.00) 55%);
   }
 
   .Hero__sub {
@@ -108,5 +157,10 @@ import Button from '../components/Button.astro';
   .Hero__foot {
     margin-top: auto;
     @include wrapper;
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.5rem;
+    padding: 1rem;
+    color: var(--color-text-accent);
   }
 </style>

@@ -47,21 +47,77 @@ let locale = 'en';
     <meta name="format-detection" content="telephone=no">
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;800" rel="stylesheet">
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com"> -->
+    <!-- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;800" rel="stylesheet"> -->
   </head>
   <body>
     <main class="Content">
       <slot/>
     </main>
     <footer class="Footer">
-      <a class="Footer__group" href="/">Playnote Studio</a>
-      <Icon class="Footer__gfx" name="icon_footer"></Icon>
-      <div class="Footer__group Footer__group--links">
-        <a href="/filehelp">File help</a> | <a href="https://github.com/jaames/playnote-studio">Source code</a>
+      <div class="Footer__body">
+        <div class="Footer__group Footer__group--left">
+          <a class="Footer__item Footer__item--title" href="/">Playnote Studio</a>
+          <a class="Footer__item" href="/filehelp">How to Load Flipnote Files</a>
+        </div>
+        <div class="Footer__group Footer__group--middle">
+          <Icon class="Footer__gfx" name="icon_footer"></Icon>
+        </div>
+        <div class="Footer__group Footer__group--right">
+          <a class="Footer__item" href="/releases">Past Releases &amp; Changelog</a>
+          <a class="Footer__item" href="https://github.com/jaames/playnote-studio">Source Code on GitHub</a>
+        </div>
       </div>
     </footer>
     <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "19224d7a1dc44932ab159e5f8466b712"}'></script>
   </body>
 </html>
+
+<style lang="scss">
+  .Footer {
+    background: #FFEBCA;
+    color: #FF8212;
+    padding: 32px;
+    margin-top: 80px;
+    font-size: var(--font-size-smaller);
+  }
+
+  .Footer__body {
+    @include wrapper;
+    display: flex;
+  }
+
+  .Footer__gfx {
+    max-width: 180px;
+  }
+
+  .Footer__group {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .Footer__group--left {
+    justify-content: flex-start;
+  }
+
+  .Footer__group--middle {
+    flex: initial;
+    min-width: 200px;
+    align-self: center;
+    justify-content: center;
+  }
+
+  .Footer__group--right {
+    justify-content: flex-end;
+  }
+
+  .Footer__item + .Footer__item {
+    margin-left: 1.25rem;
+  }
+
+  .Footer__item--title {
+    font-weight: 900;
+  }
+</style>

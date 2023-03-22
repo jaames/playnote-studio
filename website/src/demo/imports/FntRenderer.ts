@@ -158,7 +158,6 @@ export class FntRenderer {
     }
   }
 
-
   private parseGlyph(glyph: string, value: string) {
     if (glyph === 'space') {
       this.glyphMap.set(' ', {

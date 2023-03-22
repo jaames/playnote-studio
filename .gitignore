@@ -6,3 +6,4 @@ build/*
 *.dll
 
 assets/sample_packs
+.DS_Store

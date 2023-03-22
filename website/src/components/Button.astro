@@ -9,37 +9,37 @@ const { href, type } = Astro.props
 
 <style lang="scss">
   .Button {
-    margin: 5px;
+    // margin: 5px;
     border-radius: 15px;
-    border: 5px solid $color-bg-invert;
-    box-shadow: $shadow;
+    border: 5px solid #3D3E48;
+    // box-shadow: $shadow;
   }
 
   .Button__inner {
-    font-weight: bold;
     text-align: center;
+    font-weight: 700;
+    font-size: 1rem;
     display: block;
     cursor: pointer;
-    color: $color-text-invert;
-    background: $color-bg-invert;
-    padding: 6px 20px;
-    border: 3px solid #fff;
-    border-right-color: #B3B5C1;
-    border-bottom-color: #B3B5C1;
+    color: #fff;
+    background: #3D3E48;
+    padding: 6px 14px;
+    border: 3px solid #B3B5C1;
+    border-right-color: #7d8091;
+    border-bottom-color: #7d8091;
     border-radius: 10px;
     appearance: none;
   }
 
   .Button--inverted {
-    border: 5px solid $color-bg;
+    border: 5px solid #FF8212;
 
     .Button__inner {
-      font-weight: normal;
-      color: $color-text;
-      background: $color-bg;
-      border: 3px solid #B3B5C1;
-      border-right-color: #777784;
-      border-bottom-color: #777784;
+      color: #fff;
+      background: #FF8212;
+      border: 3px solid #FCD896;
+      border-right-color: #FCB873;
+      border-bottom-color: #FCB873;
     }
   }
 </style>

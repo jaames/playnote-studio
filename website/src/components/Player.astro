@@ -7,17 +7,19 @@ const pxSize = `${size}px`;
 <div class="Demo">
   <div class="Demo__wrapper">
     <div class="Demo__crankHint is-hidden">
-      <p class="Demo__crankHintText">Psssst!<br/>Try moving<br/>the crank!</p>
+      <p class="Demo__crankHintText">Psssst!<br/>Try dragging<br/>the crank!</p>
       <Icon class="Demo__crankHintArrow" name="crankhint_arrow"/>
     </div>
     <canvas class="Demo__canvas"></canvas>
     <video muted playsinline preload="auto" class="Demo__video"></video>
-    <img class="Demo__image" width={size} height={size} srcset="/assets/playdate_1x.png, /assets/playdate_2x.png 2x" src="/assets/playdate_1x.png" alt="">
+    <img class="Demo__image" width={size} height={size} srcset="/assets/demo/playdate_1x.png, /assets/demo/playdate_2x.png 2x" src="/assets/demo/playdate_1x.png" alt="">
     <Icon class="Demo__crankRange" name="crankrange_arrow"/>
   </div>
   <div class="Demo__overlay">
     <div class="Demo__credit">
+      <span class="Demo__leftArrow">←</span>
       Flipnote by <a class="Demo__creditLink" href="https://twitter.com/pekira1227">ぺきら</a>
+      <span class="Demo__rightArrow">→</span>
     </div>
     <div class="Demo__controls">
       <div class="Demo__muteToggle">
@@ -53,24 +55,24 @@ const pxSize = `${size}px`;
   }
 
   .Demo__crankHint {
-    color: $color-text-alt;
+    color: var(--color-text-accent);
     font-size: 14px;
     opacity: 1;
     transition: opacity .25s linear;
     position: absolute;
-    transform: scale(0.8);
-    top: -10px;
+    transform: scale(0.7);
+    top: 0px;
     right: -35px;
 
     @include breakpoint-tablet {
       transform: scale(0.9);
-      top: 5px;
+      top: 10px;
       right: -35px;
     }
 
     @include breakpoint-desktop {
       transform: none;
-      top: 40px;
+      top: 70px;
       right: -20px;
     }
 
@@ -79,14 +81,15 @@ const pxSize = `${size}px`;
     }
 
     .Demo__crankHintText {
+      font-weight: 700;
       width: 12ch;
       transform: rotate(-7deg);
     }
 
     .Demo__crankHintArrow {
-      transform: translate(30px, -12px);
-      width: 23px;
-      height: 85px;
+      transform: translate(70px, -30px);
+      width: 88px;
+      height: 114px;
     }
   }
 
@@ -114,6 +117,7 @@ const pxSize = `${size}px`;
     height: 100%;
     position: absolute;
     z-index: 2;
+    filter: saturate(1.15);
   }
 
   .Demo__image {
@@ -125,6 +129,7 @@ const pxSize = `${size}px`;
     .Demo--isActive & {
       opacity: 0;
     }
+    filter: saturate(1.15);
   }
 
   .Demo__overlay {
@@ -146,14 +151,32 @@ const pxSize = `${size}px`;
   }
 
   .Demo__credit {
+    color: var(--color-text-accent);
     z-index: 10;
     transform: rotate(3deg);
+    font-weight: 700;
+    margin-top: .25rem;
   }
 
   .Demo__creditLink {
-    color: black;
+    color: var(--color-text-accent);
+    font-weight: 900;
     // font-weight: bold;
     // border-bottom: 0.1em solid currentColor;
+  }
+
+  .Demo__leftArrow {
+    margin-right: 1em;
+    font-size: 1.2em;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .Demo__rightArrow {
+    margin-left: 1em;
+    font-size: 1.2em;
+    font-weight: 900;
+    cursor: pointer;
   }
 
   .Demo__controls {

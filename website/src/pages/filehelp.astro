@@ -1,100 +1,257 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageSection from '../components/PageSection.astro';
 ---
 <BaseLayout>
+  <PageSection title="Adding Flipnotes to Playnote Studio" titleTilt="1" id="title">
 
-  <header class="Header">
-    <div class="Header__top"></div>
-    <div class="Header__main">
-      <h1 class="Header__title">Adding Flipnotes to Playnote Studio</h1>
+    <div class="SelectGroup">
+      <div class="Input">
+        <label for="region">Console region</label>
+        <select class="Select Select--region" id="region">
+          <option value="eur">Europe &amp; Oceania</option>
+          <option value="usa">Americas</option>
+          <option value="jpn">Japan</option>
+        </select>
+      </div>
+      <div class="Input">
+        <label for="type">Export type</label>
+        <select class="Select Select--type" id="type">
+          <option value="sdcard">Individual Flipnotes</option>
+          <option value="backup">Full Backup</option>
+        </select>
+      </div>
     </div>
-  </header>
-
-  <div class="Instructions">
 
     <section class="Panel">
       <h2>Transfer your Flipnotes to a PC</h2>
-      <p>Dust off your Nintendo DSi, boot it up, insert an SD card, and enter Flipnote Studio. Select the Flipnote you'd like to save.</p>
+      <p>1. Dust off your Nintendo DSi, boot it up, insert an SD card, and enter Flipnote Studio.</p>
       <div class="ScreenshotGrid">
         <div class="ScreenshotGrid__item">
-          <img class="ScreenshotGrid__image" src="/assets/tutorial_sdcard/1.png" alt="">
-          <p class="ScreenshotGrid__text">Tap <b>Save</b></p>
+          <img class="ScreenshotGrid__image" src="/assets/tutorial/sdcard_1_en.png" alt="">
+          <p class="ScreenshotGrid__text"></p>
         </div>
         <div class="ScreenshotGrid__item">
-          <img class="ScreenshotGrid__image" src="/assets/tutorial_sdcard/2.png" alt="">
-          <p class="ScreenshotGrid__text">Tap <b>Other</b></p>
+          <img class="ScreenshotGrid__image" src="/assets/tutorial/sdcard_2_en.png" alt="">
+          <p class="ScreenshotGrid__text"></p>
         </div>
         <div class="ScreenshotGrid__item">
-          <img class="ScreenshotGrid__image" src="/assets/tutorial_sdcard/3.png" alt="">
-          <p class="ScreenshotGrid__text">Tap <b>SD Card</b></p>
+          <img class="ScreenshotGrid__image" src="/assets/tutorial/sdcard_3_en.png" alt="">
+          <p class="ScreenshotGrid__text"></p>
         </div>
       </div>
-      <p>Once saving is complete, turn off your Nintendo DSi then eject the SD card.</p>
-      <p>Insert your SD card into your PC. If you navigate to the SD card in the file explorer, you should be able to see a folder called <b>private</b>.</p>
+      <p>5. Once saving is complete, turn off your Nintendo DSi then eject the SD card.</p>
+      <p>6. Insert your SD card into your PC. If you navigate to the SD card in the file explorer, you should be able to see a folder called <b>private</b>.</p>
       <p>
-        Any flipnotes you saved to your SD card can be found as <b>.ppm</b> files at the following location, depending on your Nintendo DSi's region:
-        <ul>
-          <li>
-            <b>Europe &amp; Oceania:</b> /private/ds/app/4B475556
-          </li>
-          <li>
-            <b>Americas:</b> /private/ds/app/4B475545
-          </li>
-          <li>
-            <b>Japan:</b> /private/ds/app/4B47554A
-          </li>
-        </ul>
+        7. Any flipnotes you saved to your SD card can be found as <b>.ppm</b> files at <b><span class="Path"></span></b>.
       </p>
+      
     </section>
 
     <section class="Panel">
       <h2>Transfer Flipnotes from your PC to your Playdate</h2>
-      <p>Launch Playnote Studio on your Playdate so that it can set up the filesystem.</p>
-      <p>Connect your Playdate to your PC using a USB cable.</p>
-      <p>On your Playdate, hold down the <b>lock</b>, <b>menu</b>, and <b>dpad-left</b> buttons for 5 seconds to enter the Playdate's <b>disk mode</b>. Your Playdate should show up as an external drive called <b>PLAYDATE</b>.</p>
-      <p>Nagivate to the Playdate drive, and drop your Flipnote <b>.ppm</b> files into the folder at Data/com.jaames.playnote/001</p>
-      <p>You can add more folders next to 001 and place Flipnotes in them to organise your collection. Folders can also be named whatever you like, but something relatively short that uses only alphanumeric characters works the best.</p>
-      <p>Press <b>A</b> on the Playdate to stop disk mode.</p>
-      <p>Launch Playnote Studio. If you did everything correctly, your Flipnotes should show up when you select a folder from the "View Flipnotes" screen!</p>
+      <p>1. Launch Playnote Studio on your Playdate so that it can set up the filesystem.</p>
+      <p>2. Connect your Playdate to your PC using a USB cable.</p>
+      <p>3. On your Playdate, hold down the <b>lock</b>, <b>menu</b>, and <b>dpad-left</b> buttons for 5 seconds to enter the Playdate's <b>disk mode</b>. Your Playdate should show up as an external drive called <b>PLAYDATE</b>.</p>
+      <p>4. Nagivate to the Playdate drive, and drop your Flipnote <b>.ppm</b> files into the folder at Data/com.jaames.playnote/001</p>
+      <p>5. You can add more folders next to 001 and place Flipnotes in them to organise your collection. Folders can also be named whatever you like, but something relatively short that uses only alphanumeric characters works the best.</p>
+      <p>6. Press <b>A</b> on the Playdate to stop disk mode.</p>
+      <p>7. Launch Playnote Studio. If you did everything correctly, your Flipnotes should show up when you select a folder from the "View Flipnotes" screen!</p>
     </section>
-
-  </div>
+  </PageSection>
 </BaseLayout>
 
-<style lang="scss">
+<script>
+  const TUTORIAL_DATA = {
+    'eur': {
+      path: '/private/ds/app/4B475556',
+      sdcard: [
+        {
+          img: '/assets/tutorial/sdcard_1_en.png',
+          text: '2. Select a Flipnote and open it, then tap *"Save"*'
+        },
+        {
+          img: '/assets/tutorial/sdcard_2_en.png',
+          text: '3. Tap *"Other"*'
+        },
+        {
+          img: '/assets/tutorial/sdcard_3_en.png',
+          text: '4. Tap *"SD Card"*'
+        }
+      ],
+      backup: [
+        {
+          img: '/assets/tutorial/backup_1_en.png',
+          text: '2. Tap the settings icon'
+        },
+        {
+          img: '/assets/tutorial/backup_2_en.png',
+          text: '3. Tap *"Back Up Data"*'
+        },
+        {
+          img: '/assets/tutorial/backup_3_en.png',
+          text: '4. Tap *"Copy"*'
+        }
+      ]
+    },
+    'usa': {
+      path: '/private/ds/app/4B475545',
+      sdcard: [
+        {
+          img: '/assets/tutorial/sdcard_1_en.png',
+          text: '2. Select a Flipnote and open it, then tap *"Save"*'
+        },
+        {
+          img: '/assets/tutorial/sdcard_2_en.png',
+          text: '3. Tap *"Other"*'
+        },
+        {
+          img: '/assets/tutorial/sdcard_3_en.png',
+          text: '4. Tap *"SD Card"*'
+        }
+      ],
+      backup: [
+        {
+          img: '/assets/tutorial/backup_1_en.png',
+          text: '2. Tap the settings icon'
+        },
+        {
+          img: '/assets/tutorial/backup_2_en.png',
+          text: '3. Tap *"Back Up Data"*'
+        },
+        {
+          img: '/assets/tutorial/backup_3_en.png',
+          text: '4. Tap *"Copy"*'
+        }
+      ]
+    },
+    'jpn': {
+      path: '/private/ds/app/4B47554A',
+      sdcard: [
+        {
+          img: '/assets/tutorial/sdcard_1_jp.png',
+          text: '2. Select a Flipnote and open it, then tap *"保存"*'
+        },
+        {
+          img: '/assets/tutorial/sdcard_2_jp.png',
+          text: '3. Tap *"その他保存"*'
+        },
+        {
+          img: '/assets/tutorial/sdcard_3_jp.png',
+          text: '4. Tap *"SDカード"*'
+        }
+      ],
+      backup: [
+        {
+          img: '/assets/tutorial/backup_1_jp.png',
+          text: '2. Tap the settings icon'
+        },
+        {
+          img: '/assets/tutorial/backup_2_jp.png',
+          text: '3. Tap *"バックアップ"*'
+        },
+        {
+          img: '/assets/tutorial/backup_3_jp.png',
+          text: '4. Tap *"コピーする"*'
+        }
+      ]
+    }
+  };
 
-  .Header {
-    @include wrapper;
-    margin-top: 5rem;
-  }
+  const regionSelect = document.querySelector('.Select.Select--region');
+  const typeSelect = document.querySelector('.Select.Select--type');
+  let currRegion = 'usa';
+  let currType = 'sdcard';
 
-  .Header__main {
-    background: $color-bg-alt;
-    margin: 0 auto;
-    @include punchcard;
-    @include panel;
-    padding-top: 40px;
-    @include breakpoint-desktop {
-      padding-top: 40px;
-      max-width: grid-span(8, 12);
+  function updateTutorialSteps(data) {
+    const root = document.querySelector('.ScreenshotGrid');
+    const items = Array.from(root.querySelectorAll('.ScreenshotGrid__item'));
+    for (let i = 0; i < items.length; i++) {
+      const el = items[i];
+      const content = data[i];
+      const image = el.querySelector('.ScreenshotGrid__image');
+      const text = el.querySelector('.ScreenshotGrid__text');
+      image.src = content.img;
+      text.innerHTML = content.text.replace(/\*(.*)\*/, `<b>$1</b>`);
     }
   }
 
-  .Header__title {
-    font-size: 1.5rem;
-    max-width: 20ch;
-    text-align: center;
-    margin: 0 auto;
+  function updatePath(data) {
+    const path = document.querySelector('.Path');
+    console.log(data)
+    path.innerHTML = data.path;
   }
 
-  .Instructions {
-    @include wrapper;
-    margin-top: 2rem;
+  function setRegion(region) {
+    updateTutorialSteps(TUTORIAL_DATA[region][currType]);
+    updatePath(TUTORIAL_DATA[region]);
+    regionSelect.value = region;
+    currRegion = region;
+  }
+
+  function setType(type) {
+    updateTutorialSteps(TUTORIAL_DATA[currRegion][type]);
+    updatePath(TUTORIAL_DATA[currRegion]);
+    typeSelect.value = type;
+    currType = type;
+  }
+
+  regionSelect.addEventListener('change', () => {
+    if (regionSelect.value !== currRegion)
+      setRegion(regionSelect.value);
+  });
+
+  typeSelect.addEventListener('change', () => {
+    if (typeSelect.value !== currType)
+      setType(typeSelect.value);
+  });
+
+  setRegion('usa');
+  setType('sdcard');
+</script>
+
+<style lang="scss">
+
+  .SelectGroup {
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: 1fr;
+    width: fit-content;
+    margin: 0 auto;
+    margin-bottom: 2em;
+
+    @include breakpoint-tablet {
+      grid-template-columns: repeat(2, auto);
+    }
+  }
+
+  .Input {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      font-size: var(--font-size-small);
+    }
+  }
+
+  .Select {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background: var(--color-bg-accent);
+    color: var(--color-text-accent);
+    font-weight: 900;
+    border: 0;
+    padding: 8px 24px;
+    width: auto;
+    border-radius: 8px;
+    position: relative;
   }
 
   .Panel {
-    // color: $color-text-invert;
-    background: $color-bg-alt;
+    background: var(--color-bg-dark);
+    color: var(--color-text-light);
+    font-weight: 700;
     margin: 0 auto;
     margin-bottom: 2em;
     @include panel;
@@ -103,12 +260,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
 
     h2 {
-      font-size: 1.25em;
+      font-weight: 900;
+      font-size: var(--text-size-title);
       margin-bottom: .5em;
     }
 
     p {
-      margin-bottom: 1em;
+      margin-bottom: .5em;
+    }
+
+    b {
+      font-weight: 900;
     }
 
     .ScreenshotGrid {
@@ -122,7 +284,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .ScreenshotGrid {
     display: grid;
-    grid-gap: 20px;
+    grid-gap: 24px;
     grid-template-columns: 1fr;
     @include breakpoint-tablet {
       grid-template-columns: 1fr 1fr 1fr;
@@ -131,5 +293,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .ScreenshotGrid__image {
     width: 100%;
+    margin-top: .5em;
+  }
+
+  .ScreenshotGrid__text {
+    margin-top: .5em;
   }
 </style>

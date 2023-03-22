@@ -1,26 +1,38 @@
 @import './parts/reset';
+@import './parts/font';
 
-html, body {
-  font-family: $font-stack-global;
-  font-size: $font-size-global;
-  letter-spacing: 0.02em;
-  line-height: $line-height-global;
-  font-weight: $font-weight-global;
-  color: $color-text;
-  scroll-behavior: smooth;
+:root {
+  --color-bg: #FFF;
+  --color-bg-dark: #f2f5fb;
+  --color-bg-accent: #fff2de;
+  --color-text: #474856;
+  --color-text-light: #5A5C67;
+  --color-text-accent: #FF8212;
 
-  @include breakpoint-below-desktop {
-    font-size: $font-size-global-mobile;
+  --font-size-global: 16px;
+  --font-size-big: 1.4rem;
+  --font-size-header: 1.2rem;
+  --font-size-small: 0.9rem;
+  --font-size-smaller: 0.8rem;
+
+  @include breakpoint-desktop {
+    --font-size-global: 20px;
   }
 }
 
+html, body {
+  color: var(--color-text);
+  font-size: var(--font-size-global);
+  font-family: $font-stack-global;
+  letter-spacing: 0.02em;
+  line-height: 1.36;
+  font-weight: 400;
+  scroll-behavior: smooth;
+}
+
 html {
-  background: $color-bg;
-  background-image: url('data:image/svg+xml;charset=utf8,\
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">\
-      <rect x="0" y="0" width="33" height="33" fill="white" stroke-width="1" stroke-dashoffset="2" stroke-dasharray="4 4" stroke="%23B5C1CE"/>\
-    </svg>\
-  ');
+  // background: $color-bg;
+  background-image: url(assets/bgtile.svg);
   background-position: center top;
   background-repeat: repeat;
 }
@@ -33,7 +45,7 @@ img, svg {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: inherit;
-  font-weight: $font-weight-header;
+  font-weight: var(--font-weight-header);
 }
 
 a {
@@ -53,41 +65,4 @@ p:last-of-type {
 
 .link {
   border-bottom: 0.03em solid currentColor;
-}
-
-.Footer {
-  display: grid;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 2rem;
-  font-size: .9rem;
-  grid-template-columns: 1fr;
-
-  @include breakpoint-below-desktop {
-    text-align: center;
-  }
-
-  @include breakpoint-desktop {
-    grid-template-columns: 300px 180px 300px;
-    grid-gap: 3em;
-  }
-}
-
-.Footer__gfx {
-  max-width: 180px;
-  @include breakpoint-below-desktop {
-    margin: .5em auto;
-  }
-}
-
-.Footer__group {
-  @include breakpoint-desktop { 
-    text-align: right;
-  }
-}
-
-.Footer__group--links {
-  @include breakpoint-desktop { 
-    text-align: left;
-  }
 }

@@ -1,0 +1,97 @@
+---
+---
+<div class="FaqItem">
+  <div class="FaqBubble FaqBubble--question">
+    <div class="FaqBubble__inner">
+      <slot name="question"/>
+    </div>
+  </div>
+  <div class="FaqBubble FaqBubble--answer">
+    <div class="FaqBubble__inner">
+      <slot name="answer"/>
+    </div>
+  </div>
+</div>
+
+<style lang="scss">
+  .FaqItem {
+    display: flex;
+    flex-direction: column;
+    @include breakpoint-tablet {
+      max-width: 70%;
+      margin: 0 auto;
+    }
+
+    &:last-of-type {
+      margin-bottom: -3em;
+    }
+  }
+ 
+  .FaqBubble {
+    margin-bottom: 2em;
+    max-width: 80%;
+    position: relative;
+    font-weight: 700;
+    padding: 24px;
+    @include panel;
+
+    :global(a) {
+      font-weight: 900;
+    }
+
+    @include breakpoint-desktop {
+      padding: 32px;
+    }
+  }
+
+  .FaqBubble--question {
+    background: var(--color-bg-dark);
+    color: var(--color-text-light);
+    margin-right: auto;
+    transform: rotate(-1deg);
+
+    .FaqBubble__inner {
+      transform: rotate(1deg);
+    }
+
+    &::after {
+      width: 124px;
+      height: 64px;
+      background: url(/assets/faqstem_question.svg);
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      position: absolute;
+      bottom: -16px;
+      left: 28px;
+      content: ' ';
+      display: block;
+      z-index: -1;
+    }
+  }
+
+  .FaqBubble--answer {
+    color: var(--color-text-accent);
+    background: var(--color-bg-accent);
+    margin-left: auto;
+    margin-bottom: 3em;
+    transform: rotate(1deg);
+
+    .FaqBubble__inner {
+      transform: rotate(-1deg);
+    }
+
+    &::after {
+      width: 124px;
+      height: 64px;
+      background: url(/assets/faqstem_answer.svg);
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      position: absolute;
+      bottom: -16px;
+      right: 28px;
+      content: ' ';
+      display: block;
+      z-index: -1;
+    }
+  }
+</style>

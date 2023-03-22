@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="119px" height="27px" viewBox="0 0 119 27" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>website/public/assets/sectionheader_top</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-901.000000, -3568.000000)">
+            <g id="Group" transform="translate(369.000000, 3568.254126)">
+                <g id="Group-15" transform="translate(429.380042, 0.000000)">
+                    <path d="M203.923196,2 C208.551696,2 212.767575,4.66190748 214.757522,8.84079704 L218.167,16 L306,16 C315.941125,16 324,24.0588745 324,34 L324,58 C324,67.9411255 315.941125,76 306,76 L18,76 C8.0588745,76 1.18755778e-14,67.9411255 0,58 L0,34 C-1.21743675e-15,24.0588745 8.0588745,16 18,16 L105.833,16 L109.242478,8.84079704 C111.232425,4.66190748 115.448304,2 120.076804,2 L203.923196,2 Z" id="Combined-Shape" fill="#FFF2DE"></path>
+                    <circle id="Oval" fill="#FFFFFF" cx="161.619958" cy="17.745874" r="6"></circle>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
