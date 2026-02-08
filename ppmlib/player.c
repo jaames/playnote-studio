@@ -32,7 +32,7 @@ player_ctx* playerNew(u16 x, u16 y)
 void playerMoveTo(player_ctx* ctx, u16 x, u16 y)
 {
 	ctx->x = x;
-	ctx->y = y; 
+	ctx->y = y;
 }
 
 int playerOpenPpm(player_ctx* ctx, const char* filePath)
@@ -41,14 +41,14 @@ int playerOpenPpm(player_ctx* ctx, const char* filePath)
 	int res = ppmOpen(ctx->ppm, filePath);
 	if (res == -1)
 		return -1;
-	
+
 	ctx->isPlaying = 0;
 	ctx->startTime = 0;
 	ctx->currentTime = 0;
 	ctx->currentFrame = 0;
 	ctx->numFrames = ctx->ppm->hdr.numFrames;
 	ctx->loop = ctx->ppm->animHdr.flags.loop;
-	
+
 	ctx->layerPattern[0][0] = LUT_ppmDitherNone;
 	ctx->layerPattern[0][1] = LUT_ppmDitherNone;
 	ctx->layerPattern[0][2] = LUT_ppmDitherNone;
@@ -69,7 +69,7 @@ int playerOpenPpm(player_ctx* ctx, const char* filePath)
 		memset(ctx->masterAudio, 0, audioTrackSize);
 		ppmAudioRender(ctx->ppm, ctx->masterAudio, AUDIO_SIZE_LIMIT);
 		// create playdate audio sample and player from master audio track
-		ctx->masterAudioSample = pd->sound->sample->newSampleFromData((u8*)ctx->masterAudio, kSound16bitMono, OUTPUT_SAMPLE_RATE, audioTrackSize);
+		ctx->masterAudioSample = pd->sound->sample->newSampleFromData((u8*)ctx->masterAudio, kSound16bitMono, OUTPUT_SAMPLE_RATE, audioTrackSize, 0);
 		ctx->audioPlayer = pd->sound->sampleplayer->newPlayer();
 		pd->sound->sampleplayer->setSample(ctx->audioPlayer, ctx->masterAudioSample);
 	}
@@ -162,7 +162,7 @@ void playerUpdate(player_ctx* ctx)
 
 	ctx->currentTime = pd->system->getElapsedTime() - ctx->startTime;
 	u16 frameIndex = (u16)floor(ctx->currentTime / (1.0 / (float)ctx->ppm->frameRate));
-	
+
 	if (frameIndex != ctx->currentFrame)
 	{
 		if (ctx->loop && frameIndex >= ctx->numFrames)
@@ -181,10 +181,10 @@ void playerUpdate(player_ctx* ctx)
 				doCallback(ctx->stoppedCallback, 1);
 			ctx->isPlaying = 0;
 		}
-		else 
+		else
 		{
 			ctx->currentFrame = frameIndex;
-		}	
+		}
 		LCDRect dirtyRect = {ctx->x - 4, ctx->x + PPM_SCREEN_WIDTH + 4, ctx->y - 4, ctx->y + PPM_SCREEN_HEIGHT + 4};
 		pd->sprite->addDirtyRect(dirtyRect);
 	}
