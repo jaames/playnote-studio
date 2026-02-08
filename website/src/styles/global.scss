@@ -1,5 +1,5 @@
-@import './parts/reset';
-@import './parts/font';
+@use './parts/reset';
+@use './parts/font';
 
 :root {
   --color-bg: #FFF;

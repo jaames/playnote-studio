@@ -47,7 +47,7 @@ const releases = releaseData.map((release) => {
           </div>
         </div>
       ))}
-    
+
     </div>
   </PageSection>
 </BaseLayout>
@@ -55,7 +55,7 @@ const releases = releaseData.map((release) => {
 <style lang="scss">
 
   .Releases {
-    @include wrapper;
+    @include layout-wrapper;
   }
 
   .ReleaseCard {
@@ -88,7 +88,7 @@ const releases = releaseData.map((release) => {
       align-items: center;
       justify-content: space-between;
     }
-    
+
     @include breakpoint-desktop {
       border-radius: 0;
       border-top-left-radius: $border-radius;
@@ -114,11 +114,11 @@ const releases = releaseData.map((release) => {
       border-bottom-right-radius: $border-radius;
       padding: $padding;
     }
-    
+
   }
 
   .ReleaseCard__title {
-    margin-top: -0.25em;  
+    margin-top: -0.25em;
   }
 
   .ReleaseCard__stat {

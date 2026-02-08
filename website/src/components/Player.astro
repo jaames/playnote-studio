@@ -41,11 +41,11 @@ const pxSize = `${size}px`;
 <style lang="scss" define:vars={{ pxSize }}>
   .Demo {
     // height: var(--pxSize);
-    @include user-select(none);
+    @include util-user-select(none);
   }
 
   .Demo__wrapper {
-    @include aspect('1 / 1');
+    @include util-aspect('1 / 1');
     touch-action: none;
     width: 100%;
     max-width: var(--pxSize);

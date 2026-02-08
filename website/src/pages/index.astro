@@ -165,7 +165,7 @@ const timestamp = format(parseISO(latestRelease.published_at), 'MMMM y');
         Will there be any updates?
       </p>
       <p slot="answer">
-        Maybe! You should follow me on <a href="https://twitter.com/rakujira">Twitter</a> to keep up to date!
+        Maybe! You should follow me on <a href="bsky.app/profile/jaames.co.uk">Bluesky</a> to keep up to date!
       </p>
     </FaqItem>
   </PageSection>
@@ -175,12 +175,12 @@ const timestamp = format(parseISO(latestRelease.published_at), 'MMMM y');
       <div class="CreditsColumn CreditsColumn--one">
         <h5 class="CreditsTitle">Programming and UI Design</h5>
         <div class="CreditsEntry">
-          <a class="CreditsEntry__name" href="https://twitter.com/rakujira">James Daniel</a>
+          <a class="CreditsEntry__name" href="https://jaames.co.uk">James Daniel</a>
         </div>
-      
+
         <h5 class="CreditsTitle">Flipnote Decoding Library</h5>
         <div class="CreditsEntry CreditsEntry--nogrid">
-          Based on PPMLib by <a class="CreditsEntry__name" href="https://twitter.com/itssimontime">Simon Aarons</a>
+          Based on PPMLib by <a class="CreditsEntry__name" href="simonti.me">Simon Aarons</a>
         </div>
 
         <h5 class="CreditsTitle">Sound & Music</h5>
@@ -197,7 +197,7 @@ const timestamp = format(parseISO(latestRelease.published_at), 'MMMM y');
       <div class="CreditsColumn CreditsColumn--two">
         <h5 class="CreditsTitle">Flipnote Artists</h5>
         <div class="CreditsEntry">
-          <a class="CreditsEntry__name" href="https://twitter.com/Kekeflipnote">Kéké</a>
+          <a class="CreditsEntry__name" href="https://bsky.app/profile/kekeflipnote.bsky.social">Kéké</a>
         </div>
         <div class="CreditsEntry">
           <a class="CreditsEntry__name" href="https://flipnot.es/9F990EE00074AC4D">mrjohn</a>
@@ -220,7 +220,7 @@ const timestamp = format(parseISO(latestRelease.published_at), 'MMMM y');
 
         <h5 class="CreditsTitle">Special Thanks</h5>
         <div class="CreditsEntry">
-          <a class="CreditsEntry__name" href="https://twitter.com/gingerbeardman">Matt Sephton</a>
+          <a class="CreditsEntry__name" href="https://blog.gingerbeardman.com/">Matt Sephton</a>
         </div>
         <div class="CreditsEntry">
           <a class="CreditsEntry__name" href="https://kaeru.world">Kaeru Team</a>
@@ -229,7 +229,7 @@ const timestamp = format(parseISO(latestRelease.published_at), 'MMMM y');
           <a class="CreditsEntry__name" href="https://www.sudomemo.net">Rob</a>
         </div>
         <div class="CreditsEntry">
-          <a class="CreditsEntry__name" href="https://twitter.com/AustinSudomemo">Austin Burk</a>
+          <a class="CreditsEntry__name" href="bsky.app/profile/sudofox.bsky.social">Austin Burk</a>
         </div>
       </div>
 
@@ -241,8 +241,8 @@ const timestamp = format(parseISO(latestRelease.published_at), 'MMMM y');
         </div>
         <div class="CreditsEntry">
           <span class="CreditsEntry__title">Français</span>
-          <a class="CreditsEntry__name" href="https://www.evalauren.co.uk">Eva Lauren Kelly ("thejsa")</a>
-          <a class="CreditsEntry__name" href="https://twitter.com/thomasnet_mc">thomasnet</a>
+          <a class="CreditsEntry__name" href="https://www.evalauren.co.uk">Eva Kelly</a>
+          <a class="CreditsEntry__name" href="https://bsky.app/profile/thomasnet.bsky.social">thomasnet</a>
         </div>
         <div class="CreditsEntry">
           <span class="CreditsEntry__title">Español</span>
@@ -263,7 +263,7 @@ const timestamp = format(parseISO(latestRelease.published_at), 'MMMM y');
         </div>
         <div class="CreditsEntry">
           <span class="CreditsEntry__title">Polski</span>
-          <a class="CreditsEntry__name" href="https://twitter.com/twarda8">Twarda</a>
+          <a class="CreditsEntry__name" href="bsky.app/profile/twarda.bsky.social">Twarda</a>
         </div>
         <div class="CreditsEntry">
           <span class="CreditsEntry__title">Русский</span>
@@ -272,7 +272,7 @@ const timestamp = format(parseISO(latestRelease.published_at), 'MMMM y');
         </div>
         <div class="CreditsEntry">
           <span class="CreditsEntry__title">Cymraeg</span>
-          <a class="CreditsEntry__name" href="https://www.evalauren.co.uk">Eva Lauren Kelly ("thejsa")</a>
+          <a class="CreditsEntry__name" href="https://www.evalauren.co.uk">Eva Kelly</a>
         </div>
       </div>
       <div class="CreditsColumn CreditsColumn--legal">
@@ -283,8 +283,7 @@ const timestamp = format(parseISO(latestRelease.published_at), 'MMMM y');
   </PageSection>
 </BaseLayout>
 
-<style lang="scss"> 
-
+<style lang="scss">
   :global(#features) {
     max-width: 100%;
   }
@@ -311,7 +310,7 @@ const timestamp = format(parseISO(latestRelease.published_at), 'MMMM y');
 
   .FeatureGrid__itemImage {
     border-radius: 4px;
-    
+
     @include breakpoint-desktop {
       image-rendering: auto;
       image-rendering: crisp-edges;
@@ -392,7 +391,7 @@ const timestamp = format(parseISO(latestRelease.published_at), 'MMMM y');
     font-size: var(--font-size-small);
     display: flex;
     margin-bottom: .5em;
-    
+
     > * {
       margin-right: .5em;
     }
@@ -446,7 +445,7 @@ const timestamp = format(parseISO(latestRelease.published_at), 'MMMM y');
   }
 
   .Btw__card {
-    @include punchcard;
+    @include motif-punchcard;
     background: var(--color-bg-dark);
     color: var(--color-text-light);
     font-weight: 700;
