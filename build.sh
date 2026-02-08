@@ -49,7 +49,7 @@ if [ $CMD == "build" ]; then
   echo "compiling prod device build..."
   # compile C
   cd build
-  cmake -DCMAKE_TOOLCHAIN_FILE=${SDK}/C_API/buildsupport/arm.cmake ..
+  cmake -DCMAKE_TOOLCHAIN_FILE=${SDK}/C_API/buildsupport/arm.cmake .
   make
   cd ..
   # compile lua and assets, tell pdc to compile lua without debug symbols
