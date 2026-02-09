@@ -65,7 +65,9 @@ function sounds:playSfx(sampleName, callbackFn)
     local sample = sfx[sampleName]
     -- print('playing ' .. sampleName)
     sample:play(1)
-    sample:setFinishCallback(callbackFn)
+    if callbackFn then
+      sample:setFinishCallback(callbackFn)
+    end
   end
 end
 
