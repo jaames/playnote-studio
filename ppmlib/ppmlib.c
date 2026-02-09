@@ -27,7 +27,7 @@ void registerPpmlib()
 	ppmAudioRegister();
 }
 
-static player_ctx* getPlayerCtx(int n) 
+static player_ctx* getPlayerCtx(int n)
 {
 	return pd->lua->getArgObject(n, "PpmPlayer", NULL);
 }
@@ -84,7 +84,7 @@ static int ppmlib_new(lua_State* L)
 	int y = pd->lua->getArgInt(2);
 
 	player_ctx* ctx = playerNew((u16)x, (u16)y);
-	
+
 	pd->lua->pushObject(ctx, "PpmPlayer", 0);
 	return 1;
 }
@@ -101,7 +101,7 @@ static int ppmlib_index(lua_State* L)
 {
 	if (pd->lua->indexMetatable() == 1)
 		return 1;
-	
+
 	player_ctx* ctx = getPlayerCtx(1);
 	const char* key = pd->lua->getArgString(2);
 
@@ -133,7 +133,7 @@ static int ppmlib_open(lua_State* L)
 	player_ctx* ctx = getPlayerCtx(1);
 	const char* filePath = pd->lua->getArgString(2);
 	int res = playerOpenPpm(ctx, pd_strdup(filePath));
-	
+
 	if (res == -1)
 	{
 		pd->lua->pushBool(0);
@@ -200,9 +200,9 @@ static int ppmlib_drawFrameToBitmap(lua_State* L)
 	int width = 0;
 	int height = 0;
 	int stride = 0;
-	int hasMask = 0;
-	u8* bitmapBuffer;
-	pd->graphics->getBitmapData(bitmap, &width, &height, &stride, &hasMask, &bitmapBuffer);
+	u8* alphaBuffer;
+	u8* colorBuffer;
+	pd->graphics->getBitmapData(bitmap, &width, &height, &stride, &alphaBuffer, &colorBuffer);
 	if (width != PPM_SCREEN_WIDTH || height != PPM_SCREEN_HEIGHT)
 	{
 		pd_log("Error with layer bitmap");
@@ -210,12 +210,11 @@ static int ppmlib_drawFrameToBitmap(lua_State* L)
 	}
 	// bitmap data is comprised of two maps for each channel, one after the other
 	int mapSize = height * stride;
-	void* colorBuffer = bitmapBuffer; // each bit is 0 for black, 1 for white
-	if (hasMask)
+	if (alphaBuffer != NULL)
 	{
-		void* alphaBuffer = bitmapBuffer + mapSize; // each bit is 0 for transparent, 1 for opaque
 		memset(alphaBuffer, 0xFF, mapSize); // fill alpha map - so all pixels are opaque
 	}
+
 	blitPpmFrame(ctx, frameIndex, colorBuffer, 0, 0, stride);
 	return 0;
 }

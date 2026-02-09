@@ -29,11 +29,11 @@ LCDBitmap* tmbGetPdBitmap(tmb_ctx_t* ctx)
 	int width = 0;
 	int height = 0;
 	int rowBytes = 0;
-	int hasMask = 0;
+	u8* alphaData;
 	u8* bitmapData;
-	
+
 	LCDBitmap* bitmap = pd->graphics->newBitmap(PPM_THUMBNAIL_WIDTH, PPM_THUMBNAIL_HEIGHT, kColorBlack);
-	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &hasMask, &bitmapData);
+	pd->graphics->getBitmapData(bitmap, &width, &height, &rowBytes, &alphaData, &bitmapData);
 
 	tmbGetThumbnail(ctx, pixels);
 
@@ -55,7 +55,7 @@ LCDBitmap* tmbGetPdBitmap(tmb_ctx_t* ctx)
 				switch (ppmThumbnailPaletteGray[pixels[src++]])
 				{
 					// black
-					case 0: 
+					case 0:
 						chunk &= MASK_tmbDitherNone[patternOffset + shift];
 						break;
 					// dark gray (polka pattern, inverted)
@@ -121,7 +121,7 @@ static int tmb_index(lua_State* L)
 {
 	if (pd->lua->indexMetatable() == 1)
 		return 1;
-	
+
 	tmb_ctx_t* ctx = getTmbCtx(1);
 	const char* key = pd->lua->getArgString(2);
 
