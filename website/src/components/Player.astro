@@ -153,9 +153,14 @@ const pxSize = `${size}px`;
   .Demo__credit {
     color: var(--color-text-accent);
     z-index: 10;
-    transform: rotate(3deg);
-    font-weight: 700;
+    transform: rotate(3.2deg);
     margin-top: .25rem;
+    text-align: center;
+    height: 20px;
+    min-width: 24ch;
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .Demo__creditLink {
@@ -197,7 +202,7 @@ const pxSize = `${size}px`;
     }
 
     @include breakpoint-desktop {
-      margin-right: 145px;
+      margin-right: 155px;
       margin-top: -50px;
       margin-bottom: 50px;
     }

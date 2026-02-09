@@ -64,7 +64,7 @@ const releases = releaseData.map((release) => {
     display: flex;
     margin-bottom: 2rem;
     border-radius: 18px;
-    font-weight: 700;
+    /* font-weight: 700; */
 
     @include breakpoint-below-desktop {
       flex-direction: column;
@@ -119,6 +119,8 @@ const releases = releaseData.map((release) => {
 
   .ReleaseCard__title {
     margin-top: -0.25em;
+    font-weight: 900;
+    font-size: 1.3rem;
   }
 
   .ReleaseCard__stat {
@@ -152,7 +154,11 @@ const releases = releaseData.map((release) => {
     }
 
     ul, p {
-      margin-bottom: .5em;
+      margin-bottom: .1em;
+    }
+
+    li {
+      margin-bottom: .3rem;
     }
   }
 
