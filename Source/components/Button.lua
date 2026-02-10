@@ -86,7 +86,6 @@ function Button:click()
 end
 
 function Button:setText(prelocaleText)
-  gfx.setFontTracking(2)
   local text = locales:replaceKeysInText(prelocaleText)
   local textW, textH = gfx.getTextSize(text)
   self.prelocaleText = prelocaleText
@@ -166,7 +165,6 @@ function Button:draw(clipX, clipY, clipW, clipH)
   end
   -- draw text if present
   if self.localisedText then
-    gfx.setFontTracking(2)
     gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
     gfx.drawTextInRect(self.localisedText, textX, self.textY, textW, self.textH, nil, '...', self.textAlign)
     gfx.setImageDrawMode(0)

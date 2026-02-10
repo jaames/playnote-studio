@@ -9,21 +9,21 @@ local ROW_LAYER2 <const> = 164
 
 local RECT_LABELS <const> = playdate.geometry.rect.new(
   COL_BLACK - 44,
-  ROW_LABELS - 4, 
+  ROW_LABELS - 4,
   (COL_BLUE - COL_BLACK) + (44 * 2),
   27
 )
 
 local RECT_LAYER1 <const> = playdate.geometry.rect.new(
   COL_ICON - 44,
-  ROW_LAYER1 - 28, 
+  ROW_LAYER1 - 28,
   (COL_BLUE - COL_ICON) + (44 * 2),
   56
 )
 
 local RECT_LAYER2 <const> = playdate.geometry.rect.new(
   COL_ICON - 44,
-  ROW_LAYER2 - 28, 
+  ROW_LAYER2 - 28,
   (COL_BLUE - COL_ICON) + (44 * 2),
   56
 )
@@ -91,7 +91,6 @@ function DitheringScreen:drawBg(x, y, w, h)
   gfx.fillRoundRect(RECT_LABELS, 6)
 
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  gfx.setFontTracking(2)
   gfx.drawTextAligned(locales:getText('DITHER_COLOUR_BLACK'), COL_BLACK, ROW_LABELS, kTextAlignment.center)
   gfx.drawTextAligned(locales:getText('DITHER_COLOUR_RED'),   COL_RED,   ROW_LABELS, kTextAlignment.center)
   gfx.drawTextAligned(locales:getText('DITHER_COLOUR_BLUE'),  COL_BLUE,  ROW_LABELS, kTextAlignment.center)

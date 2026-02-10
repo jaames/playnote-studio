@@ -18,7 +18,6 @@ end
 
 function KeyValList:addRow(label, value)
   if value == nil then return end
-  gfx.setFontTracking(1)
   local i = #self.rows + 1
   local textW = self.width - self.padding * 2
   local labelW, labelH = gfx.getTextSizeForMaxWidth(label, textW)
@@ -65,7 +64,6 @@ function KeyValList:draw()
   self.bg:drawInRect(0, 0, self.width, self.height)
   gfx.setColor(gfx.kColorBlack)
   gfx.setPattern(HR_PATTERN)
-  gfx.setFontTracking(1)
   for i, row in ipairs(self.rows) do
     -- draw label/value row
     if type(row) == 'table' then

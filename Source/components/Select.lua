@@ -131,7 +131,6 @@ end
 function Select:draw(clipX, clipY, clipW, clipH)
   Select.super.draw(self, clipX, clipY, clipW, clipH)
   local w, h = self.width, self.height
-  gfx.setFontTracking(1)
   local currValueLabel = self.optionShortLabels[self.activeOptionIndex]
   local labelW, labelH = gfx.getTextSize(currValueLabel)
   local boxPad = 10
@@ -374,7 +373,6 @@ function SelectMenu:draw()
   -- draw selection focus
   local menuX = MENU_X
   local menuY = MENU_Y - self.menuScroll
-  gfx.setFontTracking(1)
   gfx.setColor(gfx.kColorWhite)
   gfx.fillRoundRect(MENU_X - 8, MENU_Y - 8, OPTION_WIDTH + 16, OPTION_HEIGHT + 16, (OPTION_HEIGHT + 16) / 2)
   -- draw option items
