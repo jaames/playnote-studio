@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "ppm.h"
+#include "utils.h"
 
 #include <math.h>
 #include <string.h>
@@ -35,6 +36,13 @@ static int diffTable[89][16];
 
 static s32 predictor;
 static s8  stepIndex;
+
+typedef struct ppm_audio_track_header_t
+{
+  s16 initialPredictor;
+  u8  initialStepIndex;
+	u8  pad;
+} ppm_audio_track_header_t;
 
 void ppmAudioRegister();
 u32 ppmAudioNumSamples(ppm_ctx_t* ctx);
