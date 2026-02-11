@@ -1,7 +1,6 @@
 #include "audio.h"
 #include "platform.h"
 #include "types.h"
-#include <stdio.h>
 
 /*
 	Builds diffTable for all possible stepIndex and sample combinations,
