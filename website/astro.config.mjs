@@ -25,7 +25,10 @@ export default {
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: `@import "src/styles/vars.scss";`
+          additionalData: [
+            `@use "src/styles/vars" as *;`,
+            `@use "src/styles/mixins" as *;`
+          ].join('\n')
         }
       }
     }

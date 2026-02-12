@@ -15,14 +15,24 @@ char* pd_strdup(const char* str)
 	return s;
 }
 
-int clamp(int n, int l, int h)
+inline int clamp(int n, int l, int h)
 {
 	if (n < l) return l;
 	if (n > h) return h;
 	return n;
 }
 
-int mod(int x, int n)
+inline int mod(int x, int n)
 {
 	return (x % n + n) % n;
+}
+
+inline int max(int a, int b)
+{
+	return a > b ? a : b;
+}
+
+inline int min(int a, int b)
+{
+	return a < b ? a : b;
 }

@@ -44,12 +44,11 @@ end
 function Clock:draw()
   local w = self.width
   local h = self.height
-  gfx.setFontTracking(1)
   gfx.setColor(gfx.kColorWhite)
   gfx.fillRect(0, 0, w, h)
   self.font:drawText(self.dateString, 10, 10)
-  self.clockGfx:draw(90, 7)
-  self.font:drawText(self.timeString, 108, 10)
+  self.clockGfx:draw(82, 7)
+  self.font:drawText(self.timeString, 100, 10)
   gfx.setColor(gfx.kColorBlack)
   gfx.setLineWidth(1)
   gfx.drawRect(1, 1, w-1, h-1)

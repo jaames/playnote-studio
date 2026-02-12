@@ -141,7 +141,6 @@ function dialog:show(text, type)
   self.type = type
   self.text = text
   -- calc text position
-  gfx.setFontTracking(1)
   local _, textH = gfx.getTextSizeForMaxWidth(text, self.width - 16, nil)
   local textSpace = DIALOG_H
   if type ~= dialog.kTypeError then
@@ -284,6 +283,5 @@ end
 function dialog:draw()
   local w, h = self.width, self.height
   dialogGfx:drawInRect(0, 0, w, h)
-  gfx.setFontTracking(1)
   gfx.drawTextInRect(self.text, 8, self.textY, w - 16, h - 16, nil, nil, kTextAlignment.center)
 end

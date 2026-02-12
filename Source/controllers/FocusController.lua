@@ -55,6 +55,9 @@ function FocusController:setFocus(sprite, muteSfx)
     self.selection:unfocus()
   end
   if sprite == nil then return end
+  if not muteSfx then
+    sounds:playSfx('selectionChange')
+  end
   sprite:focus()
   local rect = sprite:getBoundsRect()
   local center = rect:centerPoint()
@@ -63,9 +66,6 @@ function FocusController:setFocus(sprite, muteSfx)
   self.selectionCenter = center
   self.selectionCenterRect = playdate.geometry.rect.new(center.x, center.y, 0, 0)
   self:emitScreenHook('select:change', sprite, rect)
-  if not muteSfx then
-    sounds:playSfx('selectionChange')
-  end
   self.focusMoveCallback(sprite)
 end
 

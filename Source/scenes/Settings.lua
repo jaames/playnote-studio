@@ -30,7 +30,7 @@ function SettingsScreen:setupSprites()
   about:setIcon('./gfx/icon_about')
   about:onClick(function ()
     dialog:alert(''
-      .. '*Playnote Studio*\n'
+      .. 'Playnote Studio\n'
       .. 'https://playnote.studio\n'
       .. '\n'
       .. locales:getTextFormatted('ABOUT_VERSION', tostring(playdate.metadata.version)) .. '\n'

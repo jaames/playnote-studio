@@ -19,7 +19,7 @@ const tilt = `${ titleTilt }deg`;
 <style define:vars={{ tilt }} lang="scss">
 
   .PageSection {
-    @include wrapper;
+    @include layout-wrapper;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -33,11 +33,6 @@ const tilt = `${ titleTilt }deg`;
   .PageSection__title {
     margin-top: 8em;
     margin-bottom: 3em;
-
-    @include breakpoint-desktop {
-      margin-top: 10em;
-      margin-bottom: 5em;
-    }
   }
 
   .CardDecal {

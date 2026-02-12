@@ -1,7 +1,8 @@
 #include "audio.h"
 #include "platform.h"
+#include "types.h"
 
-/* 
+/*
 	Builds diffTable for all possible stepIndex and sample combinations,
 	seems to help improve load times on the Playdate quite a bit!
 	This should only be called when registering the ppm libray
@@ -40,8 +41,17 @@ static s16 ppmAudioDecodeSample(u8 sample)
 /* Decodes a raw IMA-ADPCM buffer to PCM-16. */
 void ppmAudioDecodeBuffer(const u8* in, s16* out, u32 length)
 {
-	predictor = 0;
-	stepIndex = 0;
+  predictor = 0;
+  stepIndex = 0;
+
+  if (length > 4)
+  {
+    ppm_audio_track_header_t* header = (ppm_audio_track_header_t*)in;
+    predictor = header->initialPredictor;
+    stepIndex = header->initialStepIndex;
+    in += 4;
+    length -= 4;
+  }
 
 	while (length--)
 	{
@@ -66,7 +76,7 @@ void ppmAudioProcess(const s16* in, s16* out, u32 samples, u32 srcFreq, int add)
 
 		/* Clip output to lessen distortion. */
 		CLAMP(samp, -32768, 32767);
-		
+
 		out[n] = samp;
 	}
 }
@@ -89,10 +99,11 @@ void ppmAudioRender(ppm_ctx_t* ctx, s16* out, int maxSize)
 	bgmSampleRate   = (u32)round((ctx->frameRate / ctx->bgmFrameRate) * SAMPLE_RATE);
 
 	/* 4-bit -> 16-bit, so multiply by 4. */
-	trackLengths[0] = ctx->sndHdr.bgmLength   * 4;
-	trackLengths[1] = ctx->sndHdr.seLength[0] * 4;
-	trackLengths[2] = ctx->sndHdr.seLength[1] * 4;
-	trackLengths[3] = ctx->sndHdr.seLength[2] * 4;
+	/* Subtract 4 to account for initial sample / step index data */
+	trackLengths[0] = max(ctx->sndHdr.bgmLength - 4, 0) * 4;
+	trackLengths[1] = max(ctx->sndHdr.seLength[0] - 4, 0) * 4;
+	trackLengths[2] = max(ctx->sndHdr.seLength[1] - 4, 0) * 4;
+	trackLengths[3] = max(ctx->sndHdr.seLength[2] - 4, 0) * 4;
 
 	/* Allocate memory for decoded PCM. */
 	bgm   = pd_malloc(trackLengths[0]);

@@ -1,4 +1,6 @@
 @use 'sass:math';
+@use '../vars.scss' as *;
+@use './breakpoints' as *;
 
 // layout wrapper - constrains the overall page width
 @mixin wrapper {
@@ -13,11 +15,11 @@
   padding-left: css-max(env(safe-area-inset-left), #{ $wrapper-padding });
   padding-right: css-max(env(safe-area-inset-right), #{ $wrapper-padding });
 
-  @include breakpoint-tablet {
+  @include tablet {
     max-width: $tablet-wrapper-width;
   }
 
-  @include breakpoint-desktop {
+  @include desktop {
     max-width: $wrapper-width;
   }
 

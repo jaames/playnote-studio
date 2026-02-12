@@ -1,0 +1,16 @@
+@use '../vars.scss' as *;
+@use './breakpoints' as *;
+
+@mixin panel {
+  padding: $padding-mobile;
+  border-radius: $border-radius-mobile;
+  @include desktop {
+    padding: $padding;
+    border-radius: $border-radius;
+  }
+}
+
+@mixin punchcard {
+  -webkit-mask-image: radial-gradient(circle at center 22px, transparent 6px, white 6px);
+  mask-image: radial-gradient(circle at center 22px, transparent 16x, white 6px);
+}

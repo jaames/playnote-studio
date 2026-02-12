@@ -7,13 +7,15 @@ _https://playnote.studio_
 %CREDITS_HEADER_JAMES%
 
 James Daniel
-_twitter.com/rakujira_
+_jaames.co.uk_
+_bsky.app/profile/jaames.co.uk_
 _github.com/jaames_
 
 
 %CREDITS_HEADER_PARSER%
 
 Simon Aarons
+_simonti.me_
 _twitter.com/ItsSimonTime_
 _github.com/simontime_
 
@@ -38,12 +40,12 @@ _ryusite.cyber-ninja.jp_
 
 Français
 
-Eva Lauren Kelly (thejsa)
+Eva Kelly
 _www.evalauren.co.uk_
-_twitter.com/thejsa___
+_https://woof.tech/@eval_
 
 thomasnet
-_twitter.com/thomasnet__mc_
+_bsky.app/profile/thomasnet.bsky.social_
 
 Español
 
@@ -73,7 +75,7 @@ _kaasiand.cool_
 Polski
 
 Twarda
-_twitter.com/Twarda8_
+_bsky.app/profile/twarda.bsky.social_
 _www.artstation.com/twarda_
 
 Русский
@@ -85,15 +87,15 @@ _UCbyMzNGlTGHxLRlShJDoD3Q_
 
 Cymraeg
 
-Eva Lauren Kelly (thejsa)
+Eva Kelly
 _www.evalauren.co.uk_
-_twitter.com/thejsa___
+_https://woof.tech/@eval_
 
 
 %CREDITS_HEADER_THANKS%
 
 Matt Sephton
-_twitter.com/gingerbeardman_
+_blog.gingerbeardman.com_
 
 Kaeru Team
 _kaeru.world_
@@ -103,10 +105,10 @@ _www.sudomemo.net_
 
 Austin Burk
 _github.com/sudofox_
-_twitter.com/AustinSudomemo_
+_bsky.app/profile/sudofox.bsky.social_
 
 NioXoiN
-_twitter.com/NioXoiN_
+_bsky.app/profile/nioxoin.bsky.social_
 
 
 %CREDITS_HEADER_ARTISTS%
@@ -154,7 +156,7 @@ _github.com/jaames_
 
 %CREDITS_HEADER_PACKETS%
 
-Lauren Kelly
+Eva Kelly
 _github.com/thejsa_
 
 

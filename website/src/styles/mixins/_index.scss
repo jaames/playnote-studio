@@ -1,5 +1,6 @@
-@import './breakpoints';
-// @import './grid';
-@import './layout';
-@import './animation';
-@import './utils';
+@forward './breakpoints' as breakpoint-*;
+// @forward './grid';
+@forward './layout' as layout-*;
+@forward './animation' as animation-*;
+@forward './utils' as util-*;
+@forward './motif' as motif-*;

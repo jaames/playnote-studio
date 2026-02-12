@@ -26,14 +26,14 @@
       margin-bottom: -3em;
     }
   }
- 
+
   .FaqBubble {
-    margin-bottom: 2em;
+    margin-bottom: 1em;
     max-width: 80%;
     position: relative;
     font-weight: 700;
     padding: 24px;
-    @include panel;
+    @include motif-panel;
 
     :global(a) {
       font-weight: 900;
@@ -74,10 +74,10 @@
     background: var(--color-bg-accent);
     margin-left: auto;
     margin-bottom: 3em;
-    transform: rotate(1deg);
+    transform: rotate(.5deg);
 
     .FaqBubble__inner {
-      transform: rotate(-1deg);
+      transform: rotate(-.5deg);
     }
 
     &::after {

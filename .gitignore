@@ -4,6 +4,7 @@ build/*
 *.bin
 *.dylib
 *.dll
+*.elf
 
 assets/sample_packs
 .DS_Store
